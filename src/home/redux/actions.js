@@ -1,0 +1,821 @@
+import { Alert } from 'react-native';
+import FireStore from '@react-native-firebase/firestore';
+import FireAuth from '@react-native-firebase/auth';
+import FireStorage from '@react-native-firebase/storage';
+import ImageResizer from 'react-native-image-resizer';
+
+import { setProfile } from '../../profile/redux/actions';
+import { updateDiscoveryPost, deleteDiscoveryPost } from '../../discover/redux/actions';
+import * as constants from './constants';
+import { useDispatch } from 'react-redux';
+
+const PostsCollection = FireStore().collection('posts');
+const ProfilesCollection = FireStore().collection('profiles');
+const ReportPostCollection = FireStore().collection('reports')
+const BlockUsersCollection = FireStore().collection("blockUsers")
+
+
+const getHomePostsQuery = PostsCollection.orderBy('createdAt', 'desc').limit(10);
+
+/**
+ * GET_HOME_POSTS
+ */
+export const getHomePosts = () => async (dispatch) => {
+  try {
+    console.log("enter ooo ")
+    dispatch({ type: constants.GET_HOME_POSTS.SUCCESS, payload: [] });
+
+    dispatch({ type: constants.GET_HOME_POSTS.REQUEST });
+    const currentUserUid = FireAuth().currentUser.uid;
+    const currentUserProfile = await (await ProfilesCollection.doc(currentUserUid).get()).data();
+    const followingUsers = currentUserProfile.followings;
+
+    // GET ALL POSTS
+    const postSnapshot = await getHomePostsQuery.get();
+    const allPosts = [];
+    if (!postSnapshot.empty) {
+      postSnapshot.forEach((snapshot) => {
+        allPosts.push({
+          ...snapshot.data(),
+          id: snapshot.id,
+        });
+      });
+    } else {
+      dispatch({ type: constants.GET_HOME_POSTS.SUCCESS, payload: [] });
+    }
+
+    // FILTERING FOLLOWING USERS POSTS FROM ALL POSTS 
+    const followedUserPost = [];
+    for (let i = 0; i < allPosts.length; i++) {
+      for (let j = 0; j < followingUsers.length; j++) {
+        if (followingUsers[j] === allPosts[i].author) {
+          followedUserPost.push(allPosts[i]);
+        }
+      }
+      if (allPosts[i].author === currentUserUid) {
+        followedUserPost.push(allPosts[i])
+      }
+    };
+
+    // POPULATE AUTHOR
+    const populatedPosts = await Promise.all(followedUserPost.map(async (post) => {
+      const author = await (await ProfilesCollection.doc(post?.author).get()).data();
+      return {
+        ...post,
+        author: {
+          userId: author?.userId,
+          username: author?.username,
+          profileImage: author?.profileImage,
+        },
+      }
+    }))
+    const alreadyBlockUsersCollection = await BlockUsersCollection.where('blockedBy' , '==' , currentUserUid).get()
+    const alreadyBlockUsersId = alreadyBlockUsersCollection.docs
+    let blockedUsersId = []
+    alreadyBlockUsersId.forEach((item) => {
+      blockedUsersId.push(item.data())
+    })
+    console.log("alreadyBlockUsersIdsHome11 - > ", blockedUsersId)
+
+    let finalPopularPosts = []
+    if (blockedUsersId.length > 0) {
+      populatedPosts.forEach((item) => {
+        blockedUsersId.forEach((blockData) => {
+          blockData.blockUserId.forEach((mdata) => {
+            console.log("print -- > " , mdata)
+            if (item.author.userId != mdata) {
+              finalPopularPosts.push(item)
+            }
+          })
+        })
+        
+      })
+    }else{
+      finalPopularPosts = populatedPosts
+    }
+    // alreadyBlockUsersId.forEach((item) => {
+    //   console.log("alreadyBlockUsersIdsHome11 - > ", item.get())
+    // })
+    // populatedPosts.filter((item) => item.author)
+    console.log("popularPosts --- > ", populatedPosts, " \n\n postsLength - > ", populatedPosts.length)
+
+    dispatch({ type: constants.GET_HOME_POSTS.SUCCESS, payload: finalPopularPosts });
+  } catch (error) {
+    dispatch({ type: constants.GET_HOME_POSTS.FAIL, error });
+  } finally {
+    dispatch({ type: constants.GET_HOME_POSTS.COMPLETE });
+  }
+};
+
+
+export const getMyHomePosts = async () => {
+  try {
+    const currentUserUid = FireAuth().currentUser.uid;
+    const currentUserProfile = await (await ProfilesCollection.doc(currentUserUid).get()).data();
+    const followingUsers = currentUserProfile.followings;
+
+    // GET ALL POSTS
+    const postSnapshot = await getHomePostsQuery.get();
+    const allPosts = [];
+    if (!postSnapshot.empty) {
+      postSnapshot.forEach((snapshot) => {
+        allPosts.push({
+          ...snapshot.data(),
+          id: snapshot.id,
+        });
+      });
+    } else {
+      return []
+    }
+
+    // FILTERING FOLLOWING USERS POSTS FROM ALL POSTS 
+    const followedUserPost = [];
+    for (let i = 0; i < allPosts.length; i++) {
+      for (let j = 0; j < followingUsers.length; j++) {
+        if (followingUsers[j] === allPosts[i].author) {
+          followedUserPost.push(allPosts[i]);
+        }
+      }
+      if (allPosts[i].author === currentUserUid) {
+        followedUserPost.push(allPosts[i])
+      }
+    };
+
+    // POPULATE AUTHOR
+    const populatedPosts = await Promise.all(followedUserPost.map(async (post) => {
+      const author = await (await ProfilesCollection.doc(post?.author).get()).data();
+      return {
+        ...post,
+        author: {
+          userId: author?.userId,
+          username: author?.username,
+          profileImage: author?.profileImage,
+        },
+      }
+    }))
+
+    const alreadyBlockUsersCollection = await BlockUsersCollection.where('blockedBy' , '==' , currentUserUid).get()
+    const alreadyBlockUsersId = alreadyBlockUsersCollection.docs
+    let blockedUsersId = []
+    alreadyBlockUsersId.forEach((item) => {
+      blockedUsersId.push(item.data())
+    })
+    console.log("alreadyBlockUsersIdsHome11 - > ", blockedUsersId)
+
+    let finalPopularPosts = []
+    if (blockedUsersId.length > 0) {
+      populatedPosts.forEach((item) => {
+        blockedUsersId.forEach((blockData) => {
+          blockData.blockUserId.forEach((mdata) => {
+            console.log("print -- > " , mdata)
+            if (item.author.userId != mdata) {
+              finalPopularPosts.push(item)
+            }
+          })
+        })
+        
+      })
+    }else{
+      finalPopularPosts = populatedPosts
+    }
+   
+    // console.log("alreadyBlockUsersIdsHome - > ", alreadyBlockUsersId)
+    // // populatedPosts.filter((item) => item.author)
+
+    return finalPopularPosts
+    // dispatch({ type: constants.GET_HOME_POSTS.SUCCESS, payload: populatedPosts });
+  } catch (error) {
+    return []
+    // dispatch({ type: constants.GET_HOME_POSTS.FAIL, error });
+  }
+}
+
+export const getUserProfilesById = async (likedUserList) => {
+  let userDataList = []
+  for (let index = 0; index < likedUserList.length; index++) {
+    const item = likedUserList[index];
+    const userProfileOfPost = await (await ProfilesCollection.doc(item).get()).data()
+    if (userProfileOfPost) {
+      userDataList.push(userProfileOfPost)
+    }
+  }
+  return userDataList
+}
+
+//get user post
+export const getPostsByID = async (userId) => {
+  const userPosts = await PostsCollection.where('author', '==', userId).get()
+  const userProfileOfPost = await (await ProfilesCollection.doc(userId).get()).data()
+  const authorObj = {
+    profileImage: userProfileOfPost.profileImage,
+    userId: userProfileOfPost.userId,
+    username: userProfileOfPost.username
+  }
+  let totalUserPost = []
+  userPosts.forEach(doc => {
+    if (doc.exists) {
+      const mObj = { ...doc.data(), author: authorObj }
+      totalUserPost.push(mObj)
+    }
+  })
+  return totalUserPost
+}
+
+/**
+ * REFRESH_HOME_POSTS
+ */
+export const refreshHomePosts = (lastDocId) => async (dispatch) => {
+  try {
+    dispatch({ type: constants.REFRESH_HOME_POSTS.REQUEST });
+    const currentUserUid = FireAuth().currentUser.uid;
+    const prevDoc = await PostsCollection.doc(lastDocId).get();
+    const currentUserProfile = await (await ProfilesCollection.doc(currentUserUid).get()).data();
+    const followingUsers = currentUserProfile.followings;
+
+    const postSnapshot = await getHomePostsQuery.startAfter(prevDoc).get();
+    const allPosts = [];
+    if (!postSnapshot.empty) {
+      postSnapshot.forEach((snapshot) => {
+        allPosts.push({
+          ...snapshot.data(),
+          id: snapshot.id,
+        });
+      });
+    };
+
+    // FILTERING FOLLOWING USERS POSTS FROM ALL POSTS AND ADDING USERS OWN POSTS 
+    const followedUserPost = [];
+    for (let i = 0; i < allPosts.length; i++) {
+      for (let j = 0; j < followingUsers.length; j++) {
+        if (followingUsers[j] === allPosts[i].author) {
+          followedUserPost.push(allPosts[i]);
+        }
+      }
+      if (allPosts[i].author === currentUserUid) {
+        followedUserPost.push(allPosts[i])
+      }
+    };
+
+    // POPULATE AUTHOR
+    const populatedPosts = await Promise.all(followedUserPost.map(async (post) => {
+      const author = await (await ProfilesCollection.doc(post?.author).get()).data();
+      return {
+        ...post,
+        author: {
+          userId: author?.userId,
+          username: author?.username,
+          profileImage: author?.profileImage,
+        },
+      }
+    }))
+
+    const alreadyBlockUsersCollection = await BlockUsersCollection.where('blockedBy' , '==' , currentUserUid).get()
+    const alreadyBlockUsersId = alreadyBlockUsersCollection.docs
+    let blockedUsersId = []
+    alreadyBlockUsersId.forEach((item) => {
+      blockedUsersId.push(item.data())
+    })
+    console.log("alreadyBlockUsersIdsHome11 - > ", blockedUsersId)
+
+    let finalPopularPosts = []
+    if (blockedUsersId.length > 0) {
+      populatedPosts.forEach((item) => {
+        blockedUsersId.forEach((blockData) => {
+          blockData.blockUserId.forEach((mdata) => {
+            console.log("print -- > " , mdata)
+            if (item.author.userId != mdata) {
+              finalPopularPosts.push(item)
+            }
+          })
+        })
+        
+      })
+    }else{
+      finalPopularPosts = populatedPosts
+    }
+
+    dispatch({
+      type: constants.REFRESH_HOME_POSTS.SUCCESS,
+      payload: finalPopularPosts,
+    });
+  } catch (error) {
+    dispatch({ type: constants.REFRESH_HOME_POSTS.FAIL, error });
+  } finally {
+    dispatch({ type: constants.REFRESH_HOME_POSTS.COMPLETE });
+  }
+};
+
+/**
+ * CREATE POST
+ */
+export const createPost = (postContent) => async (dispatch) => {
+  try {
+    dispatch({ type: constants.CREATE_POST.REQUEST });
+    const { title, description, items, order, isNumberShowInItems } = postContent;
+    const postId = Date.now();
+    const authorId = FireAuth().currentUser.uid;
+
+    const post = {
+      id: postId,
+      title,
+      order,
+      isNumberShowInItems,
+      description,
+      likes: 0,
+      shares: 0,
+      comments: [],
+      likedUsers: [],
+      author: authorId,
+
+      createdAt: FireStore.FieldValue.serverTimestamp(),
+    };
+
+    console.log("postCreateRequest - ? ")
+
+    if (items) {
+      post.items = await Promise.all(items.map(async (item, index) => {
+        let uploadImgUrl = ""
+        console.log("printItem - > " , item)
+        if (item.image && item.image.uri != "") {
+          const compressedImage = await ImageResizer.createResizedImage(item.image.uri, 1000, 1000, 'PNG', 100, 0);
+          const storageRef = FireStorage().ref('post_media').child(item.image.fileName);
+          await storageRef.putFile(compressedImage.uri)
+          uploadImgUrl = await storageRef.getDownloadURL();
+        }
+
+        return {
+          id: index,
+          name: item.name,
+          image: uploadImgUrl,
+          description: item.description,
+        };
+      }));
+    };
+
+    await PostsCollection.doc(`${postId}`).set(post);
+
+    const createdPost = await (await PostsCollection.doc(postId).get()).data();
+    const postAuthor = await (await ProfilesCollection.doc(createdPost?.author).get()).data();
+    const populatedPost = {
+      ...createPost,
+      author: {
+        userId: postAuthor?.userId,
+        username: postAuthor?.username,
+        profileImage: postAuthor?.profileImage,
+      },
+    };
+
+    dispatch({ type: constants.CREATE_POST.SUCCESS, payload: populatedPost });
+  } catch (error) {
+    dispatch({ type: constants.CREATE_POST.FAIL, error });
+  } finally {
+    dispatch({ type: constants.CREATE_POST.COMPLETE });
+  }
+};
+
+
+/**
+ * UPDATED_POST
+ */
+export const updatePost = (changes) => async (dispatch) => {
+  try {
+    dispatch({ type: constants.UPDATED_POST.REQUEST });
+    const post = {
+      ...changes,
+      author: changes?.author?.userId,
+    }
+
+    if (post?.items) {
+      post.items = await Promise.all(post?.items.map(async (item, index) => {
+        if (typeof item.image === 'object') {
+          const storageRef = FireStorage().ref('post_media').child(item.image.fileName);
+          await storageRef.putFile(item.image.uri)
+          const uploadImgUrl = await storageRef.getDownloadURL();
+
+          return {
+            id: index,
+            name: item.name,
+            image: uploadImgUrl,
+            description: item.description,
+          };
+        } else {
+          return {
+            id: index,
+            name: item.name,
+            image: item?.image,
+            description: item.description,
+          };
+        }
+      }));
+    };
+
+    await PostsCollection.doc(changes.id).update(post);
+
+    const updatedPost = await (await PostsCollection.doc(changes.id).get()).data();
+    const postAuthor = await (await ProfilesCollection.doc(updatedPost?.author).get()).data();
+    const populatedPost = {
+      ...updatedPost,
+      author: {
+        userId: postAuthor?.userId,
+        username: postAuthor?.username,
+        profileImage: postAuthor?.profileImage,
+      },
+    };
+
+    if (populatedPost?.likes >= 2) {
+      dispatch(updateDiscoveryPost(populatedPost));
+    }
+
+    dispatch({ type: constants.UPDATED_POST.SUCCESS, payload: populatedPost });
+  } catch (error) {
+    Alert.alert(error.message);
+    dispatch({ type: constants.UPDATED_POST.FAIL, error });
+  } finally {
+    dispatch({ type: constants.UPDATED_POST.COMPLETE });
+  }
+};
+
+
+
+
+/**
+ * DELETE_POST
+ */
+export const deletePost = (postId) => async (dispatch) => {
+  try {
+    dispatch({ type: constants.DELETE_POST.REQUEST });
+    const currentUserUid = FireAuth().currentUser.uid;
+    const currentUserProfile = await (await ProfilesCollection.doc(currentUserUid).get()).data();
+    const isLiked = currentUserProfile.likedPosts?.find(id => id === postId);
+
+    await PostsCollection.doc(`${postId}`).delete();
+    if (isLiked) {
+      await ProfilesCollection.doc(currentUserUid).update({
+        likedPosts: currentUserProfile.likedPosts.filter((id) => id !== postId),
+      });
+      dispatch(deleteDiscoveryPost(postId));
+    };
+
+    dispatch({
+      type: constants.DELETE_POST.SUCCESS,
+      payload: postId,
+    });
+
+
+  } catch (error) {
+    Alert.alert(error.message);
+    dispatch({ type: constants.DELETE_POST.FAIL, error });
+
+  } finally {
+    dispatch({ type: constants.DELETE_POST.COMPLETE });
+
+  }
+};
+
+
+export const deletePostComment = async (postId, commentId) => {
+  const currentUserUid = FireAuth().currentUser.uid;
+  const filterPost = await (await PostsCollection.doc(postId).get()).data()
+  if (filterPost.comments.length > 0) {
+    let commentsList = filterPost.comments.filter((item) => item.id !== commentId)
+    await PostsCollection.doc(postId).update({
+      comments: [
+        ...commentsList
+      ],
+    })
+  }
+}
+
+export const reportAgainstThisPost = async (postID, reportTxt, reportCount) => {
+  const currentUserUid = FireAuth().currentUser.uid;
+  const reportPostData = {
+    reportUserId: currentUserUid,
+    reportMessage: reportTxt
+  }
+  if (reportCount == 1)
+    reportPostData["reprtPostAuthorID"] = postID
+  else
+    reportPostData["reportPostId"] = postID
+
+  console.log("report -- > ", reportPostData)
+  const reportPostDoc = await ReportPostCollection.doc().set(reportPostData)
+  console.log("reportPostDoc -- > ", reportPostDoc)
+
+}
+
+export const blockUsers = async (blockUserId) => {
+  const currentUserUid = FireAuth().currentUser.uid;
+  console.log("currentUserId - > " , currentUserUid)
+  const alreadyBlockUsersCollection = await BlockUsersCollection.where('blockedBy' , '==' , currentUserUid).get()
+  const alreadyBlockUsersId = alreadyBlockUsersCollection.docs
+  let mBlockUserIds = []
+  console.log("printBlockUsersId - > " , alreadyBlockUsersId)
+  if (alreadyBlockUsersId) {
+    mBlockUserIds = alreadyBlockUsersId
+  }
+  mBlockUserIds.push(blockUserId)
+  const blockUsersData = {
+    blockedBy: currentUserUid,
+    blockUserId: mBlockUserIds
+  }
+  console.log("printBlockUsersData - > " , blockUsersData)
+  await BlockUsersCollection.doc().set(blockUsersData)
+}
+
+export const likeUnlikePostComments = async (postId, commentId) => {
+  const currentUserUid = FireAuth().currentUser.uid;
+  const filterPost = await (await PostsCollection.doc(postId).get()).data()
+  if (filterPost.comments.length > 0) {
+    let commentsList = filterPost.comments
+    const commentForUpdate = commentsList.find((item) => item.id == commentId)
+    let commentListIndex = commentsList.indexOf(commentForUpdate)
+    if (commentForUpdate.likedUsers.find((id) => id == currentUserUid)) {
+      const likeUserList = commentForUpdate.likedUsers.filter((item) => item !== currentUserUid)
+      commentForUpdate.likedUsers = likeUserList
+      commentsList[commentListIndex] = commentForUpdate
+
+      await PostsCollection.doc(postId).update({
+        comments: [
+          ...commentsList
+        ],
+      })
+    } else {
+      const likeUserList = commentForUpdate.likedUsers
+      likeUserList.push(currentUserUid)
+      commentForUpdate.likedUsers = likeUserList
+      commentsList[commentListIndex] = commentForUpdate
+
+      await PostsCollection.doc(postId).update({
+        comments: [
+          ...commentsList
+        ],
+      })
+    }
+  }
+}
+
+//Edit Comment
+
+export const editCommentOfMine = async (commentData, postId) => {
+  const currentUserUid = FireAuth().currentUser.uid;
+  try {
+    const filterPost = await (await PostsCollection.doc(postId).get()).data()
+    let commentsList = filterPost.comments
+    const updatedObj = filterPost.comments.find((obj) => obj.id == commentData.id)
+    let commentListIndex = filterPost.comments.indexOf(updatedObj)
+    commentsList[commentListIndex] = commentData
+    await PostsCollection.doc(postId).update({
+      comments: [
+        ...commentsList
+      ],
+    })
+    console.log("updatedObj Successfully - > ")
+    // if (filterPost.comments.find((obj) => obj.id == commentData.id)) {
+    //   const likeUserList = filterPost.likedUsers.filter((item) => item !== currentUserUid)
+    //   const likeCount = filterPost.likes - 1
+    //   await PostsCollection.doc(postId).update({
+    //     likedUsers: [
+    //       ...likeUserList
+    //     ],
+    //     likes: likeCount
+    //   })
+    // } else {
+    //   console.log("Added 000 > ")
+    //   const likeUserList = filterPost.likedUsers
+    //   likeUserList.push(currentUserUid)
+    //   const likeCount = filterPost.likes + 1
+    //   await PostsCollection.doc(postId).update({
+    //     likedUsers: [
+    //       ...likeUserList
+    //     ],
+    //     likes: likeCount
+    //   })
+    // }
+  } catch (error) {
+    console.log("printError - > ", error, error.message)
+  }
+}
+
+
+export const addReplyInComment = async (commentData, postId) => {
+  const currentUserUid = FireAuth().currentUser.uid;
+  try {
+    const filterPost = await (await PostsCollection.doc(postId).get()).data()
+    let commentsList = filterPost.comments
+    const updatedObj = filterPost.comments.find((obj) => obj.id == commentData.id)
+    let commentListIndex = filterPost.comments.indexOf(updatedObj)
+    commentsList[commentListIndex] = commentData
+    await PostsCollection.doc(postId).update({
+      comments: [
+        ...commentsList
+      ],
+    })
+    console.log("updatedObj Successfully - > ")
+    // if (filterPost.comments.find((obj) => obj.id == commentData.id)) {
+    //   const likeUserList = filterPost.likedUsers.filter((item) => item !== currentUserUid)
+    //   const likeCount = filterPost.likes - 1
+    //   await PostsCollection.doc(postId).update({
+    //     likedUsers: [
+    //       ...likeUserList
+    //     ],
+    //     likes: likeCount
+    //   })
+    // } else {
+    //   console.log("Added 000 > ")
+    //   const likeUserList = filterPost.likedUsers
+    //   likeUserList.push(currentUserUid)
+    //   const likeCount = filterPost.likes + 1
+    //   await PostsCollection.doc(postId).update({
+    //     likedUsers: [
+    //       ...likeUserList
+    //     ],
+    //     likes: likeCount
+    //   })
+    // }
+  } catch (error) {
+    console.log("printError - > ", error, error.message)
+  }
+}
+
+
+export const likeUnlikeUserPosts = async (postId) => {
+  const currentUserUid = FireAuth().currentUser.uid;
+  try {
+    const filterPost = await (await PostsCollection.doc(postId).get()).data()
+
+    if (filterPost.likedUsers.find((id) => id == currentUserUid)) {
+      const likeUserList = filterPost.likedUsers.filter((item) => item !== currentUserUid)
+      const likeCount = filterPost.likes - 1
+      await PostsCollection.doc(postId).update({
+        likedUsers: [
+          ...likeUserList
+        ],
+        likes: likeCount
+      })
+    } else {
+      console.log("Added 000 > ")
+      const likeUserList = filterPost.likedUsers
+      likeUserList.push(currentUserUid)
+      const likeCount = filterPost.likes + 1
+      await PostsCollection.doc(postId).update({
+        likedUsers: [
+          ...likeUserList
+        ],
+        likes: likeCount
+      })
+    }
+  } catch (error) {
+    console.log("printError - > ", error, error.message)
+  }
+}
+
+/**
+ * POST_LIKE
+ */
+export const likePost = (postId) => async (dispatch) => {
+  try {
+    dispatch({ type: constants.POST_LIKE.REQUEST });
+    const currentUserUid = FireAuth().currentUser.uid;
+    const userProfile = await (await ProfilesCollection.doc(currentUserUid).get()).data();
+
+    // CHECKING IF USER ALREADY LIKED THE POST AND UPDATING USER PROFILE DOCUMENT  
+    if (!userProfile.likedPosts.find((id) => id === postId)) {
+      await ProfilesCollection.doc(currentUserUid).update({
+        likedPosts: [
+          ...userProfile.likedPosts,
+          postId,
+        ]
+      })
+    };
+
+    const updatedUserProfile = await (await ProfilesCollection.doc(currentUserUid).get()).data();
+
+    // IF USER PROFILE LIKED POSTS ARRAY UPDATED THEN UPDATED POSTS LIKE COUNT
+    if (updatedUserProfile.likedPosts.find((id => id === postId))) {
+      const likedPostDoc = await (await PostsCollection.doc(postId).get()).data();
+      await PostsCollection.doc(postId).update({
+        likes: likedPostDoc.likes + 1,
+      });
+    }
+    // Populate Author
+    const updatedPostDoc = await (await PostsCollection.doc(postId).get()).data();
+    const postAuthor = await (await ProfilesCollection.doc(updatedPostDoc?.author).get()).data();
+    const populatedPost = {
+      ...updatedPostDoc,
+      author: {
+        userId: postAuthor?.userId,
+        username: postAuthor?.username,
+        profileImage: postAuthor?.profileImage,
+      },
+    };
+
+    dispatch(setProfile(updatedUserProfile));
+
+    if (populatedPost?.likes >= 2) {
+      dispatch(updateDiscoveryPost(populatedPost));
+    }
+
+    dispatch({ type: constants.POST_LIKE.SUCCESS, payload: populatedPost });
+  } catch (error) {
+    dispatch({ type: constants.POST_LIKE.FAIL, error });
+  } finally {
+    dispatch({ type: constants.POST_LIKE.COMPLETE });
+  }
+};
+
+
+
+/**
+ * POST_DISLIKE
+ */
+export const dislikePost = (postId) => async (dispatch) => {
+  try {
+    dispatch({ type: constants.POST_DISLIKE.REQUEST });
+    const currentUserUid = FireAuth().currentUser.uid;
+    const userProfile = await (await ProfilesCollection.doc(currentUserUid).get()).data();
+
+    // CHECKING IF USER ALREADY LIKED THE POST AND UPDATING USER PROFILE DOCUMENT  
+    if (userProfile.likedPosts.find((id) => id === postId)) {
+      await ProfilesCollection.doc(currentUserUid).update({
+        likedPosts: userProfile?.likedPosts.filter((id) => id !== postId),
+      })
+    };
+    const updatedUserProfile = await (await ProfilesCollection.doc(currentUserUid).get()).data();
+
+    // IF USER PROFILE LIKED POSTS ARRAY UPDATED THEN UPDATED POSTS LIKE COUNT
+    if (!updatedUserProfile.likedPosts.find((id => id === postId))) {
+      const likedPostDoc = await (await PostsCollection.doc(postId).get()).data();
+      await PostsCollection.doc(postId).update({
+        likes: likedPostDoc.likes > 0 ? likedPostDoc.likes - 1 : 0,
+      });
+    }
+    // Populate Author
+    const updatedPostDoc = await (await PostsCollection.doc(postId).get()).data();
+    const postAuthor = await (await ProfilesCollection.doc(updatedPostDoc.author).get()).data();
+    const populatedPost = {
+      ...updatedPostDoc,
+      author: {
+        userId: postAuthor?.userId,
+        username: postAuthor?.username,
+        profileImage: postAuthor?.profileImage,
+      },
+    };
+
+    dispatch(setProfile(updatedUserProfile));
+
+    if (populatedPost?.likes >= 2) {
+      dispatch(updateDiscoveryPost(populatedPost));
+    } else {
+      dispatch(deleteDiscoveryPost(postId))
+    }
+
+    dispatch({ type: constants.POST_DISLIKE.SUCCESS, payload: populatedPost });
+  } catch (error) {
+    dispatch({ type: constants.POST_DISLIKE.FAIL, error });
+  } finally {
+    dispatch({ type: constants.POST_DISLIKE.COMPLETE });
+  }
+};
+
+
+/**
+ * COMMENT_POST
+ */
+export const postComment = (commentData) => async (dispatch) => {
+  try {
+    dispatch({ type: constants.COMMENT_POST.REQUEST });
+
+    const post = await (await PostsCollection.doc(commentData.postId).get()).data();
+
+    await PostsCollection.doc(commentData.postId).update({
+      comments: [
+        ...post?.comments,
+        commentData,
+      ]
+    });
+
+    // Populate Author
+    const updatedPostDoc = await (await PostsCollection.doc(commentData.postId).get()).data();
+    const postAuthor = await (await ProfilesCollection.doc(updatedPostDoc.author).get()).data();
+    const populatedPost = {
+      ...updatedPostDoc,
+      author: {
+        userId: postAuthor?.userId,
+        username: postAuthor?.username,
+        profileImage: postAuthor?.profileImage,
+      },
+    };
+
+    if (populatedPost?.likes >= 2) {
+      dispatch(updateDiscoveryPost(populatedPost));
+    }
+
+    dispatch({ type: constants.COMMENT_POST.SUCCESS, payload: populatedPost });
+  } catch (error) {
+    dispatch({ type: constants.COMMENT_POST.FAIL, error });
+  } finally {
+    dispatch({ type: constants.COMMENT_POST.COMPLETE });
+  }
+};
+
+

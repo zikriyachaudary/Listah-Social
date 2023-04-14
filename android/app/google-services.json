@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "301520722423",
+    "project_id": "listah-ae13c",
+    "storage_bucket": "listah-ae13c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:301520722423:android:045f262a240676a44d36f2",
+        "android_client_info": {
+          "package_name": "com.listaapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "301520722423-2cjl6nk1i2vu3qg2g7j88birvl6mpfjb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBXaGQAO8FIUTGk0Qf169V0WJWsJB9x6NA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "301520722423-2cjl6nk1i2vu3qg2g7j88birvl6mpfjb.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "301520722423-3gpr5r15gvsulq3bm6jrt0vl1nf3tt4p.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.listaapp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
