@@ -1,24 +1,37 @@
-import React from 'react';
-import { useNavigation } from '@react-navigation/native';
+import React, { useEffect } from "react";
+import { useNavigation } from "@react-navigation/native";
 
-import { StackHeader } from '../../common'
-import AddIcon from '../../assets/icons/edit-plus-square.svg';
-import HomeHeaderProfileInfo from './HomeHeaderProfileInfo';
-import { Image, TouchableOpacity, View } from 'react-native';
+import { StackHeader } from "../../common";
+import AddIcon from "../../assets/icons/edit-plus-square.svg";
+import NavSearch from "../../assets/icons/nav-search.svg";
+
+import HomeHeaderProfileInfo from "./HomeHeaderProfileInfo";
+import { Image, TouchableOpacity, View } from "react-native";
 
 /* =============================================================================
 <HomeListHeader />
 ============================================================================= */
-const HomeListHeader = ({ postRefresh, filterClick }) => {
+const HomeListHeader = ({
+  postRefresh,
+  filterClick,
+  searchClicked,
+  listSize,
+}) => {
   const navigation = useNavigation();
 
-  const _handleCreatePostPress = () => navigation.navigate('PostCreate', { postRefresh: postRefresh })
+  const _handleCreatePostPress = () =>
+    navigation.navigate("PostCreate", { postRefresh: postRefresh });
 
   return (
     <View>
       <StackHeader
         left={<AddIcon />}
+        right={listSize > 0 ? <NavSearch /> : null}
+        rightContainerStyle={{
+          justifyContent: "center",
+        }}
         onLeftPress={_handleCreatePostPress}
+        onRightPress={searchClicked}
       />
       <HomeHeaderProfileInfo />
       {/* <View style={{
@@ -39,7 +52,6 @@ const HomeListHeader = ({ postRefresh, filterClick }) => {
           />
         </TouchableOpacity>
       </View> */}
-
     </View>
   );
 };

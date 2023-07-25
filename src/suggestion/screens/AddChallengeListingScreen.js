@@ -1,10 +1,8 @@
 import React, { useState } from "react";
-import * as yup from "yup";
-import { connect } from "react-redux";
-import FastImage from "react-native-fast-image";
 import { StyleSheet } from "react-native";
+import * as yup from "yup";
 import { Formik, FieldArray, ErrorMessage } from "formik";
-
+import FastImage from "react-native-fast-image";
 import {
   View,
   Button,
@@ -18,18 +16,29 @@ import {
 } from "../../common";
 import DeleteIcon from "../../assets/icons/edit-trash-icon.svg";
 import AddIcon from "../../assets/icons/edit-plus-square.svg";
+import { connect, useDispatch, useSelector } from "react-redux";
 
 import { getLoading } from "../redux/selectors";
-import { createPost as createPostAction } from "../redux/actions";
+import { challengePost as challengePostAction } from "../redux/actions";
 import { useEffect } from "react";
 import { RadioGroup } from "react-native-radio-buttons-group";
 import CheckBox from "@react-native-community/checkbox";
+import { createPost as createPostAction } from "../redux/actions";
+import { challengePost, createPost } from "../../home/redux/actions";
+import { updateHomeData } from "../../home/redux/appLogics";
+import { UPDATE_CHALLENGE_FEATURE } from "../redux/constants";
 
-/* =============================================================================
-<PostCreateScreen />
-============================================================================= */
-const PostCreateScreen = ({ navigation, loading, createPost, route }) => {
+
+const AddChallengeListingScreen = ({
+  createPost,
+  challengePost,
+  navigation,
+  route,
+}) => {
+  const post = route.params.post;
+  const items = post?.items;
   const [isShowAddBtn, setShowAddBtn] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [radioButtons, setRadioButtons] = useState([
     {
       id: "1", // acts as primary key, should be unique and non-empty string
@@ -45,9 +54,11 @@ const PostCreateScreen = ({ navigation, loading, createPost, route }) => {
       borderColor: "#6d14c4",
     },
   ]);
+  const dispatch = useDispatch()
+  const selector = useSelector((AppState) => AppState)
 
   const _handleAdd = (arrayHelpers) => {
-    let arraySize = arrayHelpers.form.values.items.length + 1
+    let arraySize = arrayHelpers.form.values.items.length + 1;
     arrayHelpers.push({
       name: "",
       image: "",
@@ -63,7 +74,7 @@ const PostCreateScreen = ({ navigation, loading, createPost, route }) => {
   const [toggleCheckBox, setToggleCheckBox] = useState(false);
 
   const _handleRemove = (arrayHelpers, index) => {
-    let arraySize = arrayHelpers.form.values.items.length - 1
+    let arraySize = arrayHelpers.form.values.items.length - 1;
 
     arrayHelpers.remove(index);
     if (arraySize < 10) {
@@ -74,11 +85,16 @@ const PostCreateScreen = ({ navigation, loading, createPost, route }) => {
   };
 
   const _handleSubmit = async (values) => {
+    console.log("clickkkkkk", values);
     values["order"] = radioButtons.find((item) => item.selected).id;
     values["isNumberShowInItems"] = toggleCheckBox;
-    // console.log("printValues - > " , values)
-    await createPost(values);
-    route.params.postRefresh();
+    setLoading(true);
+    await challengePost(values, post);
+    setLoading(false);
+    UPDATE_CHALLENGE_FEATURE.isUpdate = true
+    dispatch(updateHomeData(!selector.Home.updateHomeData))
+
+    navigation.goBack();
     navigation.goBack();
   };
 
@@ -86,7 +102,6 @@ const PostCreateScreen = ({ navigation, loading, createPost, route }) => {
     console.log("radiooooooo ", radioButtonsArray);
     setRadioButtons(radioButtonsArray);
   };
-
   return (
     <Container style={styles.content}>
       <StackHeader />
@@ -108,21 +123,7 @@ const PostCreateScreen = ({ navigation, loading, createPost, route }) => {
             render={(arrayHelpers) => (
               <Content contentContainerStyle={styles.content}>
                 <View center>
-                  <TextInput
-                    value={values.title}
-                    onBlur={handleBlur("title")}
-                    errorText={errors?.title}
-                    maxLength = {55}
-                    onChangeText={handleChange("title")}
-                    placeholder="What's your List Title..."
-                  />
-                  <TextInput
-                    value={values.description}
-                    onBlur={handleBlur("description")}
-                    errorText={errors?.description}
-                    onChangeText={handleChange("description")}
-                    placeholder="Post description..."
-                  />
+                  <Text bold>Create your challenge list:</Text>
                   {values.items && values.items.length > 0
                     ? values.items.map((item, index) => (
                         <View
@@ -257,7 +258,7 @@ const PostCreateScreen = ({ navigation, loading, createPost, route }) => {
                 </View>
                 <View center>
                   <Button
-                    title="Upload"
+                    title="Challenge"
                     loading={loading}
                     onPress={handleSubmit}
                   />
@@ -271,8 +272,21 @@ const PostCreateScreen = ({ navigation, loading, createPost, route }) => {
   );
 };
 
+const mapStateToProps = (state) => ({
+  loading: getLoading(state),
+});
+
+const mapDispatchToProps = {
+  challengePost: challengePost,
+  createPost: createPost,
+};
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(AddChallengeListingScreen);
+
 const initialValues = {
-  title: "",
   items: [
     {
       name: "",
@@ -283,8 +297,8 @@ const initialValues = {
 };
 
 const schema = yup.object().shape({
-  title: yup.string().required("!Empty Field"),
-  description: yup.string().required("!Empty Field"),
+  //   title: yup.string().required("!Empty Field"),
+  //   description: yup.string().required("!Empty Field"),
   items: yup.array().of(
     yup.object().shape({
       name: yup.string().required("!Empty Field"),
@@ -341,13 +355,3 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
 });
-
-const mapStateToProps = (state) => ({
-  loading: getLoading(state),
-});
-
-const mapDispatchToProps = {
-  createPost: createPostAction,
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(PostCreateScreen);

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import { Alert, StyleSheet } from 'react-native';
 
@@ -27,7 +27,10 @@ const SelectSuggestionScreen = ({ mpost, navigation, route }) => {
   const postId = post?.id;
   const postTitle = post?.title;
 
-  console.log("printPost - > " , post)
+
+  useEffect(()=>{
+    console.log("printPost999 - > " , post, authorId)
+  }, [])
 
   const _handleSelect = (id) => setSelected(id);
 
@@ -40,6 +43,10 @@ const SelectSuggestionScreen = ({ mpost, navigation, route }) => {
     }
 
   };
+
+  const _handleChallengeClicked = () => {
+    navigation.navigate('AddChalleenge', {post : post})
+  }
 
   const _handleAddPress = () => navigation.navigate('SuggestionAdd', { postId, postTitle, authorId });
 
@@ -62,6 +69,8 @@ const SelectSuggestionScreen = ({ mpost, navigation, route }) => {
           <Button  style={{flex: 0.3, marginHorizontal: 5, paddingHorizontal : 2}} btnTxtStyles = {{fontSize: 11}}  title='Add' onPress={_handleAddPress} />
           <Button style={{flex: 0.3, marginStart: 5, paddingHorizontal : 2}} btnTxtStyles = {{fontSize: 11}} title='Delete' onPress={_handleDeletePress} />
         </View>
+        <Button style={{width : 120, height : 50, marginEnd: 5, paddingHorizontal : 2, alignSelf : "center", marginVertical: 40}} btnTxtStyles = {{fontSize: 11}} title='Challenge' onPress={_handleChallengeClicked} />
+
         <View horizontal style={styles.itemsContainer}>
           {items.length && items.map((item) => (
             <Touchable
@@ -74,6 +83,9 @@ const SelectSuggestionScreen = ({ mpost, navigation, route }) => {
             </Touchable>
           ))}
         </View>
+
+
+
       </Content>
     </Container >
   );

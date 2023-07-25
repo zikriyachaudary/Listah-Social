@@ -7,6 +7,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Avatar, Touchable, View } from '../../common';
 import EditIcon from '../../assets/icons/edit-icon.svg';
 import * as Colors from '../../config/colors';
+import LoadingImage from '../../common/LoadingImage';
 
 /* =============================================================================
 <ProfileHeader />
@@ -30,7 +31,19 @@ const ProfileHeader = ({ photoUrl }) => {
           <EditIcon />
         </Touchable>
       </View>
-      <Avatar size={160} url={{ uri: `${photoUrl}` }} />
+      {/* <Avatar size={160} url={{ uri: `${photoUrl}` }} /> */}
+      <LoadingImage
+          source={{ uri: `${photoUrl}` }}
+          style={{
+            width: 160,
+            height: 160,
+            borderRadius: 2,
+            borderWidth: 1.4,
+            borderRadius: 160 / 2,
+            backgroundColor: Colors.outline,
+            borderColor: "yellow",
+          }}
+        />
     </LinearGradient>
   );
 };

@@ -47,6 +47,7 @@ export const getLikedPosts = () => async (dispatch) => {
 
     // POPULATE AUTHOR
     const populatedPosts = await Promise.all(posts.map(async (post) => {
+     
       const author = await (await ProfileCollection.doc(post?.author).get()).data();
       return {
         ...post,
@@ -57,9 +58,18 @@ export const getLikedPosts = () => async (dispatch) => {
         },
       }
     }))
-    console.log("likedPosts - > " , populatedPosts)
+    const compList = populatedPosts.map((item) => {
+      let itemsTitleAndDescription = "";
+      item.items.forEach((element) => {
+        itemsTitleAndDescription += element.name + element.description;
+      });
+      const mSearchTxts =
+        item.title + item.description + itemsTitleAndDescription;
+      const obj = { ...item, searchTxt: mSearchTxts };
+      return obj;
+    });
 
-    dispatch({ type: constants.GET_LIKED_POSTS.SUCCESS, payload: populatedPosts });
+    dispatch({ type: constants.GET_LIKED_POSTS.SUCCESS, payload: compList });
   } catch (error) {
     dispatch({ type: constants.GET_LIKED_POSTS.FAIL, error });
   } finally {
@@ -103,7 +113,18 @@ export const refreshLikedPosts = (prevDocId) => async (dispatch) => {
       }
     }))
 
-    dispatch({ type: constants.REFRESH_LIKED_POSTS.SUCCESS, payload: populatedPosts });
+    const compList = populatedPosts.map((item) => {
+      let itemsTitleAndDescription = "";
+      item.items.forEach((element) => {
+        itemsTitleAndDescription += element.name + element.description;
+      });
+      const mSearchTxts =
+        item.title + item.description + itemsTitleAndDescription;
+      const obj = { ...item, searchTxt: mSearchTxts };
+      return obj;
+    });
+
+    dispatch({ type: constants.REFRESH_LIKED_POSTS.SUCCESS, payload: compList });
   } catch (error) {
     dispatch({ type: constants.REFRESH_LIKED_POSTS.FAIL, error });
   } finally {

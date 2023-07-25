@@ -8,6 +8,8 @@ import PostCreateScreen from './PostCreateScreen';
 import PostEditScreen from './PostEditScreen';
 import ReportPost from './ReportPost'
 import { getLoginUserNotificationCount } from '../../notification/redux/actions';
+import AddChallengeListingScreen from '../../suggestion/screens/AddChallengeListingScreen';
+import AcceptRejectChallenge from './AcceptRejectChallenge';
 
 const Stack = createNativeStackNavigator();
 
@@ -32,7 +34,9 @@ const HomeStack = () => {
       <Stack.Screen name="Home" component={HomeScreen} />
       <Stack.Screen name="MyPosts" component={MyPostsScreen} />
       <Stack.Screen name='ReportPost' component={ReportPost}/>
+      <Stack.Screen name='AcceptRejectChallenge' component={AcceptRejectChallenge}/>
       <Stack.Screen name="PostCreate" component={PostCreateScreen} />
+      <Stack.Screen name='AddChalleenge' component={AddChallengeListingScreen} />
       <Stack.Screen name="PostEdit" component={PostEditScreen} />
     </Stack.Navigator>
   );

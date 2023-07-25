@@ -7,6 +7,9 @@ import HomeIcon from '../../assets/icons/nav-home-icon.svg';
 import NotificationIcon from '../../assets/icons/nav-notification-icon.svg';
 import FollowingIcon from '../../assets/icons/nav-following-icon.svg';
 import DiscoverIcon from '../../assets/icons/nav-discover-icon.svg';
+// import DiscoverIcon from '../../assets/icons/nav-search-bottom.svg';
+
+
 import ProfileIcon from '../../assets/icons/nav-profile-icon.svg';
 import * as Colors from '../../config/colors';
 import { useSelector } from 'react-redux';
@@ -57,7 +60,7 @@ const HomeTabBar = ({ state, navigation }) => {
 
             {isFocused ? ICONS[index][1] : ICONS[index][0]}
             <Text xs style={isFocused ? styles.activeTxt : styles.txt}>
-              {route.name.slice(0, (route.name.indexOf('Stack')))}
+              {route.name.slice(0, (route.name.indexOf('Stack'))) == "Discover" ? "Search" : route.name.slice(0, (route.name.indexOf('Stack')))}
             </Text>
           </Touchable>
         );
