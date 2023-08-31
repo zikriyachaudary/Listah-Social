@@ -56,7 +56,7 @@ const SubCommentItem = ({ item, index, profile, author }) => {
             </View>
             <View style={{
                 flex: 1,
-                marginTop: 10,
+                marginTop: 3,
             }}>
                 <View style={styles.container}>
                     <View style={{
@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         paddingHorizontal: 10,
         alignItems: 'flex-start',
-        backgroundColor: '#f1f1f1'
+        // backgroundColor: '#f1f1f1'
     },
     txtContainer: {
         marginLeft: 10,
@@ -111,28 +111,28 @@ export const ShowMoreSubCommentView = ({ onClick }) => {
             <View style={{
                 marginEnd: 10,
                 flexDirection: "row",
-                marginStart: 40,
+                marginStart: 62,
             }}>
 
                 <View style={{
                     flexDirection: "row",
 
                 }}>
-                    <View style={{
+                    {/* <View style={{
                         height: 25,
                         width: 0.6,
-                        backgroundColor: 'gray'
+                        // backgroundColor: 'gray'
 
-                    }} />
+                    }} /> */}
                     <View
                         style={{
-                            height: 25,
+                            height: 4,
                             width: 15,
                             justifyContent: "flex-end"
                         }}>
                         <View style={{
                             height: 0.6,
-                            width: 15,
+                            width: 25,
                             backgroundColor: 'gray'
 
                         }} />
@@ -143,8 +143,8 @@ export const ShowMoreSubCommentView = ({ onClick }) => {
                         style={{
                             fontSize: 10,
                             color: "gray",
-                            marginTop: 15,
-                            marginStart: 10,
+                            marginTop: -5,
+                            marginStart: 30,
                             textDecorationLine: 'underline',
 
                         }}>Show more replies</Text>

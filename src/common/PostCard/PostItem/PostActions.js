@@ -53,7 +53,7 @@ const PostActions = ({
   const [likesCount, setLikesCount] = useState(post?.likes);
   const likedPosts = profile?.likedPosts;
   const authorId = post?.author?.userId;
-  const commentsCount = post?.comments?.length;
+  const [commentsCount, setCommentsCount] = useState(post?.comments?.length);
   const [liked, setLiked] = useState();
   const [loading, setLoading] = useState(false);
   const [commentModal, setCommentModal] = useState(false);
@@ -96,7 +96,10 @@ const PostActions = ({
     setLoading(false);
   };
 
-  const _toggleCommentModal = () => setCommentModal((prevState) => !prevState);
+  const _toggleCommentModal = (count = 0) => {
+    setCommentsCount(count)
+    setCommentModal((prevState) => !prevState)
+  };
 
   const _handleSharePress = async () => {
     try {
@@ -170,7 +173,9 @@ const PostActions = ({
         <Touchable
           horizontal
           style={{ ...styles.btn }}
-          onPress={_toggleCommentModal}
+          onPress={()=>{
+            _toggleCommentModal(commentsCount)
+          }}
         >
           <CommentIcon />
           <Text style={styles.btnTxt}>{commentsCount}</Text>

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, TouchableWithoutFeedback } from 'react-native';
 
 import { Avatar, Text, View } from '../../../common';
 import { getProfileById } from '../../../profile/redux/selectors';
@@ -24,6 +24,7 @@ const ProfileFollowersListItem = ({ id, profile }) => {
   }
 
   return (
+
     <View horizontal style={styles.container}>
       <Avatar url={{ uri: `${profileImage}` }} />
       <Text style={styles.txt}>{username}</Text>

@@ -32,6 +32,7 @@ const HomeListHeader = ({
         }}
         onLeftPress={_handleCreatePostPress}
         onRightPress={searchClicked}
+        isHome = {true}
       />
       <HomeHeaderProfileInfo />
       {/* <View style={{

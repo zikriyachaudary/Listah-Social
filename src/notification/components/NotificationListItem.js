@@ -1,6 +1,10 @@
 import { useNavigation } from "@react-navigation/native";
 import React from "react";
-import { StyleSheet, TouchableOpacity } from "react-native";
+import {
+  StyleSheet,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+} from "react-native";
 
 import { Avatar, Text, Touchable, View } from "../../common";
 import LoadingImage from "../../common/LoadingImage";
@@ -39,36 +43,40 @@ const NotificationListItem = ({ notification }) => {
             style={styles.profileImg}
             url={{ uri: `${senderProfilePic}` }}
           /> */}
-           <LoadingImage
-          source={{ uri: `${senderProfilePic}` }}
-          style={{
-            width: 50,
-            height: 50,
-            borderRadius: 2,
-            borderWidth: 1.4,
-            borderRadius: 50 / 2,
-            backgroundColor: Colors.outline,
-            borderColor: "yellow",
-          }}
-        />
+          <LoadingImage
+            source={{ uri: `${senderProfilePic}` }}
+            style={{
+              width: 50,
+              height: 50,
+              borderRadius: 2,
+              borderWidth: 1.4,
+              borderRadius: 50 / 2,
+              backgroundColor: Colors.outline,
+              borderColor: "yellow",
+            }}
+          />
         </TouchableOpacity>
         <Text sm>{`${senderProfileUsername} has a suggestion for you`}</Text>
       </Touchable>
     );
   }
   const postRefresh = () => {
-    console.log("click")
-  }
+    console.log("click");
+  };
 
   return (
-    <View horizontal style={styles.container}>
-         <TouchableOpacity
-          onPress={() => {
-            navigation.navigate('MyPosts', { userId: notification.sender.userId, username: notification.sender.username, refreshCall: postRefresh });
-          }}
-        >
-      {/* <Avatar style={styles.profileImg} url={{ uri: `${senderProfilePic}` }} /> */}
-      <LoadingImage
+    <TouchableWithoutFeedback
+      onPress={() => {
+        navigation.navigate("MyPosts", {
+          userId: notification.sender.userId,
+          username: notification.sender.username,
+          refreshCall: postRefresh,
+        });
+      }}
+    >
+      <View horizontal style={styles.container}>
+        {/* <Avatar style={styles.profileImg} url={{ uri: `${senderProfilePic}` }} /> */}
+        <LoadingImage
           source={{ uri: `${senderProfilePic}` }}
           style={{
             width: 50,
@@ -81,15 +89,16 @@ const NotificationListItem = ({ notification }) => {
             borderColor: "yellow",
           }}
         />
-      </TouchableOpacity>
-      <Text
-        style={{
-          flex: 1,
-          flexWrap: "wrap",
-        }}
-        sm
-      >{`${senderProfileUsername} is now Following you`}</Text>
-    </View>
+
+        <Text
+          style={{
+            flex: 1,
+            flexWrap: "wrap",
+          }}
+          sm
+        >{`${senderProfileUsername} is now Following you`}</Text>
+      </View>
+    </TouchableWithoutFeedback>
   );
 };
 

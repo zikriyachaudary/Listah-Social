@@ -88,6 +88,11 @@ const HomeScreen = ({ posts, getHomePosts, refreshHomePosts, getProfile }) => {
     getProfile();
   }, [selector.Home.updateHomeData]);
 
+  useEffect(() => {
+    setLoaderVisible(true);
+    getMyUserHomePosts();
+  }, [selector.Home.isPostRefresh]);
+
   const getMyUserHomePosts = async () => {
     const mHomePosts = await getMyHomePosts();
     allHomePosts = mHomePosts;
@@ -292,16 +297,16 @@ const HomeScreen = ({ posts, getHomePosts, refreshHomePosts, getProfile }) => {
           source={require("../../assets/images/edit-app-logo.jpeg")}
           // <UploadIcon />
           style={{
-            flex: 0.9
+            flex: 0.9,
           }}
         />
 
         <Image
           style={{
-            width : 35,
+            width: 35,
             height: 35,
             margin: 20,
-            marginTop : 40,
+            marginTop: 40,
             fontSize: 30,
             color: "black",
             position: "absolute",
@@ -309,8 +314,6 @@ const HomeScreen = ({ posts, getHomePosts, refreshHomePosts, getProfile }) => {
           }}
           source={require("../../assets/images/cross_ic.png")}
         />
-          
-        
       </ReactNativeModal>
     );
   };

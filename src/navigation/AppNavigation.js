@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { connect } from 'react-redux';
+import { connect, useDispatch, useSelector } from 'react-redux';
 import { StatusBar } from 'react-native';
 import RNSplashScreen from 'react-native-splash-screen';
 import FirebaseAuth from '@react-native-firebase/auth';
@@ -15,6 +15,8 @@ import * as Colors from '../config/colors';
 import { getUser } from '../auth/redux/selectors';
 import { getProfile as getProfileAction } from '../profile/redux/actions';
 import { changeAuthState as changeAuthStateAction } from '../auth/redux/actions';
+import FullImageModal from '../common/PostCard/PostItem/FullImageModal';
+import { showFullImage } from '../home/redux/appLogics';
 
 const Stack = createNativeStackNavigator();
 
@@ -23,6 +25,8 @@ const Stack = createNativeStackNavigator();
 ============================================================================= */
 const AppNavigation = ({ changeAuthState, getProfile, authenticated }) => {
   const [initializing, setInitializing] = useState(true);
+  const selector = useSelector((AppState) => AppState)
+  const dispatch = useDispatch()
 
   // firebase user state check 
   useEffect(() => {
@@ -68,6 +72,14 @@ const AppNavigation = ({ changeAuthState, getProfile, authenticated }) => {
           <Stack.Screen name="AuthStack" component={AuthStack} />
         )}
       </Stack.Navigator>
+
+      {selector.Home.showFullImage && selector.Home.fullImagePath !== "" && (
+        <FullImageModal
+          visible={selector.Home.showFullImage}
+          onClose={() => { dispatch(showFullImage(false))}}
+          userImage={selector.Home.fullImagePath}
+        />
+      )}
     </NavigationContainer>
   );
 };

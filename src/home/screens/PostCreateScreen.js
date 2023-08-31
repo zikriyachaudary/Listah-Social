@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import * as yup from "yup";
-import { connect } from "react-redux";
+import { connect, useDispatch, useSelector } from "react-redux";
 import FastImage from "react-native-fast-image";
 import { StyleSheet } from "react-native";
 import { Formik, FieldArray, ErrorMessage } from "formik";
@@ -24,6 +24,7 @@ import { createPost as createPostAction } from "../redux/actions";
 import { useEffect } from "react";
 import { RadioGroup } from "react-native-radio-buttons-group";
 import CheckBox from "@react-native-community/checkbox";
+import { setPostRefresh } from "../redux/appLogics";
 
 /* =============================================================================
 <PostCreateScreen />
@@ -45,6 +46,9 @@ const PostCreateScreen = ({ navigation, loading, createPost, route }) => {
       borderColor: "#6d14c4",
     },
   ]);
+  const dispatch = useDispatch()
+  const selector = useSelector((AppState) => AppState);
+
 
   const _handleAdd = (arrayHelpers) => {
     let arraySize = arrayHelpers.form.values.items.length + 1
@@ -73,12 +77,14 @@ const PostCreateScreen = ({ navigation, loading, createPost, route }) => {
     }
   };
 
-  const _handleSubmit = async (values) => {
+  const _handleSubmit = async (values, { resetForm }) => {
     values["order"] = radioButtons.find((item) => item.selected).id;
     values["isNumberShowInItems"] = toggleCheckBox;
     // console.log("printValues - > " , values)
     await createPost(values);
-    route.params.postRefresh();
+    // route.params.postRefresh();
+    dispatch(setPostRefresh(!selector.Home.isPostRefresh))
+    resetForm()
     navigation.goBack();
   };
 

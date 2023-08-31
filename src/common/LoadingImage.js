@@ -8,11 +8,15 @@ import {
 } from "react-native";
 import FastImage from "react-native-fast-image";
 import * as Colors from "../config/colors";
+import { useDispatch, useSelector } from "react-redux";
+import { setFullImageLink, showFullImage } from "../home/redux/appLogics";
 
 const LoadingImage = (props) => {
   // console.log(props.source);
   const [loading, setLoading] = useState(false);
   const [src, setSource] = useState(props.source);
+  const selector = useSelector((AppState) => AppState)
+  const dispatch = useDispatch()
 
   useEffect(() => {
     setSource(props.source);
@@ -45,6 +49,10 @@ const LoadingImage = (props) => {
 
       <TouchableWithoutFeedback
         onPress={() => {
+          if(!selector.Home.showFullImage){
+            dispatch(setFullImageLink(src))
+            dispatch(showFullImage(true))
+          }
           console.log("clicked -- > ");
         }}
       >

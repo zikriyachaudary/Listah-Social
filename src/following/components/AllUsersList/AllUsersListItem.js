@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { connect, useDispatch, useSelector } from "react-redux";
-import { StyleSheet } from "react-native";
+import { StyleSheet, TouchableWithoutFeedback } from "react-native";
 
 import { Avatar, Button, Text, View } from "../../../common";
 
@@ -12,6 +12,7 @@ import {
 import { updateHomeData } from "../../../home/redux/appLogics";
 import * as Colors from "../../../config/colors";
 import LoadingImage from "../../../common/LoadingImage";
+import { useNavigation } from "@react-navigation/native";
 
 /* =============================================================================
 <AllUsersListItem />
@@ -30,6 +31,7 @@ const AllUsersListItem = ({
   const selector = useSelector((AppState) => AppState);
   const isFollowed = userFollowings?.find((user) => user?.userId === userId);
 
+  const navigation = useNavigation();
   const _handleFollowPress = async () => {
     setLoading(true);
     await followUser(userId);
@@ -37,7 +39,9 @@ const AllUsersListItem = ({
 
     setLoading(false);
   };
-
+  const postRefresh = () => {
+    console.log("click");
+  };
   const _handleUnFollowPress = async () => {
     // if (isFollowed) {
     setLoading(true);
@@ -53,25 +57,35 @@ const AllUsersListItem = ({
 
   return (
     <View horizontal style={styles.container}>
-      <View horizontal>
-        {/* <Avatar url={{ uri: `${userProfileImage}` }} /> */}
-        <LoadingImage
-          source={{ uri: `${userProfileImage}` }}
-          style={{
-            width: 68,
-            height: 68,
-            borderRadius: 2,
-            marginVertical: 10,
-            borderWidth: 1.4,
-            borderRadius: 68 / 2,
-            backgroundColor: Colors.outline,
-            borderColor: "yellow",
-          }}
-        />
-        <Text style={styles.userNameText} numberOfLines={2}>
-          {userName}
-        </Text>
-      </View>
+      <TouchableWithoutFeedback
+        onPress={() => {
+          navigation.navigate("MyPosts", {
+            userId: userId,
+            username: userName,
+            refreshCall: postRefresh,
+          });
+        }}
+      >
+        <View horizontal>
+          {/* <Avatar url={{ uri: `${userProfileImage}` }} /> */}
+          <LoadingImage
+            source={{ uri: `${userProfileImage}` }}
+            style={{
+              width: 68,
+              height: 68,
+              borderRadius: 2,
+              marginVertical: 10,
+              borderWidth: 1.4,
+              borderRadius: 68 / 2,
+              backgroundColor: Colors.outline,
+              borderColor: "yellow",
+            }}
+          />
+          <Text style={styles.userNameText} numberOfLines={2}>
+            {userName}
+          </Text>
+        </View>
+      </TouchableWithoutFeedback>
       {isFollowed ? (
         <Button
           title="Unfollow"

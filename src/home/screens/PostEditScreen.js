@@ -179,9 +179,9 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   img: {
-    width: 66,
+    width: 50,
     height: 50,
-    borderRadius: 55 / 2,
+    borderRadius: 50 / 2,
     marginVertical: 0,
   },
   deleteBtn: {

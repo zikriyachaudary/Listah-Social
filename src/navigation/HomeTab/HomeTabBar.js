@@ -8,6 +8,7 @@ import NotificationIcon from '../../assets/icons/nav-notification-icon.svg';
 import FollowingIcon from '../../assets/icons/nav-following-icon.svg';
 import DiscoverIcon from '../../assets/icons/nav-discover-icon.svg';
 // import DiscoverIcon from '../../assets/icons/nav-search-bottom.svg';
+import AddIcon from "../../assets/icons/edit-plus-square.svg";
 
 
 import ProfileIcon from '../../assets/icons/nav-profile-icon.svg';
@@ -60,7 +61,7 @@ const HomeTabBar = ({ state, navigation }) => {
 
             {isFocused ? ICONS[index][1] : ICONS[index][0]}
             <Text xs style={isFocused ? styles.activeTxt : styles.txt}>
-              {route.name.slice(0, (route.name.indexOf('Stack'))) == "Discover" ? "Search" : route.name.slice(0, (route.name.indexOf('Stack')))}
+              {route.name.slice(0, (route.name.indexOf('Stack'))) == "Discover" ? "Add Post" : route.name.slice(0, (route.name.indexOf('Stack')))}
             </Text>
           </Touchable>
         );
@@ -79,8 +80,11 @@ const ICONS = {
     <FollowingIcon stroke={Colors.primary} />,
   ],
   2: [
-    <DiscoverIcon stroke="#999" />,
-    <DiscoverIcon stroke={Colors.primary} />,
+    
+    <AddIcon stroke="#999" />,
+    <AddIcon stroke={Colors.primary} />,
+    // <DiscoverIcon stroke="#999" />,
+    // <DiscoverIcon stroke={Colors.primary} />,
   ],
   3: [
     <NotificationIcon stroke="#999" />,

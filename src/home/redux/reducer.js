@@ -1,15 +1,24 @@
-import * as constants from './constants';
-import * as helpers from '../../util/reduxHelpers';
-import { NOTIFICATION_UNREAD, UPDATE_HOME_DATA } from './types';
+import * as constants from "./constants";
+import * as helpers from "../../util/reduxHelpers";
+import {
+  FULL_IMAGE_URL,
+  IS_POST_REFRESH,
+  NOTIFICATION_UNREAD,
+  SHOW_FULL_IMAGE,
+  UPDATE_HOME_DATA,
+} from "./types";
 
-export const LOADER_START = "FETCH"
+export const LOADER_START = "FETCH";
 const INITIAL_STATE = {
   byId: {},
   allIds: [],
   error: null,
   loading: false,
   updateHomeData: false,
-  notificationUnread: 0
+  notificationUnread: 0,
+  showFullImage: false,
+  fullImagePath: "",
+  isPostRefresh: false,
 };
 
 export default function reducer(state = INITIAL_STATE, action) {
@@ -26,20 +35,20 @@ export default function reducer(state = INITIAL_STATE, action) {
     case LOADER_START:
       return {
         ...state,
-        loading: action.data
+        loading: action.data,
       };
 
     case UPDATE_HOME_DATA:
       return {
         ...state,
-        updateHomeData: action.data
-      }
+        updateHomeData: action.data,
+      };
 
     case NOTIFICATION_UNREAD:
       return {
         ...state,
-        notificationUnread: action.data
-      }
+        notificationUnread: action.data,
+      };
     case constants.GET_HOME_POSTS.SUCCESS:
       return {
         ...helpers.merge(state, payload),
@@ -53,6 +62,23 @@ export default function reducer(state = INITIAL_STATE, action) {
       return {
         ...state,
         loading: false,
+      };
+
+    case SHOW_FULL_IMAGE:
+      return {
+        ...state,
+        showFullImage: action.data,
+      };
+
+    case IS_POST_REFRESH:
+      return {
+        ...state,
+        isPostRefresh: action.data,
+      };
+    case FULL_IMAGE_URL:
+      return {
+        ...state,
+        fullImagePath: action.data,
       };
 
     // REFRESH_HOME_POSTS
@@ -84,7 +110,7 @@ export default function reducer(state = INITIAL_STATE, action) {
       };
     case constants.CREATE_POST.SUCCESS:
       return {
-        ...helpers.add(state, payload)
+        ...helpers.add(state, payload),
       };
     case constants.CREATE_POST.FAIL:
       return {
@@ -105,7 +131,7 @@ export default function reducer(state = INITIAL_STATE, action) {
       };
     case constants.UPDATED_POST.SUCCESS:
       return {
-        ...helpers.update(state, payload)
+        ...helpers.update(state, payload),
       };
     case constants.UPDATED_POST.FAIL:
       return {
@@ -126,7 +152,7 @@ export default function reducer(state = INITIAL_STATE, action) {
       };
     case constants.DELETE_POST.SUCCESS:
       return {
-        ...helpers.remove(state, payload)
+        ...helpers.remove(state, payload),
       };
     case constants.DELETE_POST.FAIL:
       return {
@@ -189,7 +215,7 @@ export default function reducer(state = INITIAL_STATE, action) {
       };
     case constants.COMMENT_POST.SUCCESS:
       return {
-        ...helpers.update(state, payload)
+        ...helpers.update(state, payload),
       };
     case constants.COMMENT_POST.FAIL:
       return {

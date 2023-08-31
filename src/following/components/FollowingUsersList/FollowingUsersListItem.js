@@ -1,12 +1,13 @@
-import React, { useEffect, useState } from 'react';
-import { connect } from 'react-redux';
-import { StyleSheet } from 'react-native';
+import React, { useEffect, useState } from "react";
+import { connect } from "react-redux";
+import { StyleSheet, TouchableWithoutFeedback } from "react-native";
 
-import { Avatar, Button, Text, View } from '../../../common';
+import { Avatar, Button, Text, View } from "../../../common";
 
-import { unFollowUser as unFollowUserAction } from '../../redux/actions';
-import * as Colors from '../../../config/colors';
-import LoadingImage from '../../../common/LoadingImage';
+import { unFollowUser as unFollowUserAction } from "../../redux/actions";
+import * as Colors from "../../../config/colors";
+import LoadingImage from "../../../common/LoadingImage";
+import { useNavigation } from "@react-navigation/native";
 
 /* =============================================================================
 <FollowingUsersListItem />
@@ -16,24 +17,36 @@ const FollowingUsersListItem = ({ user, unFollowUser }) => {
   const userId = user?.userId;
   const userName = user?.username;
   const userProfileImage = user?.profileImage;
+  const navigation = useNavigation();
 
   const _handleUnFollowPress = async () => {
     setLoading(true);
     await unFollowUser(userId);
-    setLoading(false)
+    setLoading(false);
   };
 
   if (!user) {
-    return null
-  };
+    return null;
+  }
 
-  
+  const postRefresh = () => {
+    console.log("click");
+  };
 
   return (
     <View horizontal style={styles.container}>
-      <View horizontal>
-        {/* <Avatar url={{ uri: `${userProfileImage}` }} /> */}
-        <LoadingImage
+      <TouchableWithoutFeedback
+        onPress={() => {
+          navigation.navigate("MyPosts", {
+            userId: userId,
+            username: userName,
+            refreshCall: postRefresh,
+          });
+        }}
+      >
+        <View horizontal>
+          {/* <Avatar url={{ uri: `${userProfileImage}` }} /> */}
+          <LoadingImage
             source={{ uri: `${userProfileImage}` }}
             style={{
               width: 68,
@@ -46,10 +59,11 @@ const FollowingUsersListItem = ({ user, unFollowUser }) => {
               borderColor: "yellow",
             }}
           />
-        <Text style={styles.userNameTxt}>{userName}</Text>
-      </View>
+          <Text style={styles.userNameTxt}>{userName}</Text>
+        </View>
+      </TouchableWithoutFeedback>
       <Button
-        title='Unfollow'
+        title="Unfollow"
         loading={loading}
         style={styles.btn}
         btnTxtStyles={styles.btnTxtStyles}
@@ -62,17 +76,19 @@ const FollowingUsersListItem = ({ user, unFollowUser }) => {
 const styles = StyleSheet.create({
   container: {
     marginTop: 20,
-    justifyContent: 'space-between',
+    justifyContent: "space-between",
   },
   userNameTxt: {
     marginLeft: 10,
+    width: "45%",
+    flexWrap: "wrap",
   },
   btn: {
-    width: 120
+    width: 120,
   },
   btnTxtStyles: {
     fontSize: 12,
-  }
+  },
 });
 
 const mapDispatchToProps = {

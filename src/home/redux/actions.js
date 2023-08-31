@@ -273,6 +273,16 @@ export const getPostsByID = async (userId) => {
   return totalUserPost;
 };
 
+export const getPostInfoById = async (postId) => {
+  try {
+    const postInfo = await (await PostsCollection.doc(postId).get()).data()
+    // console.log("printPostInfo - > " , postInfo)
+    return postInfo
+  } catch (error) {
+    return null;
+  }
+};
+
 /**
  * REFRESH_HOME_POSTS
  */

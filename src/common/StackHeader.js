@@ -28,6 +28,7 @@ const StackHeader = ({
   centerContainerStyle,
   onLeftPress,
   onRightPress,
+  isHome = false
 }) => {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
@@ -47,6 +48,9 @@ const StackHeader = ({
   };
 
   const _renderLeft = () => {
+    if (isHome) {
+      return null
+    }
     if (left) {
       return left;
     }
