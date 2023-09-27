@@ -156,7 +156,6 @@ export const getMyHomePosts = async () => {
     const followedUserPost = [];
     for (let i = 0; i < allPosts.length; i++) {
       for (let j = 0; j < followingUsers.length; j++) {
-        console.log("allPosts - > ", followingUsers[j], allPosts[i].author);
         if (typeof allPosts[i].author == "string") {
           if (followingUsers[j] === allPosts[i].author) {
             followedUserPost.push(allPosts[i]);
@@ -936,6 +935,17 @@ export const challengePostLikeUnlike = async (postId, isChallengePost) => {
   }
 };
 
+export const getProfileDataByID = async(userId) => {
+  try{
+    const usersProfile = await (
+      await ProfilesCollection.doc(userId).get()
+    ).data();
+    console.log("usersFetchData - > " , usersProfile)
+    return usersProfile
+  }catch(error){
+    console.log("printError - > " , error)
+  }
+}
 /**
  * POST_LIKE
  */

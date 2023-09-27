@@ -7,6 +7,7 @@ import NavSearch from "../../assets/icons/nav-search.svg";
 
 import HomeHeaderProfileInfo from "./HomeHeaderProfileInfo";
 import { Image, TouchableOpacity, View } from "react-native";
+import { useSelector } from "react-redux";
 
 /* =============================================================================
 <HomeListHeader />
@@ -18,21 +19,31 @@ const HomeListHeader = ({
   listSize,
 }) => {
   const navigation = useNavigation();
+  const selector = useSelector((AppState) => AppState);
 
   const _handleCreatePostPress = () =>
-    navigation.navigate("PostCreate", { postRefresh: postRefresh });
+    navigation.navigate("PostCreate", { postRefresh: postRefresh, isAnnouncement: true });
 
   return (
     <View>
       <StackHeader
-        left={<AddIcon />}
+        // left={<AddIcon />}
+        left={
+          <Image
+            source={require("../../assets/images/announcement-ic.png")}
+            style={{
+              width: 35,
+              height: 35,
+            }}
+          />
+        }
         right={listSize > 0 ? <NavSearch /> : null}
         rightContainerStyle={{
           justifyContent: "center",
         }}
         onLeftPress={_handleCreatePostPress}
         onRightPress={searchClicked}
-        isHome = {true}
+        isHome = {selector.Profile && selector.Profile.profile && selector.Profile.profile.isAdmin ? false : true}
       />
       <HomeHeaderProfileInfo />
       {/* <View style={{

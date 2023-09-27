@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
 import { ActivityIndicator, FlatList, StyleSheet } from 'react-native';
 
@@ -8,11 +8,13 @@ import * as Colors from '../../../config/colors';
 
 
 import { getLoading, getUserFollowings as selectUserFollowings } from '../../redux/selectors';
+import { removeDuplicates } from '../../../util/functions';
 
 /* =============================================================================
 <FollowingUsersList />
 ============================================================================= */
 const FollowingUsersList = ({ userFollowings, loading }) => {
+
   const _renderListEmptyComponent = () => (
     <View center style={styles.emptyComponentContainer}>
       {loading ? (

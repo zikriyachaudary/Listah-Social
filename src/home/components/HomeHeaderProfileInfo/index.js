@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import { StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
@@ -20,6 +20,9 @@ const HomeHeaderProfileInfo = ({ profile }) => {
   const followers = profile?.followers;
   const followings = profile?.followings;
 
+  // useEffect(()=>{
+  //   console.log("followersList - > " , JSON.stringify(followers))
+  // }, [])
   const _toggleFollowersModal = () => setFollowersModal((prev) => !prev);
 
   const _handleFollowingPress = () => {

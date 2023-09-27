@@ -79,8 +79,9 @@ const HomeScreen = ({ posts, getHomePosts, refreshHomePosts, getProfile }) => {
 
   const [isUpdate, setUpdate] = useState(false);
   const [reportText, setReportTxt] = useState("");
+
   useEffect(() => {
-    console.log("callllllllll 0 ", selector.Home.updateHomeData);
+    console.log("callllllllll 0 ", JSON.stringify(selector));
     // setIsFilterPopup(true);
     setLoaderVisible(true);
     getMyUserHomePosts();

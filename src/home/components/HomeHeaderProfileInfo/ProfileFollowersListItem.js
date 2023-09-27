@@ -8,7 +8,7 @@ import { getProfileById } from '../../../profile/redux/selectors';
 /* =============================================================================
  ProfileFollowersListItem />
 ============================================================================= */
-const ProfileFollowersListItem = ({ id, profile }) => {
+const ProfileFollowersListItem = ({ id, profile, onItemPress }) => {
   const [user, setUser] = useState();
   const username = user?.username;
   const profileImage = user?.profileImage;
@@ -25,10 +25,17 @@ const ProfileFollowersListItem = ({ id, profile }) => {
 
   return (
 
+    <TouchableWithoutFeedback onPress={()=>{
+      console.log("onPressCall", user)
+      onItemPress(user)
+    }}>
+
+  
     <View horizontal style={styles.container}>
       <Avatar url={{ uri: `${profileImage}` }} />
       <Text style={styles.txt}>{username}</Text>
     </View>
+    </TouchableWithoutFeedback>
   );
 };
 
