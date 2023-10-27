@@ -47,7 +47,7 @@ const PostCommentItem = ({
   onEditComment,
   deleteComment,
   onReplyComment,
-  onLikeClicked
+  onLikeClicked,
 }) => {
   const [user, setUser] = useState();
   const username = user?.username;
@@ -179,14 +179,14 @@ const PostCommentItem = ({
   };
 
   return (
-      <View>
-        <View style={styles.container}>
-          <View horizontal>
-            <Avatar size={45} url={{ uri: `${profileImage}` }} />
-            <View flex style={styles.txtContainer}>
-              <Text sm>{username}</Text>
-              <Text medium>{text}</Text>
-              {/* {showAndEditIcon && (
+    <View>
+      <View style={styles.container}>
+        <View horizontal>
+          <Avatar size={45} url={{ uri: `${profileImage}` }} />
+          <View flex style={styles.txtContainer}>
+            <Text sm>{username}</Text>
+            <Text medium>{text}</Text>
+            {/* {showAndEditIcon && (
               <>
                 <Touchable
                   horizontal
@@ -202,22 +202,22 @@ const PostCommentItem = ({
                 </Touchable>
                 </>
               )} */}
-            </View>
+          </View>
 
-            <Touchable
-              horizontal
-              onPress={() => {
-                _likeUnLikePostComments();
-              }}
-            >
-              {loading ? (
-                  <ActivityIndicator color={Colors.primary} />
-                ) : liked ? (
-                  <LikeActiveIcon />
-                ) : (
-                  <LikeInActiveIcon />
-                )}
-              {/* {loading ? (
+          <Touchable
+            horizontal
+            onPress={() => {
+              _likeUnLikePostComments();
+            }}
+          >
+            {loading ? (
+              <ActivityIndicator color={Colors.primary} />
+            ) : liked ? (
+              <LikeActiveIcon />
+            ) : (
+              <LikeInActiveIcon />
+            )}
+            {/* {loading ? (
                 <ActivityIndicator color={Colors.primary} />
               ) : liked ? (
                 <Image
@@ -236,70 +236,72 @@ const PostCommentItem = ({
                   source={require("../../../../assets/icons/heart-ic-unfill.png")}
                 />
               )} */}
-            </Touchable>
-          </View>
-          <View
-            horizontal
-            style={{
-              justifyContent: "center",
-              alignItems: "center",
-              marginStart: 34
-            }}
-          >
-            {
-              likedUserList.length > 0 && (
-                <Touchable
-                horizontal
-                style={styles.btn}
-                onPress={() => {
-                  // _likeUnLikePostComments();
-                }}
-              >
-                {/* {loading ? (
+          </Touchable>
+        </View>
+        <View
+          horizontal
+          style={{
+            justifyContent: "center",
+            alignItems: "center",
+            marginStart: 34,
+          }}
+        >
+          {likedUserList.length > 0 && (
+            <Touchable
+              horizontal
+              style={styles.btn}
+              onPress={() => {
+                // _likeUnLikePostComments();
+              }}
+            >
+              {/* {loading ? (
                   <ActivityIndicator color={Colors.primary} />
                 ) : liked ? (
                   <LikeActiveIcon />
                 ) : (
                   <LikeInActiveIcon />
                 )} */}
-                <Text
-                  style={{
-                    color: "gray",
-                    fontSize: 12,
-                    fontWeight: "bold"
-                  }}
-                >
-                  {likedUserList.length + " likes"} 
-                </Text>
-              </Touchable>
-              )
-            }
-          
+              <Text
+                style={{
+                  color: "gray",
+                  fontSize: 12,
+                  fontWeight: "bold",
+                }}
+              >
+                {likedUserList.length + " likes"}
+              </Text>
+            </Touchable>
+          )}
+
           <Touchable
-              horizontal
-              style={styles.btn}
-              onPress={() => {
-                // _deleteComment()
-                onReplyComment();
+            horizontal
+            style={styles.btn}
+            onPress={() => {
+              // _deleteComment()
+              onReplyComment();
+            }}
+          >
+            <Text
+              style={{
+                color: "gray",
+                fontSize: 12,
+                fontWeight: "bold",
               }}
             >
-              <Text style={{
-                    color: "gray",
-                    fontSize: 12,
-                    fontWeight: "bold"
-                  }}>Reply</Text>
-              {/* <Image
+              Reply
+            </Text>
+            {/* <Image
                 style={{
                   width: 24,
                   height: 24,
                 }}
                 source={require("../../../../assets/images/reply-ic.png")}
               /> */}
-            </Touchable>
+          </Touchable>
 
-            {showAndEditIcon && (
-              <>
-                {/* <Touchable
+          {showAndEditIcon && (
+            <>
+              {/* <Touchable
                   horizontal
                   style={styles.btn}
                   onPress={() => {
@@ -314,51 +316,49 @@ const PostCommentItem = ({
                   }}>Edit</Text>
                 </Touchable> */}
 
-                <Touchable
-                  horizontal
-                  style={styles.btn}
-                  onPress={() => {
-                    _deleteComment();
-                  }}
-                >
-                   <Text style={{
+              <Touchable
+                horizontal
+                style={styles.btn}
+                onPress={() => {
+                  _deleteComment();
+                }}
+              >
+                <Text
+                  style={{
                     color: "red",
                     fontSize: 12,
-                    fontWeight: "bold"
-                  }}>Delete</Text>
-                  {/* <DeleteIcon width={24} height={24} fill={"#999"} /> */}
-                </Touchable>
-              </>
-            )}
-
-        
-          </View>
+                    fontWeight: "bold",
+                  }}
+                >
+                  Delete
+                </Text>
+                {/* <DeleteIcon width={24} height={24} fill={"#999"} /> */}
+              </Touchable>
+            </>
+          )}
         </View>
-
-        {comment.subCommentList.length > 0 && !showSubCommentDisplay ? (
-          <ShowMoreSubCommentView
-            onClick={() => {
-              setSubCommentDisplay(!showSubCommentDisplay);
-            }}
-          />
-        ) : (
-          <FlatList
-            data={comment.subCommentList ? comment.subCommentList : []}
-            keyExtractor={(item, index) => {
-              return item.id;
-            }}
-            renderItem={({ item, index }) => {
-              return (
-                <SubCommentItem
-                  item={item}
-                  index={index}
-                  author={item?.author}
-                />
-              );
-            }}
-          />
-        )}
       </View>
+
+      {comment.subCommentList.length > 0 && !showSubCommentDisplay ? (
+        <ShowMoreSubCommentView
+          onClick={() => {
+            setSubCommentDisplay(!showSubCommentDisplay);
+          }}
+        />
+      ) : (
+        <FlatList
+          data={comment.subCommentList ? comment.subCommentList : []}
+          keyExtractor={(item, index) => {
+            return item.id;
+          }}
+          renderItem={({ item, index }) => {
+            return (
+              <SubCommentItem item={item} index={index} author={item?.author} />
+            );
+          }}
+        />
+      )}
+    </View>
   );
 };
 

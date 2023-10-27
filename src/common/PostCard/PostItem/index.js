@@ -168,7 +168,8 @@ const PostItem = ({
       />
       <PostInnerItems post={post} userPosts={postItems} />
 
-      {post.challenge && post.challengeRequest == CHALLENGE_REQUEST.ACCEPT && (
+
+      {post.challenge && post.challengeRequest == CHALLENGE_REQUEST.ACCEPT  && (
         <View>
           <Touchable
             horizontal
@@ -289,24 +290,30 @@ const PostItem = ({
       ))} */}
 
       {post.description && (
-        <Text style={{ marginTop: 10, fontSize: 16 }}>
-          <B>{post.author.username}</B> {post.description}.
+        <Text style={{ marginTop: 10, fontSize: 16, color:"black" }}>
+          <B>{post?.announcement ? "A-Listah" : post.author.username}</B> {post.description}.
         </Text>
       )}
-      <PostActions
-        id={id}
-        post={post}
-        postRefresh={() => {
-          if (postRefresh) {
-            console.log("triggerr -- > ", postRefresh);
-            postRefresh();
-          }
-        }}
-        likeUserOpenClicked={() => {
-          console.log("printPost -- > ", post);
-          setLikeUserModalVisible((prev) => true);
-        }}
-      />
+
+      {
+        !post?.announcement && (
+          <PostActions
+          id={id}
+          post={post}
+          postRefresh={() => {
+            if (postRefresh) {
+              console.log("triggerr -- > ", postRefresh);
+              postRefresh();
+            }
+          }}
+          likeUserOpenClicked={() => {
+            console.log("printPost -- > ", post);
+            setLikeUserModalVisible((prev) => true);
+          }}
+        />
+        )
+      }
+     
 
       {showLikeUserModal && (
         <LikeUserModal

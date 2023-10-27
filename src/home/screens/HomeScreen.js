@@ -26,6 +26,7 @@ import { getPosts as selectPosts } from "../redux/selectors";
 import { getProfile as getProfileAction } from "../../profile/redux/actions";
 import {
   blockUsers,
+  getAnnouncementPosts,
   getHomePosts as getHomePostsAction,
   getMyHomePosts,
   refreshHomePosts as refreshHomePostsAction,
@@ -95,6 +96,7 @@ const HomeScreen = ({ posts, getHomePosts, refreshHomePosts, getProfile }) => {
   }, [selector.Home.isPostRefresh]);
 
   const getMyUserHomePosts = async () => {
+    const mAnnouncementPosts = await getAnnouncementPosts();
     const mHomePosts = await getMyHomePosts();
     allHomePosts = mHomePosts;
     console.log("updateRequest - . ", UPDATE_CHALLENGE_FEATURE.isUpdate);
@@ -102,6 +104,17 @@ const HomeScreen = ({ posts, getHomePosts, refreshHomePosts, getProfile }) => {
       setHomePosts([]);
       UPDATE_CHALLENGE_FEATURE.isUpdate = false;
     }
+
+    let announcementList = mAnnouncementPosts.map((item) => {
+      let itemsTitleAndDescription = "";
+      item.items.forEach((element) => {
+        itemsTitleAndDescription += element.name + element.description;
+      });
+      const mSearchTxts =
+        item.title + item.description + itemsTitleAndDescription;
+      const obj = { ...item, searchTxt: mSearchTxts };
+      return obj;
+    });
 
     const compList = mHomePosts.map((item) => {
       let itemsTitleAndDescription = "";
@@ -114,9 +127,13 @@ const HomeScreen = ({ posts, getHomePosts, refreshHomePosts, getProfile }) => {
       return obj;
     });
 
-    console.log("ggggg - > ", JSON.stringify(compList));
+    if (announcementList.length > 0) {
+      announcementList = [announcementList[0]]
+    }
+    const mFinalList = [...announcementList, ...compList]
+    // console.log("ggggg - > ", JSON.stringify(mFinalList));
     setTimeout(() => {
-      setHomePosts(compList);
+      setHomePosts(mFinalList);
       console.log("updateUp 00 >");
       setUpdate(!isUpdate);
       setRefreshing(false);
@@ -333,6 +350,7 @@ const HomeScreen = ({ posts, getHomePosts, refreshHomePosts, getProfile }) => {
             <View
               style={{
                 paddingHorizontal: 5,
+                backgroundColor : "white"
               }}
             >
               <ChevronLeftIcon />
@@ -344,6 +362,7 @@ const HomeScreen = ({ posts, getHomePosts, refreshHomePosts, getProfile }) => {
               flex: 1,
               height: 40,
               fontSize: 16,
+              color : "black"
             }}
             placeholder="Search in post..."
             placeholderTextColor={"gray"}
@@ -428,9 +447,10 @@ const styles = StyleSheet.create({
   },
   searchTopStyle: {
     flexDirection: "row",
-    height: 40,
+    height: 60,
     marginHorizontal: 18,
-    marginVertical: 10,
+    marginTop: Platform.OS == "android" ? 60 : 10,
+    marginBottom : 10,
     borderRadius: 5,
     borderWidth: 1,
     borderColor: "gray",

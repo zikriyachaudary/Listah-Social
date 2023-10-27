@@ -68,13 +68,16 @@ const PostInnerItems = ({ post, userPosts, profile }) => {
               style={{
                 flex: 0.3,
                 marginEnd: 8,
+                fontSize: 12
               }}
+              adjustsFontSizeToFit={true}
+              numberOfLines={4}
               flex
               center
               sm
               medium
             >
-              {item.name || "--"}
+              {item.name  || "--"}
             </Text>
             <Text center xs light style={styles.descriptionTxt}>
               {item.description || "--"}
@@ -134,7 +137,7 @@ const styles = StyleSheet.create({
     marginLeft: 15,
   },
   descriptionTxt: {
-    flex: 0.5,
+    flex: 0.5
   },
   menuBtn: {
     paddingVertical: 20,

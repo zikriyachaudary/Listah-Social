@@ -21,6 +21,7 @@ import AddIcon from "../../assets/icons/edit-plus-square.svg";
 
 import { getLoading } from "../redux/selectors";
 import { createPost as createPostAction } from "../redux/actions";
+import { createAnnouncementPost as createAnnouncementPostAction } from "../redux/actions";
 import { useEffect } from "react";
 import { RadioGroup } from "react-native-radio-buttons-group";
 import CheckBox from "@react-native-community/checkbox";
@@ -29,7 +30,13 @@ import { setPostRefresh } from "../redux/appLogics";
 /* =============================================================================
 <PostCreateScreen />
 ============================================================================= */
-const PostCreateScreen = ({ navigation, loading, createPost, route }) => {
+const PostCreateScreen = ({
+  navigation,
+  loading,
+  createPost,
+  route,
+  createAnnouncementPost,
+}) => {
   const [isShowAddBtn, setShowAddBtn] = useState(true);
   const [radioButtons, setRadioButtons] = useState([
     {
@@ -46,12 +53,11 @@ const PostCreateScreen = ({ navigation, loading, createPost, route }) => {
       borderColor: "#6d14c4",
     },
   ]);
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
   const selector = useSelector((AppState) => AppState);
 
-
   const _handleAdd = (arrayHelpers) => {
-    let arraySize = arrayHelpers.form.values.items.length + 1
+    let arraySize = arrayHelpers.form.values.items.length + 1;
     arrayHelpers.push({
       name: "",
       image: "",
@@ -67,7 +73,7 @@ const PostCreateScreen = ({ navigation, loading, createPost, route }) => {
   const [toggleCheckBox, setToggleCheckBox] = useState(false);
 
   const _handleRemove = (arrayHelpers, index) => {
-    let arraySize = arrayHelpers.form.values.items.length - 1
+    let arraySize = arrayHelpers.form.values.items.length - 1;
 
     arrayHelpers.remove(index);
     if (arraySize < 10) {
@@ -81,10 +87,13 @@ const PostCreateScreen = ({ navigation, loading, createPost, route }) => {
     values["order"] = radioButtons.find((item) => item.selected).id;
     values["isNumberShowInItems"] = toggleCheckBox;
     // console.log("printValues - > " , values)
-    await createPost(values);
+
+    if (route.params && route.params.isAnnouncement) {
+      await createAnnouncementPost(values);
+    } else await createPost(values);
     // route.params.postRefresh();
-    dispatch(setPostRefresh(!selector.Home.isPostRefresh))
-    resetForm()
+    dispatch(setPostRefresh(!selector.Home.isPostRefresh));
+    resetForm();
     navigation.goBack();
   };
 
@@ -118,7 +127,7 @@ const PostCreateScreen = ({ navigation, loading, createPost, route }) => {
                     value={values.title}
                     onBlur={handleBlur("title")}
                     errorText={errors?.title}
-                    maxLength = {55}
+                    maxLength={55}
                     onChangeText={handleChange("title")}
                     placeholder="What's your List Title..."
                   />
@@ -354,6 +363,7 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = {
   createPost: createPostAction,
+  createAnnouncementPost: createAnnouncementPostAction,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(PostCreateScreen);

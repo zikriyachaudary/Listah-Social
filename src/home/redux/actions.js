@@ -14,6 +14,7 @@ import { useDispatch } from "react-redux";
 import { CHALLENGE_REQUEST } from "../../suggestion/redux/constants";
 
 const PostsCollection = FireStore().collection("posts");
+const AnnouncementCollection = FireStore().collection("announcements");
 const ProfilesCollection = FireStore().collection("profiles");
 const ReportPostCollection = FireStore().collection("reports");
 const BlockUsersCollection = FireStore().collection("blockUsers");
@@ -21,6 +22,11 @@ const BlockUsersCollection = FireStore().collection("blockUsers");
 const getHomePostsQuery = PostsCollection.orderBy("createdAt", "desc").limit(
   100
 );
+
+const getAnnouncementQuery = AnnouncementCollection.orderBy(
+  "createdAt",
+  "desc"
+).limit(50);
 
 /**
  * GET_HOME_POSTS
@@ -127,6 +133,41 @@ export const getHomePosts = () => async (dispatch) => {
   } finally {
     dispatch({ type: constants.GET_HOME_POSTS.COMPLETE });
   }
+};
+
+export const getAnnouncementPosts = async () => {
+  const postSnapshot = await getAnnouncementQuery.get();
+
+  const allPosts = [];
+  if (!postSnapshot.empty) {
+    postSnapshot.forEach((snapshot) => {
+      allPosts.push({
+        ...snapshot.data(),
+        id: snapshot.id,
+      });
+    });
+  } else {
+    return [];
+  }
+
+  // POPULATE AUTHOR
+  const populatedPosts = await Promise.all(
+    allPosts.map(async (post) => {
+      const author = await (
+        await ProfilesCollection.doc(post?.author).get()
+      ).data();
+      return {
+        ...post,
+        author: {
+          userId: author?.userId,
+          username: author?.username,
+          profileImage: author?.profileImage,
+        },
+      };
+    })
+  );
+
+  return populatedPosts
 };
 
 export const getMyHomePosts = async () => {
@@ -274,9 +315,9 @@ export const getPostsByID = async (userId) => {
 
 export const getPostInfoById = async (postId) => {
   try {
-    const postInfo = await (await PostsCollection.doc(postId).get()).data()
+    const postInfo = await (await PostsCollection.doc(postId).get()).data();
     // console.log("printPostInfo - > " , postInfo)
-    return postInfo
+    return postInfo;
   } catch (error) {
     return null;
   }
@@ -375,6 +416,85 @@ export const refreshHomePosts = (lastDocId) => async (dispatch) => {
   }
 };
 
+export const createAnnouncementPost = (postContent) => async (dispatch) => {
+  try {
+    dispatch({ type: constants.CREATE_POST.REQUEST });
+    const { title, description, items, order, isNumberShowInItems } =
+      postContent;
+    const postId = Date.now();
+    const authorId = FireAuth().currentUser.uid;
+
+    const post = {
+      id: postId,
+      title,
+      order,
+      isNumberShowInItems,
+      description,
+      likes: 0,
+      shares: 0,
+      comments: [],
+      likedUsers: [],
+      author: authorId,
+      announcement: true,
+      createdAt: FireStore.FieldValue.serverTimestamp(),
+    };
+
+    if (items) {
+      post.items = await Promise.all(
+        items.map(async (item, index) => {
+          let uploadImgUrl = "";
+          console.log("printItem - > ", item);
+          if (item.image && item.image.uri != "") {
+            const compressedImage = await ImageResizer.createResizedImage(
+              item.image.uri,
+              1000,
+              1000,
+              "PNG",
+              100,
+              0
+            );
+            const storageRef = FireStorage()
+              .ref("post_media")
+              .child(item.image.fileName);
+            await storageRef.putFile(compressedImage.uri);
+            uploadImgUrl = await storageRef.getDownloadURL();
+          }
+
+          return {
+            id: index,
+            name: item.name,
+            image: uploadImgUrl,
+            description: item.description,
+          };
+        })
+      );
+    }
+
+    await AnnouncementCollection.doc(`${postId}`).set(post);
+
+    const createdPost = await (
+      await AnnouncementCollection.doc(postId).get()
+    ).data();
+    const postAuthor = await (
+      await ProfilesCollection.doc(createdPost?.author).get()
+    ).data();
+    const populatedPost = {
+      ...createPost,
+      author: {
+        userId: postAuthor?.userId,
+        username: postAuthor?.username,
+        profileImage: postAuthor?.profileImage,
+      },
+    };
+
+    dispatch({ type: constants.CREATE_POST.SUCCESS, payload: populatedPost });
+  } catch (error) {
+    dispatch({ type: constants.CREATE_POST.FAIL, error });
+  } finally {
+    dispatch({ type: constants.CREATE_POST.COMPLETE });
+  }
+};
+
 /**
  * CREATE POST
  */
@@ -397,11 +517,8 @@ export const createPost = (postContent) => async (dispatch) => {
       comments: [],
       likedUsers: [],
       author: authorId,
-
       createdAt: FireStore.FieldValue.serverTimestamp(),
     };
-
-    console.log("postCreateRequest - ? ");
 
     if (items) {
       post.items = await Promise.all(
@@ -935,17 +1052,17 @@ export const challengePostLikeUnlike = async (postId, isChallengePost) => {
   }
 };
 
-export const getProfileDataByID = async(userId) => {
-  try{
+export const getProfileDataByID = async (userId) => {
+  try {
     const usersProfile = await (
       await ProfilesCollection.doc(userId).get()
     ).data();
-    console.log("usersFetchData - > " , usersProfile)
-    return usersProfile
-  }catch(error){
-    console.log("printError - > " , error)
+    console.log("usersFetchData - > ", usersProfile);
+    return usersProfile;
+  } catch (error) {
+    console.log("printError - > ", error);
   }
-}
+};
 /**
  * POST_LIKE
  */

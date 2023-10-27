@@ -26,7 +26,8 @@ const SubCommentItem = ({ item, index, profile, author }) => {
             marginEnd: 10,
             flexDirection: "row",
             justifyContent: "flex-end",
-            marginStart: 40
+            marginStart: 40,
+
         }}>
 
             <View style={{
@@ -63,7 +64,7 @@ const SubCommentItem = ({ item, index, profile, author }) => {
                         flexDirection: "row"
                     }}>
                         <Avatar size={30} url={{ uri: `${profileImage}` }} />
-                        <View flex style={styles.txtContainer}>
+                        <View style={styles.txtContainer}>
                             <Text medium style={{
                                 fontSize: 13,
                                 marginTop: 5

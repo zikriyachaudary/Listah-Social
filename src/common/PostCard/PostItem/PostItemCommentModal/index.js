@@ -119,8 +119,10 @@ const PostItemCommentModal = ({
             setComments(myPostInfo.comments);
 
             setTimeout(() => {
-              flatListRef.current.scrollToEnd();
-            },900);
+              if (flatListRef && flatListRef.current) {
+                flatListRef.current.scrollToEnd();
+              }
+            }, 900);
           } else {
             setIsEmptyVisible(true);
           }
@@ -174,7 +176,7 @@ const PostItemCommentModal = ({
           setIsEmptyVisible(true);
         }
       }}
-      onLikeClicked ={async()=>{
+      onLikeClicked={async () => {
         const myPostInfo = await getPostInfoById(post.id);
         if (myPostInfo.comments && myPostInfo.comments.length > 0) {
           setIsEmptyVisible(false);
@@ -203,7 +205,9 @@ const PostItemCommentModal = ({
             setIsEmptyVisible(false);
             setComments(myPostInfo.comments);
             setTimeout(() => {
-              flatListRef.current.scrollToEnd();
+              if (flatListRef && flatListRef.current) {
+                flatListRef.current.scrollToEnd();
+              }
             }, 800);
           } else {
             setIsEmptyVisible(true);
@@ -330,7 +334,7 @@ const PostItemCommentModal = ({
               value={text}
               onChange={setText}
               containerStyle={styles.inputContainer}
-              autoFocus={"true"}
+              // autoFocus={"true"}
               placeholder="Type a comment..."
               onFocus={() => setShouldDismissKeyboard(false)}
               onBlur={() => setShouldDismissKeyboard(true)}

@@ -22,6 +22,9 @@ import { getPostsById } from "../../../home/redux/selectors";
 import { deletePost as deletePostAction } from "../../../home/redux/actions";
 import LoadingImage from "../../LoadingImage";
 
+import AppLogoImg from "../../../assets/images/edit-app-logo.jpeg";
+import FastImage from "react-native-fast-image";
+
 /* =============================================================================
 <PostItemHeader />
 ============================================================================= */
@@ -51,9 +54,6 @@ const PostItemHeader = ({
     : post?.author?.profileImage;
   const isAuthor = authorId === FireAuth().currentUser.uid;
 
-  useEffect(() => {
-    // console.log("ppppp - > ", post)
-  }, []);
   const _toggleMenu = () => setVisible((prev) => !prev);
 
   const _handleEditPress = () => {
@@ -84,6 +84,7 @@ const PostItemHeader = ({
   return (
     <View horizontal style={styles.header}>
       <TouchableOpacity
+        disabled={post?.announcement}
         onPress={() => {
           console.log("clicked11 - > ", postRefresh);
           navigation.navigate("MyPosts", {
@@ -103,24 +104,42 @@ const PostItemHeader = ({
           )}
           {/* <Avatar size={68} url={{ uri: `${profileImage}` }} /> */}
 
-          <LoadingImage
-            source={{ uri: `${profileImage}` }}
-            style={{
-              width: 68,
-              height: 68,
-              borderRadius: 2,
-              marginVertical: 10,
-              borderWidth: 1.4,
-              borderRadius: 68 / 2,
-              backgroundColor: Colors.outline,
-              borderColor: "yellow",
-            }}
-          />
+          {post?.announcement == true ? (
+            <FastImage
+              style={{
+                width: 68,
+                height: 68,
+                borderRadius: 2,
+                marginVertical: 10,
+                borderWidth: 1.4,
+                borderRadius: 68 / 2,
+                backgroundColor: Colors.outline,
+                borderColor: "yellow",
+              }}
+              source={AppLogoImg}
+            />
+          ) : (
+            <LoadingImage
+              source={{ uri: `${profileImage}` }}
+              style={{
+                width: 68,
+                height: 68,
+                borderRadius: 2,
+                marginVertical: 10,
+                borderWidth: 1.4,
+                borderRadius: 68 / 2,
+                backgroundColor: Colors.outline,
+                borderColor: "yellow",
+              }}
+            />
+          )}
+
           <View style={styles.userInfoContainer}>
             <Text
               style={{
                 fontFamily: "Poppins-Bold",
                 fontSize: 16,
+                color: "black",
                 width: Dimensions.get("screen").width - 200,
               }}
               adjustsFontSizeToFit={true}
@@ -128,11 +147,17 @@ const PostItemHeader = ({
             >
               {title}
             </Text>
-            <Text>{username}</Text>
+            <Text
+              style={{
+                color: "black",
+              }}
+            >
+              {post?.announcement == true ? "A-Listah" : username}
+            </Text>
           </View>
         </View>
       </TouchableOpacity>
-      {!isChallenge && (
+      {!isChallenge && !post?.announcement && (
         <Menu
           visible={visible}
           onRequestClose={_toggleMenu}
