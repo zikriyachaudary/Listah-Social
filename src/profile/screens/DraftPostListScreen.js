@@ -125,7 +125,7 @@ const DraftPostListScreen = () => {
           onPress={() => {
             deleteDraftPost(alertModal?.data?.id);
           }}
-          message={"do you want to delete this post from draft?"}
+          message={"Do you want to delete this post from draft?"}
         />
       ) : null}
     </Container>

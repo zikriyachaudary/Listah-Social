@@ -13,7 +13,6 @@ import {
   StyleSheet,
   TouchableWithoutFeedback,
 } from "react-native";
-import FireStore from "@react-native-firebase/firestore";
 import dynamicLinks from "@react-native-firebase/dynamic-links";
 
 import Text from "../../Text";
@@ -97,8 +96,8 @@ const PostActions = ({
   };
 
   const _toggleCommentModal = (count = 0) => {
-    setCommentsCount(count)
-    setCommentModal((prevState) => !prevState)
+    setCommentsCount(count);
+    setCommentModal((prevState) => !prevState);
   };
 
   const _handleSharePress = async () => {
@@ -136,9 +135,8 @@ const PostActions = ({
   };
 
   const challengeAcceptReject = () => {
-    navigation.navigate("AcceptRejectChallenge",
-    { post: post });
-  }
+    navigation.navigate("AcceptRejectChallenge", { post: post });
+  };
 
   return (
     <View horizontal style={styles.btnContainer}>
@@ -173,8 +171,8 @@ const PostActions = ({
         <Touchable
           horizontal
           style={{ ...styles.btn }}
-          onPress={()=>{
-            _toggleCommentModal(commentsCount)
+          onPress={() => {
+            _toggleCommentModal(commentsCount);
           }}
         >
           <CommentIcon />

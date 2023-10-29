@@ -18,7 +18,7 @@ import {
 } from "../../common";
 import DeleteIcon from "../../assets/icons/edit-trash-icon.svg";
 import AddIcon from "../../assets/icons/edit-plus-square.svg";
-
+import { useToast } from "react-native-toast-notifications";
 import { createPost as createPostAction } from "../redux/actions";
 import { createAnnouncementPost as createAnnouncementPostAction } from "../redux/actions";
 import { RadioGroup } from "react-native-radio-buttons-group";
@@ -44,6 +44,7 @@ const PostCreateScreen = ({
   route,
   createAnnouncementPost,
 }) => {
+  const toast = useToast();
   const isFocused = useIsFocused();
   const formikRef = useRef();
   const [initialValues, setInitialValues] = useState({});
@@ -236,6 +237,11 @@ const PostCreateScreen = ({
     await saveUserDraftPost(draftArr);
     dispatch(setCreatePostFailError(""));
     setAlertModal({ value: false, data: null, message: "" });
+    toast.show(
+      route?.params?.isEdit
+        ? "Post update in your draft list"
+        : "Post save in your draft list"
+    );
     dispatch(setPostRefresh(!selector.Home.isPostRefresh));
     formikRef.current?.resetForm();
     navigation.goBack();
