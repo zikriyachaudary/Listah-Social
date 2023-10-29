@@ -1,22 +1,24 @@
-import React, { useEffect, useState } from 'react';
-import { connect, useDispatch, useSelector } from 'react-redux';
-import { StatusBar } from 'react-native';
-import RNSplashScreen from 'react-native-splash-screen';
-import FirebaseAuth from '@react-native-firebase/auth';
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import React, { useEffect, useState } from "react";
+import { connect, useDispatch, useSelector } from "react-redux";
+import { StatusBar } from "react-native";
+import RNSplashScreen from "react-native-splash-screen";
+import FirebaseAuth from "@react-native-firebase/auth";
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
-import { View, Text } from '../common';
-import HomeTab from './HomeTab/index';
-import AuthStack from '../auth/screens/AuthStack';
-import SuggestionStack from '../suggestion/screens/SuggestionStack';
-import * as Colors from '../config/colors';
+import { View, Text } from "../common";
+import HomeTab from "./HomeTab/index";
+import AuthStack from "../auth/screens/AuthStack";
+import SuggestionStack from "../suggestion/screens/SuggestionStack";
+import * as Colors from "../config/colors";
 
-import { getUser } from '../auth/redux/selectors';
-import { getProfile as getProfileAction } from '../profile/redux/actions';
-import { changeAuthState as changeAuthStateAction } from '../auth/redux/actions';
-import FullImageModal from '../common/PostCard/PostItem/FullImageModal';
-import { showFullImage } from '../home/redux/appLogics';
+import { getUser } from "../auth/redux/selectors";
+import { getProfile as getProfileAction } from "../profile/redux/actions";
+import { changeAuthState as changeAuthStateAction } from "../auth/redux/actions";
+import FullImageModal from "../common/PostCard/PostItem/FullImageModal";
+import { showFullImage } from "../home/redux/appLogics";
+import { getUserDraftPost } from "../util/helperFun";
+import { setDraftPost } from "../redux/action/AppLogics";
 
 const Stack = createNativeStackNavigator();
 
@@ -25,26 +27,35 @@ const Stack = createNativeStackNavigator();
 ============================================================================= */
 const AppNavigation = ({ changeAuthState, getProfile, authenticated }) => {
   const [initializing, setInitializing] = useState(true);
-  const selector = useSelector((AppState) => AppState)
-  const dispatch = useDispatch()
+  const selector = useSelector((AppState) => AppState);
+  const dispatch = useDispatch();
 
-  // firebase user state check 
+  // firebase user state check
   useEffect(() => {
     FirebaseAuth().onAuthStateChanged(async (user) => {
       if (user) {
+        onAppStart();
         changeAuthState(user.toJSON());
       }
       setInitializing(false);
       RNSplashScreen.hide();
-    })
-  }, [])
+    });
+  }, []);
 
   // Get Profile
   useEffect(() => {
     if (authenticated) {
+      onAppStart();
       getProfile();
     }
-  }, [])
+  }, []);
+
+  const onAppStart = async () => {
+    let draftPost = await getUserDraftPost();
+    if (draftPost?.length > 0) {
+      dispatch(setDraftPost(draftPost));
+    }
+  };
 
   if (initializing) {
     return null;
@@ -55,13 +66,14 @@ const AppNavigation = ({ changeAuthState, getProfile, authenticated }) => {
       <StatusBar
         translucent
         backgroundColor="transparent"
-        barStyle='dark-content'
+        barStyle="dark-content"
       />
       <Stack.Navigator
         screenOptions={{
           headerShown: false,
-          animation: 'slide_from_right',
-        }}>
+          animation: "slide_from_right",
+        }}
+      >
         {authenticated ? (
           // <Stack.Screen name="EMPTY_SCREEN" component={EMPTY_SCREEN} />
           <>
@@ -76,7 +88,9 @@ const AppNavigation = ({ changeAuthState, getProfile, authenticated }) => {
       {selector.Home.showFullImage && selector.Home.fullImagePath !== "" && (
         <FullImageModal
           visible={selector.Home.showFullImage}
-          onClose={() => { dispatch(showFullImage(false))}}
+          onClose={() => {
+            dispatch(showFullImage(false));
+          }}
           userImage={selector.Home.fullImagePath}
         />
       )}

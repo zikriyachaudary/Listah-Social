@@ -1,4 +1,4 @@
-import * as constants from './constants';
+import * as constants from "./constants";
 
 const INITIAL_STATE = {
   profile: null,
@@ -14,7 +14,7 @@ export default function reducer(state = INITIAL_STATE, action) {
       return {
         ...state,
         profile: payload,
-      }
+      };
 
     // GET_PROFILE
     case constants.GET_PROFILE.REQUEST:

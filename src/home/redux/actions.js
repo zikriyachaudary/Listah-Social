@@ -12,6 +12,7 @@ import {
 import * as constants from "./constants";
 import { useDispatch } from "react-redux";
 import { CHALLENGE_REQUEST } from "../../suggestion/redux/constants";
+import { setCreatePostFailError } from "../../redux/action/AppLogics";
 
 const PostsCollection = FireStore().collection("posts");
 const AnnouncementCollection = FireStore().collection("announcements");
@@ -167,7 +168,7 @@ export const getAnnouncementPosts = async () => {
     })
   );
 
-  return populatedPosts
+  return populatedPosts;
 };
 
 export const getMyHomePosts = async () => {
@@ -490,6 +491,7 @@ export const createAnnouncementPost = (postContent) => async (dispatch) => {
     dispatch({ type: constants.CREATE_POST.SUCCESS, payload: populatedPost });
   } catch (error) {
     dispatch({ type: constants.CREATE_POST.FAIL, error });
+    dispatch(setCreatePostFailError(error));
   } finally {
     dispatch({ type: constants.CREATE_POST.COMPLETE });
   }
@@ -568,6 +570,7 @@ export const createPost = (postContent) => async (dispatch) => {
 
     dispatch({ type: constants.CREATE_POST.SUCCESS, payload: populatedPost });
   } catch (error) {
+    dispatch(setCreatePostFailError(error));
     dispatch({ type: constants.CREATE_POST.FAIL, error });
   } finally {
     dispatch({ type: constants.CREATE_POST.COMPLETE });

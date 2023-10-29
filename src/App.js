@@ -1,11 +1,9 @@
-import React from 'react';
-import { Provider, useDispatch, useSelector } from 'react-redux';
-import { ToastProvider } from 'react-native-toast-notifications'
+import React from "react";
+import { Provider } from "react-redux";
+import { ToastProvider } from "react-native-toast-notifications";
 
-import AppNavigation from './navigation/AppNavigation';
-import configureStore from './redux/configureStore';
-import FullImageModal from './common/PostCard/PostItem/FullImageModal';
-import { showFullImage } from './home/redux/appLogics';
+import AppNavigation from "./navigation/AppNavigation";
+import configureStore from "./redux/configureStore";
 
 const store = configureStore();
 
@@ -13,16 +11,11 @@ const store = configureStore();
 <App />
 ============================================================================= */
 const App = () => {
-
-
   return (
-
     <Provider store={store}>
-      
       <ToastProvider>
         <AppNavigation />
       </ToastProvider>
-     
     </Provider>
   );
 };

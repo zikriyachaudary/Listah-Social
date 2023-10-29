@@ -82,7 +82,6 @@ const HomeScreen = ({ posts, getHomePosts, refreshHomePosts, getProfile }) => {
   const [reportText, setReportTxt] = useState("");
 
   useEffect(() => {
-    console.log("callllllllll 0 ", JSON.stringify(selector));
     // setIsFilterPopup(true);
     setLoaderVisible(true);
     getMyUserHomePosts();
@@ -128,9 +127,9 @@ const HomeScreen = ({ posts, getHomePosts, refreshHomePosts, getProfile }) => {
     });
 
     if (announcementList.length > 0) {
-      announcementList = [announcementList[0]]
+      announcementList = [announcementList[0]];
     }
-    const mFinalList = [...announcementList, ...compList]
+    const mFinalList = [...announcementList, ...compList];
     // console.log("ggggg - > ", JSON.stringify(mFinalList));
     setTimeout(() => {
       setHomePosts(mFinalList);
@@ -350,7 +349,7 @@ const HomeScreen = ({ posts, getHomePosts, refreshHomePosts, getProfile }) => {
             <View
               style={{
                 paddingHorizontal: 5,
-                backgroundColor : "white"
+                backgroundColor: "white",
               }}
             >
               <ChevronLeftIcon />
@@ -362,7 +361,7 @@ const HomeScreen = ({ posts, getHomePosts, refreshHomePosts, getProfile }) => {
               flex: 1,
               height: 40,
               fontSize: 16,
-              color : "black"
+              color: "black",
             }}
             placeholder="Search in post..."
             placeholderTextColor={"gray"}
@@ -450,7 +449,7 @@ const styles = StyleSheet.create({
     height: 60,
     marginHorizontal: 18,
     marginTop: Platform.OS == "android" ? 60 : 10,
-    marginBottom : 10,
+    marginBottom: 10,
     borderRadius: 5,
     borderWidth: 1,
     borderColor: "gray",

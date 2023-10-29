@@ -1,7 +1,7 @@
 /**
  * Redux async action creator
  */
-export const actionGenerator = actionName => ({
+export const actionGenerator = (actionName) => ({
   REQUEST: `${actionName}_REQUEST`,
   SUCCESS: `${actionName}_SUCCESS`,
   FAIL: `${actionName}_FAIL`,
@@ -12,7 +12,7 @@ export const actionGenerator = actionName => ({
 /**
  * Normalize response from api for redux store
  */
-export const normalize = (state, list, id = 'id', length = 10) => {
+export const normalize = (state, list, id = "id", length = 10) => {
   const updatedState = {
     byId: {},
     allIds: [],
@@ -31,7 +31,7 @@ export const normalize = (state, list, id = 'id', length = 10) => {
 /**
  * Normalize and merge response from api into redux store
  */
-export const merge = (state, list, id = 'id', length = 10) => {
+export const merge = (state, list, id = "id", length = 10) => {
   const updatedState = {
     byId: { ...state.byId },
     allIds: [...state.allIds],
@@ -125,7 +125,7 @@ export const remove = (state, itemId) => {
     let byId = {};
     const allIds = [];
 
-    state.allIds.forEach(id => {
+    state.allIds.forEach((id) => {
       if (id !== itemId) {
         allIds.push(id);
 

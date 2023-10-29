@@ -1,12 +1,13 @@
-import { combineReducers } from 'redux';
+import { combineReducers } from "redux";
 
-import AuthReducer from '../auth/redux/reducer';
-import HomeReducer from '../home/redux/reducer';
-import ProfileReducer from '../profile/redux/reducer';
-import DiscoverReducer from '../discover/redux/reducer';
-import FollowingReducer from '../following/redux/reducer';
-import NotificationsReducer from '../notification/redux/reducer';
-import SuggestionReducer from '../suggestion/redux/reducer';
+import AuthReducer from "../auth/redux/reducer";
+import HomeReducer from "../home/redux/reducer";
+import ProfileReducer from "../profile/redux/reducer";
+import DiscoverReducer from "../discover/redux/reducer";
+import FollowingReducer from "../following/redux/reducer";
+import NotificationsReducer from "../notification/redux/reducer";
+import SuggestionReducer from "../suggestion/redux/reducer";
+import DraftPostReducer from "./DraftPostReducer";
 
 const rootReducer = combineReducers({
   Auth: AuthReducer,
@@ -16,6 +17,7 @@ const rootReducer = combineReducers({
   Following: FollowingReducer,
   Notifications: NotificationsReducer,
   Suggestion: SuggestionReducer,
+  DraftPost: DraftPostReducer,
 });
 
 export default rootReducer;

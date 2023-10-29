@@ -1,22 +1,27 @@
-import React, { useEffect } from 'react';
-import { connect } from 'react-redux';
-import { StyleSheet } from 'react-native';
-import { useIsFocused } from '@react-navigation/native';
+import React, { useEffect } from "react";
+import { connect } from "react-redux";
+import { StyleSheet, TouchableOpacity } from "react-native";
+import { useIsFocused, useNavigation } from "@react-navigation/native";
 
-import { Button, Container, Content, Text, View } from '../../common';
-import ProfileHeader from '../components/ProfileHeader';
-import NameIcon from '../../assets/icons/edit-name-icon.svg';
-import EditIcon from '../../assets/icons/edit-email-icon.svg';
+import { Button, Container, Content, Text, View } from "../../common";
+import ProfileHeader from "../components/ProfileHeader";
+import NameIcon from "../../assets/icons/edit-name-icon.svg";
+import EditIcon from "../../assets/icons/edit-email-icon.svg";
 
-import { getProfile as selectProfile } from '../redux/selectors';
-import { getProfile as getProfileAction } from '../redux/actions';
-import { deleteUserAccount, logout as logoutAction } from '../../auth/redux/actions';
+import * as Colors from "../../config/colors";
+import { getProfile as selectProfile } from "../redux/selectors";
+import { getProfile as getProfileAction } from "../redux/actions";
+import {
+  deleteUserAccount,
+  logout as logoutAction,
+} from "../../auth/redux/actions";
 
 /* =============================================================================
 <ProfileScreen />
 ============================================================================= */
 const ProfileScreen = ({ profile, getProfile, logout, deleteUserAccount }) => {
   const isFocused = useIsFocused();
+  const navigation = useNavigation();
   const email = profile?.email;
   const profileImage = profile?.profileImage;
   const username = profile?.username;
@@ -27,14 +32,14 @@ const ProfileScreen = ({ profile, getProfile, logout, deleteUserAccount }) => {
       getProfile();
     }
     // console.log("profileID -- > " , JSON.stringify(profile.userId))
-  }, [isFocused])
+  }, [isFocused]);
 
   const _handleLogout = () => {
     logout();
   };
 
   const _deleteAccount = () => {
-    deleteUserAccount()
+    deleteUserAccount();
   };
 
   return (
@@ -55,14 +60,30 @@ const ProfileScreen = ({ profile, getProfile, logout, deleteUserAccount }) => {
             <Text normal>{email}</Text>
           </View>
         </View>
-        
+        <TouchableOpacity
+          style={{
+            borderColor: Colors.primary,
+            borderWidth: 1,
+            borderRadius: 50,
+            justifyContent: "center",
+            alignItems: "center",
+            height: 40,
+            width: 170,
+          }}
+          activeOpacity={1}
+          onPress={() => {
+            navigation.navigate("DraftPostListing");
+          }}
+        >
+          <Text normal>{"My draft posts"}</Text>
+        </TouchableOpacity>
       </Content>
-      
+
       <View center style={styles.btnContainer}>
-        <Button title='Logout' onPress={_handleLogout} />
+        <Button title="Logout" onPress={_handleLogout} />
       </View>
       <View center style={styles.btnContainer}>
-        <Button title='Delete Account' onPress={_deleteAccount} />
+        <Button title="Delete Account" onPress={_deleteAccount} />
       </View>
     </Container>
   );
@@ -81,7 +102,7 @@ const styles = StyleSheet.create({
   },
   btnContainer: {
     marginBottom: 20,
-  }
+  },
 });
 
 const mapStateToProps = (state) => ({
@@ -92,7 +113,6 @@ const mapDispatchToProps = {
   logout: logoutAction,
   deleteUserAccount: deleteUserAccount,
   getProfile: getProfileAction,
-
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(ProfileScreen);
