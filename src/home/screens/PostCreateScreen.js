@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import * as yup from "yup";
 import { connect, useDispatch, useSelector } from "react-redux";
 import FastImage from "react-native-fast-image";
-import { StyleSheet } from "react-native";
+import { BackHandler, StyleSheet } from "react-native";
 import { Formik, FieldArray } from "formik";
 
 import {
@@ -47,7 +47,17 @@ const PostCreateScreen = ({
   const toast = useToast();
   const isFocused = useIsFocused();
   const formikRef = useRef();
-  const [initialValues, setInitialValues] = useState({});
+  const [initialValues, setInitialValues] = useState({
+    title: "",
+    description: "",
+    items: [
+      {
+        name: "",
+        image: "",
+        description: "",
+      },
+    ],
+  });
   const [radioButtons, setRadioButtons] = useState([
     {
       id: "1", // acts as primary key, should be unique and non-empty string
@@ -63,7 +73,7 @@ const PostCreateScreen = ({
       borderColor: "#6d14c4",
     },
   ]);
-  const [initialState, setInitialState] = useState({
+  const initialState = useRef({
     title: "",
     items: [
       {
@@ -72,7 +82,9 @@ const PostCreateScreen = ({
         description: "",
       },
     ],
+    description: "",
   });
+
   const [alertModal, setAlertModal] = useState({
     value: false,
     data: null,
@@ -106,8 +118,8 @@ const PostCreateScreen = ({
         ]);
       }
       let makeObj = {
-        description: data?.description ? data?.description : "",
         title: data?.title ? data?.title : "",
+        description: data?.description ? data?.description : "",
         items:
           data?.items?.length > 0
             ? data?.items
@@ -120,39 +132,34 @@ const PostCreateScreen = ({
               ],
       };
       setInitialValues(makeObj);
-    } else {
-      setInitialValues({
-        title: "",
-        items: [
-          {
-            name: "",
-            image: "",
-            description: "",
-          },
-        ],
-      });
     }
   }, [isFocused]);
 
   const dispatch = useDispatch();
   const selector = useSelector((AppState) => AppState);
-  //Hardware Back Handler------->
-  useBackButtonListener(() => {
-    fetchCurrentStates();
-    return true;
-  });
+  useEffect(() => {
+    const backAction = () => {
+      fetchCurrentStates();
+      return true;
+    };
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      backAction
+    );
+    return () => backHandler.remove();
+  }, []);
   const fetchCurrentStates = () => {
     let isOpenAlert = false;
-    if (initialState?.title?.length > 0) {
+    if (initialState.current?.title?.length > 0) {
       isOpenAlert = true;
-    } else if (initialState?.description?.length > 0) {
+    } else if (initialState.current?.description?.length > 0) {
       isOpenAlert = true;
-    } else if (initialState?.items?.length > 1) {
+    } else if (initialState.current?.items?.length > 1) {
       isOpenAlert = true;
     } else if (
-      initialState?.items?.length == 0 &&
-      (initialState?.items[0]?.description?.length > 0 ||
-        initialState?.items[0]?.title?.length > 0)
+      initialState.current?.items?.length == 0 &&
+      (initialState.current?.items[0]?.description?.length > 0 ||
+        initialState.current?.items[0]?.title?.length > 0)
     ) {
       isOpenAlert = true;
     }
@@ -161,7 +168,7 @@ const PostCreateScreen = ({
       setAlertModal({
         value: true,
         data: {
-          ...initialState,
+          ...initialState.current,
           isNumberShowInItems: toggleCheckBox,
           order: radioButtons.find((item) => item.selected).id,
         },
@@ -274,12 +281,13 @@ const PostCreateScreen = ({
           <FieldArray
             name="items"
             render={(arrayHelpers) => {
-              setInitialState(values);
+              console.log("values------>", values);
+              initialState.current = values;
               return (
                 <Content contentContainerStyle={styles.content}>
                   <View center>
                     <TextInput
-                      value={values.title}
+                      value={values?.title}
                       onBlur={handleBlur("title")}
                       errorText={errors?.title}
                       maxLength={55}

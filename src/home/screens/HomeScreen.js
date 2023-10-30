@@ -98,7 +98,6 @@ const HomeScreen = ({ posts, getHomePosts, refreshHomePosts, getProfile }) => {
     const mAnnouncementPosts = await getAnnouncementPosts();
     const mHomePosts = await getMyHomePosts();
     allHomePosts = mHomePosts;
-    console.log("updateRequest - . ", UPDATE_CHALLENGE_FEATURE.isUpdate);
     if (UPDATE_CHALLENGE_FEATURE.isUpdate) {
       setHomePosts([]);
       UPDATE_CHALLENGE_FEATURE.isUpdate = false;
@@ -133,7 +132,6 @@ const HomeScreen = ({ posts, getHomePosts, refreshHomePosts, getProfile }) => {
     // console.log("ggggg - > ", JSON.stringify(mFinalList));
     setTimeout(() => {
       setHomePosts(mFinalList);
-      console.log("updateUp 00 >");
       setUpdate(!isUpdate);
       setRefreshing(false);
       setLoaderVisible(false);

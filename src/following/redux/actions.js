@@ -1,10 +1,10 @@
-import FireStore from '@react-native-firebase/firestore';
-import FireAuth from '@react-native-firebase/auth';
-import { setProfile } from '../../profile/redux/actions';
-import * as constants from './constants';
+import FireStore from "@react-native-firebase/firestore";
+import FireAuth from "@react-native-firebase/auth";
+import { setProfile } from "../../profile/redux/actions";
+import * as constants from "./constants";
 
-const ProfilesCollection = FireStore().collection('profiles');
-const BlockUsersCollection = FireStore().collection("blockUsers")
+const ProfilesCollection = FireStore().collection("profiles");
+const BlockUsersCollection = FireStore().collection("blockUsers");
 
 /**
  * GET_ALL_USERS
@@ -59,7 +59,6 @@ export const refreshAllUsers = (lastDocId) => async (dispatch) => {
       profileSnapshot.forEach((snapshot) => {
         const profile = snapshot.data();
         if (profile.userId !== currentUser) {
-          
           profiles.push({
             ...profile,
             id: snapshot.id,
@@ -91,19 +90,23 @@ export const getUserFollowings = () => async (dispatch) => {
     const userFollowingIds = await userProfile.data().followings;
 
     // POPULATE USER FOLLOWING IDS
-    const userFollowings = await Promise.all(userFollowingIds.map(async (id) => {
-      const author = await ProfilesCollection.doc(id).get();
-      return author.data();
-    }))
+    const userFollowings = await Promise.all(
+      userFollowingIds.map(async (id) => {
+        const author = await ProfilesCollection.doc(id).get();
+        return author.data();
+      })
+    );
 
-    dispatch({ type: constants.GET_USER_FOLLOWINGS.SUCCESS, payload: userFollowings });
+    dispatch({
+      type: constants.GET_USER_FOLLOWINGS.SUCCESS,
+      payload: userFollowings,
+    });
   } catch (error) {
     dispatch({ type: constants.GET_USER_FOLLOWINGS.FAIL, error });
   } finally {
     dispatch({ type: constants.GET_USER_FOLLOWINGS.COMPLETE });
   }
 };
-
 
 /**
  * USER_FOLLOW
@@ -116,35 +119,43 @@ export const followUser = (userId) => async (dispatch) => {
     const currentUserProfile = await ProfilesCollection.doc(currentUser).get();
     const currentUserFollowing = await currentUserProfile.data().followings;
     const currentUserFollowingUpdated = [...currentUserFollowing, userId];
-    await ProfilesCollection.doc(currentUser).update({ followings: currentUserFollowingUpdated });
+    await ProfilesCollection.doc(currentUser).update({
+      followings: currentUserFollowingUpdated,
+    });
     // SAVING UPDATED PROFILE DOC TO PROFILE REDUX AS WELL
-    const updatedCurrentUserProfile = await (await ProfilesCollection.doc(currentUser).get()).data();
+    const updatedCurrentUserProfile = await (
+      await ProfilesCollection.doc(currentUser).get()
+    ).data();
     dispatch(setProfile(updatedCurrentUserProfile));
 
-    // ADDING NOTIFICATION TO USER_ID ABOUT FOLLOW 
+    // ADDING NOTIFICATION TO USER_ID ABOUT FOLLOW
     // & ADDING CURRENT USER TO FOLLOWED USER FOLLOWERS
-    const followedUserProfile = await (await ProfilesCollection.doc(userId).get()).data();
+    const followedUserProfile = await (
+      await ProfilesCollection.doc(userId).get()
+    ).data();
     await ProfilesCollection.doc(userId).update({
       followers: [...followedUserProfile.followers, currentUser],
       notifications: [
         {
           id: Date.now(),
-          type: 'follow',
+          type: "follow",
           sender: currentUser,
-          unread: true
+          unread: true,
         },
         ...followedUserProfile.notifications,
-      ]
+      ],
     });
 
-    dispatch({ type: constants.USER_FOLLOW.SUCCESS, payload: followedUserProfile });
+    dispatch({
+      type: constants.USER_FOLLOW.SUCCESS,
+      payload: followedUserProfile,
+    });
   } catch (error) {
     dispatch({ type: constants.USER_FOLLOW.FAIL, error });
   } finally {
     dispatch({ type: constants.USER_FOLLOW.COMPLETE });
   }
 };
-
 
 /**
  * USER_UN_FOLLOW
@@ -156,16 +167,26 @@ export const unFollowUser = (userId) => async (dispatch) => {
     const currentUser = FireAuth().currentUser.uid;
     const userProfile = await ProfilesCollection.doc(currentUser).get();
     const userFollowings = await userProfile.data().followings;
-    const userFollowingsUpdated = userFollowings.filter((item) => item !== userId);
-    await ProfilesCollection.doc(currentUser).update({ followings: userFollowingsUpdated });
+    const userFollowingsUpdated = userFollowings.filter(
+      (item) => item !== userId
+    );
+    await ProfilesCollection.doc(currentUser).update({
+      followings: userFollowingsUpdated,
+    });
     // SAVING UPDATED PROFILE DOC TO PROFILE REDUX AS WELL
-    const updatedCurrentUserProfile = await (await ProfilesCollection.doc(currentUser).get()).data();
+    const updatedCurrentUserProfile = await (
+      await ProfilesCollection.doc(currentUser).get()
+    ).data();
     dispatch(setProfile(updatedCurrentUserProfile));
 
     // & REMOVING CURRENT USER TO FOLLOWED USER FOLLOWERS
-    const followedUserProfile = await (await ProfilesCollection.doc(userId).get()).data();
+    const followedUserProfile = await (
+      await ProfilesCollection.doc(userId).get()
+    ).data();
     await ProfilesCollection.doc(userId).update({
-      followers: followedUserProfile.followers?.filter((id) => id !== currentUser),
+      followers: followedUserProfile.followers?.filter(
+        (id) => id !== currentUser
+      ),
     });
 
     dispatch({ type: constants.USER_UN_FOLLOW.SUCCESS, payload: userId });
@@ -175,7 +196,6 @@ export const unFollowUser = (userId) => async (dispatch) => {
     dispatch({ type: constants.USER_UN_FOLLOW.COMPLETE });
   }
 };
-
 
 /**
  * USER_SEARCH
@@ -192,19 +212,25 @@ export const searchUser = (searchTxt) => async (dispatch) => {
       profileSnapshot.forEach((snapshot) => {
         const profile = snapshot.data();
         if (profile.username.toLowerCase().includes(searchTxt.toLowerCase())) {
-          console.log("profileId - > " , profile.userId, FireAuth().currentUser.uid)
+          console.log(
+            "profileId - > ",
+            profile.userId,
+            FireAuth().currentUser.uid
+          );
           if (FireAuth().currentUser.uid !== profile.userId) {
             searchedProfiles.push({
               ...profile,
               id: snapshot.id,
-            })
+            });
           }
-          
         }
       });
     }
 
-    dispatch({ type: constants.USER_SEARCH.SUCCESS, payload: searchedProfiles });
+    dispatch({
+      type: constants.USER_SEARCH.SUCCESS,
+      payload: searchedProfiles,
+    });
   } catch (error) {
     dispatch({ type: constants.USER_SEARCH.FAIL, error });
   } finally {
@@ -212,32 +238,32 @@ export const searchUser = (searchTxt) => async (dispatch) => {
   }
 };
 
-const removeBlockUser = async(profileList) => {
-  const alreadyBlockUsersCollection = await BlockUsersCollection.where('blockedBy' , '==' , currentUserUid).get()
-    const alreadyBlockUsersId = alreadyBlockUsersCollection.docs
-    let blockedUsersId = []
-    alreadyBlockUsersId.forEach((item) => {
-      blockedUsersId.push(item.data())
-    })
-    console.log("alreadyBlockUsersIdsHome11 - > ", blockedUsersId)
+const removeBlockUser = async (profileList) => {
+  const alreadyBlockUsersCollection = await BlockUsersCollection.where(
+    "blockedBy",
+    "==",
+    currentUserUid
+  ).get();
+  const alreadyBlockUsersId = alreadyBlockUsersCollection.docs;
+  let blockedUsersId = [];
+  alreadyBlockUsersId.forEach((item) => {
+    blockedUsersId.push(item.data());
+  });
 
-    let finalPopularPosts = []
-    if (blockedUsersId.length > 0) {
-      profileList.forEach((item) => {
-        blockedUsersId.forEach((blockData) => {
-          blockData.blockUserId.forEach((mdata) => {
-            console.log("print -- > " , mdata)
-            if (item.id != mdata) {
-              finalPopularPosts.push(item)
-            }
-          })
-        })
-        
-      })
-    }else{
-      finalPopularPosts = profileList
-    }
+  let finalPopularPosts = [];
+  if (blockedUsersId.length > 0) {
+    profileList.forEach((item) => {
+      blockedUsersId.forEach((blockData) => {
+        blockData.blockUserId.forEach((mdata) => {
+          if (item.id != mdata) {
+            finalPopularPosts.push(item);
+          }
+        });
+      });
+    });
+  } else {
+    finalPopularPosts = profileList;
+  }
 
-    return finalPopularPosts
-}
-
+  return finalPopularPosts;
+};

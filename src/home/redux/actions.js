@@ -97,14 +97,12 @@ export const getHomePosts = () => async (dispatch) => {
     alreadyBlockUsersId.forEach((item) => {
       blockedUsersId.push(item.data());
     });
-    console.log("alreadyBlockUsersIdsHome11 - > ", blockedUsersId);
 
     let finalPopularPosts = [];
     if (blockedUsersId.length > 0) {
       populatedPosts.forEach((item) => {
         blockedUsersId.forEach((blockData) => {
           blockData.blockUserId.forEach((mdata) => {
-            console.log("print -- > ", mdata);
             if (item.author.userId != mdata) {
               finalPopularPosts.push(item);
             }
@@ -114,16 +112,6 @@ export const getHomePosts = () => async (dispatch) => {
     } else {
       finalPopularPosts = populatedPosts;
     }
-    // alreadyBlockUsersId.forEach((item) => {
-    //   console.log("alreadyBlockUsersIdsHome11 - > ", item.get())
-    // })
-    // populatedPosts.filter((item) => item.author)
-    console.log(
-      "popularPosts --- > ",
-      populatedPosts,
-      " \n\n postsLength - > ",
-      populatedPosts.length
-    );
 
     dispatch({
       type: constants.GET_HOME_POSTS.SUCCESS,
@@ -250,14 +238,12 @@ export const getMyHomePosts = async () => {
     alreadyBlockUsersId.forEach((item) => {
       blockedUsersId.push(item.data());
     });
-    console.log("alreadyBlockUsersIdsHome11 - > ", blockedUsersId);
 
     let finalPopularPosts = [];
     if (blockedUsersId.length > 0) {
       populatedPosts.forEach((item) => {
         blockedUsersId.forEach((blockData) => {
           blockData.blockUserId.forEach((mdata) => {
-            console.log("print -- > ", mdata);
             if (item.author.userId != mdata) {
               finalPopularPosts.push(item);
             }
@@ -388,14 +374,12 @@ export const refreshHomePosts = (lastDocId) => async (dispatch) => {
     alreadyBlockUsersId.forEach((item) => {
       blockedUsersId.push(item.data());
     });
-    console.log("alreadyBlockUsersIdsHome11 - > ", blockedUsersId);
 
     let finalPopularPosts = [];
     if (blockedUsersId.length > 0) {
       populatedPosts.forEach((item) => {
         blockedUsersId.forEach((blockData) => {
           blockData.blockUserId.forEach((mdata) => {
-            console.log("print -- > ", mdata);
             if (item.author.userId != mdata) {
               finalPopularPosts.push(item);
             }
