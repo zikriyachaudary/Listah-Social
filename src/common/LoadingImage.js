@@ -15,8 +15,8 @@ const LoadingImage = (props) => {
   // console.log(props.source);
   const [loading, setLoading] = useState(false);
   const [src, setSource] = useState(props.source);
-  const selector = useSelector((AppState) => AppState)
-  const dispatch = useDispatch()
+  const selector = useSelector((AppState) => AppState);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     setSource(props.source);
@@ -49,11 +49,10 @@ const LoadingImage = (props) => {
 
       <TouchableWithoutFeedback
         onPress={() => {
-          if(!selector.Home.showFullImage){
-            dispatch(setFullImageLink(src))
-            dispatch(showFullImage(true))
+          if (!selector.Home.showFullImage) {
+            dispatch(setFullImageLink(src));
+            dispatch(showFullImage(true));
           }
-          console.log("clicked -- > ");
         }}
       >
         <FastImage

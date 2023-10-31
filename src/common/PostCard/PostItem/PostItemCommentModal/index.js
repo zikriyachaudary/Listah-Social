@@ -31,7 +31,6 @@ import {
 } from "../../../../home/redux/actions";
 import { updateHomeData } from "../../../../home/redux/appLogics";
 import { useEffect } from "react";
-import { isEmptyArray } from "formik";
 
 /* =============================================================================
  PostItemCommentModal />

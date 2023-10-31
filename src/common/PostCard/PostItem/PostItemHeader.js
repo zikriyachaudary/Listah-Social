@@ -86,7 +86,6 @@ const PostItemHeader = ({
       <TouchableOpacity
         disabled={post?.announcement}
         onPress={() => {
-          console.log("clicked11 - > ", postRefresh);
           navigation.navigate("MyPosts", {
             userId: post.author.userId,
             username: username,

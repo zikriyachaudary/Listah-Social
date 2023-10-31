@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import * as yup from "yup";
 import { connect, useDispatch, useSelector } from "react-redux";
 import FastImage from "react-native-fast-image";
-import { BackHandler, StyleSheet } from "react-native";
+import { BackHandler, Platform, StyleSheet } from "react-native";
 import { Formik, FieldArray } from "formik";
 
 import {
@@ -29,10 +29,11 @@ import {
   setCreatePostFailError,
   setDraftPost,
 } from "../../redux/action/AppLogics";
-import useBackButtonListener from "../../hooks/useBackButtonListener";
 import AlertModal from "../../common/AlertModal";
 import { saveUserDraftPost } from "../../util/helperFun";
 import { useIsFocused } from "@react-navigation/native";
+import TextInputComponent from "../../common/TextInputComponent";
+import { AppColors, ScreenSize, normalized } from "../../util/AppConstant";
 
 /* =============================================================================
 <PostCreateScreen />
@@ -44,12 +45,20 @@ const PostCreateScreen = ({
   route,
   createAnnouncementPost,
 }) => {
+  const dispatch = useDispatch();
+  const selector = useSelector((AppState) => AppState);
+  const [title, setTitle] = useState("");
+  const title2 = useRef("");
+  const [titleError, setTitleError] = useState("");
+
+  const [des, setDes] = useState("");
+  const des2 = useRef("");
+  const [desError, setDesError] = useState("");
+
   const toast = useToast();
   const isFocused = useIsFocused();
   const formikRef = useRef();
   const [initialValues, setInitialValues] = useState({
-    title: "",
-    description: "",
     items: [
       {
         name: "",
@@ -58,6 +67,7 @@ const PostCreateScreen = ({
       },
     ],
   });
+
   const [radioButtons, setRadioButtons] = useState([
     {
       id: "1", // acts as primary key, should be unique and non-empty string
@@ -74,7 +84,6 @@ const PostCreateScreen = ({
     },
   ]);
   const initialState = useRef({
-    title: "",
     items: [
       {
         name: "",
@@ -82,7 +91,6 @@ const PostCreateScreen = ({
         description: "",
       },
     ],
-    description: "",
   });
 
   const [alertModal, setAlertModal] = useState({
@@ -117,9 +125,11 @@ const PostCreateScreen = ({
           },
         ]);
       }
+      setTitle(data?.title ? data?.title : "");
+      title2.current = data?.title ? data?.title : "";
+      setDes(data?.description ? data?.description : "");
+      des2.current = data?.description ? data?.description : "";
       let makeObj = {
-        title: data?.title ? data?.title : "",
-        description: data?.description ? data?.description : "",
         items:
           data?.items?.length > 0
             ? data?.items
@@ -133,10 +143,26 @@ const PostCreateScreen = ({
       };
       setInitialValues(makeObj);
     }
+    return () => {
+      clearStates();
+    };
   }, [isFocused]);
-
-  const dispatch = useDispatch();
-  const selector = useSelector((AppState) => AppState);
+  const clearStates = () => {
+    title2.current = "";
+    des2.current = "";
+    formikRef.current?.resetForm();
+    setInitialValues({
+      items: [
+        {
+          name: "",
+          image: "",
+          description: "",
+        },
+      ],
+    });
+    setTitle("");
+    setDes("");
+  };
   useEffect(() => {
     const backAction = () => {
       fetchCurrentStates();
@@ -146,38 +172,61 @@ const PostCreateScreen = ({
       "hardwareBackPress",
       backAction
     );
-    return () => backHandler.remove();
+    return () => {
+      backHandler.remove();
+      clearStates();
+    };
   }, []);
   const fetchCurrentStates = () => {
-    let isOpenAlert = false;
-    if (initialState.current?.title?.length > 0) {
-      isOpenAlert = true;
-    } else if (initialState.current?.description?.length > 0) {
-      isOpenAlert = true;
-    } else if (initialState.current?.items?.length > 1) {
-      isOpenAlert = true;
-    } else if (
-      initialState.current?.items?.length == 0 &&
-      (initialState.current?.items[0]?.description?.length > 0 ||
-        initialState.current?.items[0]?.title?.length > 0)
-    ) {
-      isOpenAlert = true;
-    }
-
-    if (isOpenAlert) {
-      setAlertModal({
-        value: true,
-        data: {
-          ...initialState.current,
-          isNumberShowInItems: toggleCheckBox,
-          order: radioButtons.find((item) => item.selected).id,
-        },
-        message: route?.params?.isEdit
-          ? "Do you want to replace this post in your draft?"
-          : "Do you want to save this post in your draft?",
-      });
+    let obj = {
+      ...initialState.current,
+      title: title2.current,
+      description: des2.current,
+      isNumberShowInItems: toggleCheckBox,
+      order: radioButtons.find((item) => item.selected).id,
+    };
+    if (route?.params?.isEdit && route?.params?.data) {
+      if (
+        JSON.stringify(route?.params?.data) ===
+        JSON.stringify({
+          ...obj,
+          draftPostId: route?.params?.data?.draftPostId,
+        })
+      ) {
+        navigation?.goBack();
+      } else {
+        setAlertModal({
+          value: true,
+          data: obj,
+          message: "Do you want to update this post in your draft?",
+        });
+      }
     } else {
-      navigation?.goBack();
+      let isOpenAlert = false;
+      console.log("title----->", title2.current);
+      if (title2.current?.length > 0) {
+        isOpenAlert = true;
+      } else if (des2.current?.length > 0) {
+        isOpenAlert = true;
+      } else if (initialState.current?.items?.length > 1) {
+        isOpenAlert = true;
+      } else if (
+        initialState.current?.items?.length == 0 &&
+        (initialState.current?.items[0]?.description?.length > 0 ||
+          initialState.current?.items[0]?.title?.length > 0)
+      ) {
+        isOpenAlert = true;
+      }
+      console.log("isOpenAlert------>", isOpenAlert);
+      if (isOpenAlert) {
+        setAlertModal({
+          value: true,
+          data: obj,
+          message: "Do you want to save this post in your draft?",
+        });
+      } else {
+        navigation?.goBack();
+      }
     }
   };
   const _handleAdd = (arrayHelpers) => {
@@ -204,8 +253,20 @@ const PostCreateScreen = ({
     }
   };
   const _handleSubmit = async (values, { resetForm }) => {
+    if (title?.length == 0) {
+      setTitleError("!Empty Field");
+    }
+    if (des?.length == 0) {
+      setDesError("!Empty Field");
+    }
+    if (title?.length == 0 || des?.length == 0) {
+      return;
+    }
+    values["title"] = title;
+    values["description"] = des;
     values["order"] = radioButtons.find((item) => item.selected).id;
     values["isNumberShowInItems"] = toggleCheckBox;
+
     if (route.params && route.params.isAnnouncement) {
       await createAnnouncementPost(values);
     } else {
@@ -243,6 +304,7 @@ const PostCreateScreen = ({
     dispatch(setDraftPost(draftArr));
     await saveUserDraftPost(draftArr);
     dispatch(setCreatePostFailError(""));
+
     setAlertModal({ value: false, data: null, message: "" });
     toast.show(
       route?.params?.isEdit
@@ -250,12 +312,12 @@ const PostCreateScreen = ({
         : "Post save in your draft list"
     );
     dispatch(setPostRefresh(!selector.Home.isPostRefresh));
-    formikRef.current?.resetForm();
     navigation.goBack();
   };
   const onPressRadioButton = (radioButtonsArray) => {
     setRadioButtons(radioButtonsArray);
   };
+
   return (
     <Container style={styles.content}>
       <StackHeader
@@ -263,6 +325,29 @@ const PostCreateScreen = ({
           fetchCurrentStates();
         }}
       />
+      <TextInputComponent
+        value={title}
+        maxLength={55}
+        setValue={(val) => {
+          setTitleError("");
+          setTitle(val);
+          title2.current = val;
+        }}
+        placeholder="What's your List Title..."
+        error={titleError}
+      />
+
+      <TextInputComponent
+        value={des}
+        setValue={(val) => {
+          setDesError("");
+          setDes(val);
+          des2.current = val;
+        }}
+        placeholder="Post description..."
+        error={desError}
+      />
+
       <Formik
         enableReinitialize={true}
         innerRef={formikRef}
@@ -270,37 +355,14 @@ const PostCreateScreen = ({
         validationSchema={schema}
         onSubmit={_handleSubmit}
       >
-        {({
-          handleChange,
-          handleBlur,
-          handleSubmit,
-          setFieldValue,
-          values,
-          errors,
-        }) => (
+        {({ handleChange, handleSubmit, setFieldValue, values, errors }) => (
           <FieldArray
             name="items"
-            render={(arrayHelpers) => {
-              console.log("values------>", values);
+            render={(arrayHelpers, i) => {
               initialState.current = values;
               return (
                 <Content contentContainerStyle={styles.content}>
-                  <View center>
-                    <TextInput
-                      value={values?.title}
-                      onBlur={handleBlur("title")}
-                      errorText={errors?.title}
-                      maxLength={55}
-                      onChangeText={handleChange("title")}
-                      placeholder="What's your List Title..."
-                    />
-                    <TextInput
-                      value={values.description}
-                      onBlur={handleBlur("description")}
-                      errorText={errors?.description}
-                      onChangeText={handleChange("description")}
-                      placeholder="Post description..."
-                    />
+                  <View key={i} center>
                     {values.items && values.items.length > 0
                       ? values.items.map((item, index) => (
                           <View
@@ -310,28 +372,17 @@ const PostCreateScreen = ({
                           >
                             {item?.image && item.image !== "a" ? (
                               <FastImage
-                                style={{ ...styles.img, marginEnd: 10 }}
+                                style={styles.img}
                                 source={item?.image}
                               />
                             ) : (
-                              <View center>
-                                <ImagePickerButton
-                                  btnSize="small"
-                                  style={{
-                                    ...styles.img,
-                                    marginEnd: 10,
-                                    marginHorizontal: 0,
-                                  }}
-                                  onImageSelect={(img) => {
-                                    setFieldValue(`items.${index}.image`, img);
-                                  }}
-                                />
-                                {/* {errors?.items && errors?.items[index] ? (
-                                <Text sm style={styles.errorText}>
-                                  {errors?.items[index].image}
-                                </Text>
-                              ) : null} */}
-                              </View>
+                              <ImagePickerButton
+                                btnSize="small"
+                                style={styles.img}
+                                onImageSelect={(img) => {
+                                  setFieldValue(`items.${index}.image`, img);
+                                }}
+                              />
                             )}
                             <TextInput
                               value={item.name}
@@ -374,7 +425,6 @@ const PostCreateScreen = ({
                       style={{
                         alignItems: "flex-start",
                         marginVertical: 10,
-                        // backgroundColor: "red"
                       }}
                     >
                       <RadioGroup
@@ -408,7 +458,6 @@ const PostCreateScreen = ({
                           boxType={"circle"}
                           onValueChange={(newValue) => {
                             // setShhowModal(false)
-                            console.log("showNewValue - > ", newValue);
                             setToggleCheckBox(newValue);
                           }}
                         />
@@ -416,7 +465,7 @@ const PostCreateScreen = ({
                           style={{
                             fontSize: 14,
                             marginStart: 5,
-                            color: "black",
+                            color: AppColors.black.black,
                           }}
                         >
                           Numbered List
@@ -469,8 +518,8 @@ const PostCreateScreen = ({
 };
 
 const schema = yup.object().shape({
-  title: yup.string().required("!Empty Field"),
-  description: yup.string().required("!Empty Field"),
+  // title: yup.string().required("!Empty Field"),
+  // description: yup.string().required("!Empty Field"),
   items: yup.array().of(
     yup.object().shape({
       name: yup.string().required("!Empty Field"),
@@ -483,10 +532,11 @@ const schema = yup.object().shape({
 
 const styles = StyleSheet.create({
   dynamicFieldContainer: {
-    width: "100%",
-    borderRadius: 20,
+    width: ScreenSize.width - normalized(Platform.OS == "ios" ? 30 : 40),
+    borderRadius: normalized(10),
     alignItems: "flex-start",
-    marginTop: 20,
+    height: normalized(60),
+    marginTop: normalized(7),
   },
   content: {
     justifyContent: "space-between",
@@ -517,14 +567,16 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   img: {
-    width: 40,
-    height: 40,
-    borderRadius: 40 / 2,
+    width: normalized(40),
+    height: normalized(40),
+    borderRadius: normalized(40 / 2),
     marginVertical: 0,
+    justifyContent: "center",
+    alignItems: "center",
+    marginHorizontal: normalized(5),
   },
   deleteBtn: {
-    paddingVertical: 8,
-    paddingHorizontal: 10,
+    padding: normalized(5),
   },
 });
 

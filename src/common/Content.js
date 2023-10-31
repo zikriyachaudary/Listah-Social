@@ -1,5 +1,5 @@
-import React from 'react';
-import { StyleSheet, ScrollView } from 'react-native';
+import React from "react";
+import { StyleSheet, ScrollView } from "react-native";
 
 /* =============================================================================
 <Content />
@@ -15,14 +15,19 @@ const Content = ({
 }) => {
   return (
     <ScrollView
-      style={[styles.container, containerStyle, horizontalPadding && { paddingHorizontal: horizontalPadding }]}
+      style={[
+        styles.container,
+        containerStyle,
+        horizontalPadding && { paddingHorizontal: horizontalPadding },
+      ]}
       showsVerticalScrollIndicator={false}
       contentContainerStyle={[
         styles.contentContainer,
         center && styles.center,
         contentContainerStyle,
       ]}
-      {...props}>
+      {...props}
+    >
       {children}
     </ScrollView>
   );
@@ -35,19 +40,19 @@ Content.defaultProps = {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   contentContainer: {
     flexGrow: 1,
     paddingBottom: 20,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   horizontalPadding: {
     paddingHorizontal: 20,
   },
   center: {
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
 

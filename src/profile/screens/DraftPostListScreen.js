@@ -110,7 +110,7 @@ const DraftPostListScreen = () => {
         />
       ) : (
         <View style={styles.emptyCont}>
-          <Text style={styles.emptyTxt}>No Order found!</Text>
+          <Text style={styles.emptyTxt}>No Post found!</Text>
         </View>
       )}
       {alertModal?.value ? (

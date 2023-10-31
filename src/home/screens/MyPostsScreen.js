@@ -62,7 +62,6 @@ const MyPostsScreen = ({
   const [userProfileImage, setUsersProfileImage] = useState();
   const [userProfileInfo, setUsersProfileInfo] = useState();
 
-
   const [isFollowUser, setFollowUser] = useState();
   const [followersModal, setFollowersModal] = useState(false);
   const [followersOrFollowingList, setFollowersOrFollowingList] = useState([]);
@@ -70,7 +69,6 @@ const MyPostsScreen = ({
   const selector = useSelector((AppState) => AppState);
 
   useEffect(() => {
-    console.log("usersParams - > ", userFollowings);
     fetchUsersData();
   }, []);
   const _toggleFollowersModal = () => setFollowersModal((prev) => !prev);
@@ -85,7 +83,7 @@ const MyPostsScreen = ({
       const isFollowed = mUsersData.followers?.find(
         (user) => user === profile.userId
       );
-      setFollowUser(isFollowed)
+      setFollowUser(isFollowed);
     }
   };
   // GET POSTS
@@ -110,7 +108,6 @@ const MyPostsScreen = ({
   };
 
   const renderItem = ({ item, index }) => {
-    console.log("mInnnn ", index);
     return (
       <PostItem
         id={item.id}
@@ -120,7 +117,6 @@ const MyPostsScreen = ({
           route.params.refreshCall();
         }}
         postReport={async (isReportCount) => {
-          console.log("reportClick");
           if (isReportCount == 2) {
             await blockUsers(item.author.userId);
             navigation.goBack();
@@ -142,7 +138,7 @@ const MyPostsScreen = ({
     await followUser(route.params.userId);
     dispatch(updateHomeData(!selector.Home.updateHomeData));
     setFollowUser(!isFollowUser);
-    await fetchUsersData()
+    await fetchUsersData();
     setLoading(false);
   };
 
@@ -153,7 +149,7 @@ const MyPostsScreen = ({
     await unFollowUser(route.params.userId);
     dispatch(updateHomeData(!selector.Home.updateHomeData));
     setFollowUser(!isFollowUser);
-    await fetchUsersData()
+    await fetchUsersData();
     setLoading(false);
   };
 
@@ -309,6 +305,7 @@ const MyPostsScreen = ({
       )}
       {userPosts.length > 0 && (
         <FlatList
+          showsVerticalScrollIndicator={false}
           data={userPosts}
           refreshing={false}
           renderItem={renderItem}

@@ -724,7 +724,7 @@ export const updatePost = (changes) => async (dispatch) => {
         })
       );
     }
-
+    console.log("post------>", post);
     await PostsCollection.doc(changes.id).update(post);
 
     const updatedPost = await (
@@ -1044,7 +1044,6 @@ export const getProfileDataByID = async (userId) => {
     const usersProfile = await (
       await ProfilesCollection.doc(userId).get()
     ).data();
-    console.log("usersFetchData - > ", usersProfile);
     return usersProfile;
   } catch (error) {
     console.log("printError - > ", error);

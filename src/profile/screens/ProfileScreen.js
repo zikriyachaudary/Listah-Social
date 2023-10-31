@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
-import { connect } from "react-redux";
-import { StyleSheet, TouchableOpacity } from "react-native";
+import { connect, useDispatch } from "react-redux";
+import { Image, StyleSheet, TouchableOpacity } from "react-native";
 import { useIsFocused, useNavigation } from "@react-navigation/native";
 
 import { Button, Container, Content, Text, View } from "../../common";
@@ -15,6 +15,9 @@ import {
   deleteUserAccount,
   logout as logoutAction,
 } from "../../auth/redux/actions";
+import { AppColors, AppImages, normalized } from "../../util/AppConstant";
+import { setDraftPost } from "../../redux/action/AppLogics";
+import { saveUserDraftPost } from "../../util/helperFun";
 
 /* =============================================================================
 <ProfileScreen />
@@ -22,6 +25,7 @@ import {
 const ProfileScreen = ({ profile, getProfile, logout, deleteUserAccount }) => {
   const isFocused = useIsFocused();
   const navigation = useNavigation();
+  const dispatch = useDispatch();
   const email = profile?.email;
   const profileImage = profile?.profileImage;
   const username = profile?.username;
@@ -34,11 +38,15 @@ const ProfileScreen = ({ profile, getProfile, logout, deleteUserAccount }) => {
     // console.log("profileID -- > " , JSON.stringify(profile.userId))
   }, [isFocused]);
 
-  const _handleLogout = () => {
+  const _handleLogout = async () => {
+    dispatch(setDraftPost([]));
+    await saveUserDraftPost([]);
     logout();
   };
 
-  const _deleteAccount = () => {
+  const _deleteAccount = async () => {
+    dispatch(setDraftPost([]));
+    await saveUserDraftPost([]);
     deleteUserAccount();
   };
 
@@ -60,48 +68,74 @@ const ProfileScreen = ({ profile, getProfile, logout, deleteUserAccount }) => {
             <Text normal>{email}</Text>
           </View>
         </View>
+        <View style={styles.simpleLine} />
         <TouchableOpacity
-          style={{
-            borderColor: Colors.primary,
-            borderWidth: 1,
-            borderRadius: 50,
-            justifyContent: "center",
-            alignItems: "center",
-            height: 40,
-            width: 170,
-          }}
+          style={{ ...styles.item, paddingVertical: normalized(5) }}
           activeOpacity={1}
           onPress={() => {
             navigation.navigate("DraftPostListing");
           }}
         >
-          <Text normal>{"My draft posts"}</Text>
+          <EditIcon />
+          <View style={styles.itemInfoContainer}>
+            <Text normal>{"My Draft Post"}</Text>
+          </View>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={{ ...styles.item, paddingVertical: normalized(5) }}
+          activeOpacity={1}
+          onPress={() => {
+            _handleLogout();
+          }}
+        >
+          <Image source={AppImages.profile.logout} style={styles.icon} />
+          <View style={styles.itemInfoContainer}>
+            <Text normal>{"Logout"}</Text>
+          </View>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={{ ...styles.item, paddingVertical: normalized(5) }}
+          activeOpacity={1}
+          onPress={() => {
+            _deleteAccount();
+          }}
+        >
+          <Image source={AppImages.profile.delete} style={styles.icon} />
+
+          <View style={styles.itemInfoContainer}>
+            <Text normal>{"Delete Account"}</Text>
+          </View>
         </TouchableOpacity>
       </Content>
-
-      <View center style={styles.btnContainer}>
-        <Button title="Logout" onPress={_handleLogout} />
-      </View>
-      <View center style={styles.btnContainer}>
-        <Button title="Delete Account" onPress={_deleteAccount} />
-      </View>
     </Container>
   );
 };
 
 const styles = StyleSheet.create({
   content: {
-    marginTop: 40,
-    paddingHorizontal: 30,
+    marginTop: normalized(40),
+    paddingHorizontal: normalized(20),
   },
   item: {
-    marginBottom: 30,
+    flexDirection: "row",
+    marginVertical: normalized(5),
   },
   itemInfoContainer: {
-    marginLeft: 25,
+    marginLeft: normalized(20),
   },
   btnContainer: {
     marginBottom: 20,
+  },
+  simpleLine: {
+    height: normalized(1),
+    backgroundColor: AppColors.grey.dark,
+    width: "100%",
+    marginVertical: normalized(10),
+  },
+  icon: {
+    height: normalized(25),
+    width: normalized(25),
   },
 });
 

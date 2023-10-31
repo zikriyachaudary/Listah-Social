@@ -28,7 +28,6 @@ import { challengePost, createPost } from "../../home/redux/actions";
 import { updateHomeData } from "../../home/redux/appLogics";
 import { UPDATE_CHALLENGE_FEATURE } from "../redux/constants";
 
-
 const AddChallengeListingScreen = ({
   createPost,
   challengePost,
@@ -54,8 +53,8 @@ const AddChallengeListingScreen = ({
       borderColor: "#6d14c4",
     },
   ]);
-  const dispatch = useDispatch()
-  const selector = useSelector((AppState) => AppState)
+  const dispatch = useDispatch();
+  const selector = useSelector((AppState) => AppState);
 
   const _handleAdd = (arrayHelpers) => {
     let arraySize = arrayHelpers.form.values.items.length + 1;
@@ -91,8 +90,8 @@ const AddChallengeListingScreen = ({
     setLoading(true);
     await challengePost(values, post);
     setLoading(false);
-    UPDATE_CHALLENGE_FEATURE.isUpdate = true
-    dispatch(updateHomeData(!selector.Home.updateHomeData))
+    UPDATE_CHALLENGE_FEATURE.isUpdate = true;
+    dispatch(updateHomeData(!selector.Home.updateHomeData));
 
     navigation.goBack();
     navigation.goBack();
@@ -110,14 +109,7 @@ const AddChallengeListingScreen = ({
         validationSchema={schema}
         onSubmit={_handleSubmit}
       >
-        {({
-          handleChange,
-          handleBlur,
-          handleSubmit,
-          setFieldValue,
-          values,
-          errors,
-        }) => (
+        {({ handleChange, handleSubmit, setFieldValue, values, errors }) => (
           <FieldArray
             name="items"
             render={(arrayHelpers) => (
