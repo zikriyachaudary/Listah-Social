@@ -168,8 +168,7 @@ const PostItem = ({
       />
       <PostInnerItems post={post} userPosts={postItems} />
 
-
-      {post.challenge && post.challengeRequest == CHALLENGE_REQUEST.ACCEPT  && (
+      {post.challenge && post.challengeRequest == CHALLENGE_REQUEST.ACCEPT && (
         <View>
           <Touchable
             horizontal
@@ -237,9 +236,9 @@ const PostItem = ({
           <Touchable
             horizontal
             style={{ ...styles.btn }}
-             onPress={()=>{
-              _handlePostReact(true)
-             }}
+            onPress={() => {
+              _handlePostReact(true);
+            }}
           >
             {challengeLikeLoading ? (
               <ActivityIndicator color={Colors.primary} />
@@ -290,14 +289,14 @@ const PostItem = ({
       ))} */}
 
       {post.description && (
-        <Text style={{ marginTop: 10, fontSize: 16, color:"black" }}>
-          <B>{post?.announcement ? "A-Listah" : post.author.username}</B> {post.description}.
+        <Text style={{ marginTop: 10, fontSize: 16, color: "black" }}>
+          <B>{post?.announcement ? "A-Listah" : post.author.username}</B>{" "}
+          {post.description}.
         </Text>
       )}
 
-      {
-        !post?.announcement && (
-          <PostActions
+      {!post?.announcement && (
+        <PostActions
           id={id}
           post={post}
           postRefresh={() => {
@@ -311,9 +310,7 @@ const PostItem = ({
             setLikeUserModalVisible((prev) => true);
           }}
         />
-        )
-      }
-     
+      )}
 
       {showLikeUserModal && (
         <LikeUserModal

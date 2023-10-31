@@ -1,15 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import { connect } from 'react-redux';
-import { StyleSheet } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import React, { useEffect, useState } from "react";
+import { connect } from "react-redux";
+import { StyleSheet } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 
-import { Text, Touchable, View } from '../../../common';
-import ListIcon from '../../../assets/icons/edit-list-icon.svg';
-import GlobeIcon from '../../../assets/icons/edit-globe-icon.svg';
-import UsersIcon from '../../../assets/icons/edit-users-icon.svg';
-import ProfileFollowersListModal from './ProfileFollowersListModal';
+import { Text, Touchable, View } from "../../../common";
+import ListIcon from "../../../assets/icons/edit-list-icon.svg";
+import GlobeIcon from "../../../assets/icons/edit-globe-icon.svg";
+import UsersIcon from "../../../assets/icons/edit-users-icon.svg";
+import ProfileFollowersListModal from "./ProfileFollowersListModal";
 
-import { getProfile } from '../../../profile/redux/selectors';
+import { getProfile } from "../../../profile/redux/selectors";
 
 /* =============================================================================
 <HomeHeaderProfileInfo />
@@ -26,12 +26,15 @@ const HomeHeaderProfileInfo = ({ profile }) => {
   const _toggleFollowersModal = () => setFollowersModal((prev) => !prev);
 
   const _handleFollowingPress = () => {
-    navigation.navigate('FollowingStack');
+    navigation.navigate("FollowingStack");
   };
 
   const _handleMyPostedPress = () => {
-    console.log("printProfile = > ", profile)
-    navigation.navigate('MyPosts', { userId: profile.userId, username: profile.username });
+    console.log("printProfile = > ", profile);
+    navigation.navigate("MyPosts", {
+      userId: profile.userId,
+      username: profile.username,
+    });
   };
 
   return (
@@ -59,7 +62,7 @@ const HomeHeaderProfileInfo = ({ profile }) => {
 
 const styles = StyleSheet.create({
   container: {
-    justifyContent: 'space-between',
+    justifyContent: "space-between",
   },
   item: {
     flex: 1,

@@ -22,7 +22,10 @@ const HomeListHeader = ({
   const selector = useSelector((AppState) => AppState);
 
   const _handleCreatePostPress = () =>
-    navigation.navigate("PostCreate", { postRefresh: postRefresh, isAnnouncement: true });
+    navigation.navigate("PostCreate", {
+      postRefresh: postRefresh,
+      isAnnouncement: true,
+    });
 
   return (
     <View>
@@ -43,7 +46,13 @@ const HomeListHeader = ({
         }}
         onLeftPress={_handleCreatePostPress}
         onRightPress={searchClicked}
-        isHome = {selector.Profile && selector.Profile.profile && selector.Profile.profile.isAdmin ? false : true}
+        isHome={
+          selector.Profile &&
+          selector.Profile.profile &&
+          selector.Profile.profile.isAdmin
+            ? false
+            : true
+        }
       />
       <HomeHeaderProfileInfo />
       {/* <View style={{

@@ -50,7 +50,6 @@ const PostCreateScreen = ({
   const [title, setTitle] = useState("");
   const title2 = useRef("");
   const [titleError, setTitleError] = useState("");
-
   const [des, setDes] = useState("");
   const des2 = useRef("");
   const [desError, setDesError] = useState("");
@@ -203,7 +202,6 @@ const PostCreateScreen = ({
       }
     } else {
       let isOpenAlert = false;
-      console.log("title----->", title2.current);
       if (title2.current?.length > 0) {
         isOpenAlert = true;
       } else if (des2.current?.length > 0) {
@@ -217,7 +215,6 @@ const PostCreateScreen = ({
       ) {
         isOpenAlert = true;
       }
-      console.log("isOpenAlert------>", isOpenAlert);
       if (isOpenAlert) {
         setAlertModal({
           value: true,

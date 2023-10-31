@@ -20,9 +20,9 @@ import LoadingImage from "../../LoadingImage";
 const FullImageModal = ({ visible, onClose, userImage }) => {
   const [usersImage, setUsersImage] = useState(userImage);
 
-  useEffect(()=>{
-    console.log(" ------ ", userImage)
-  }, [])
+  useEffect(() => {
+    console.log(" ------ ", userImage);
+  }, []);
   return (
     <SafeAreaView>
       <Modal
@@ -30,7 +30,7 @@ const FullImageModal = ({ visible, onClose, userImage }) => {
         style={styles.modal}
         // swipeDirection={"up"}
         animationIn={"fadeIn"}
-        animationOut={'slideOutRight'}
+        animationOut={"slideOutRight"}
         useNativeDriver={true}
         onBackButtonPress={onClose}
         onBackdropPress={onClose}
@@ -42,11 +42,8 @@ const FullImageModal = ({ visible, onClose, userImage }) => {
               <ChevronLeftIcon />
             </Touchable>
           </View>
-          <LoadingImage
-            source={usersImage}
-            style={styles.contentContainer}
-          />
-          <SafeAreaView/>
+          <LoadingImage source={usersImage} style={styles.contentContainer} />
+          <SafeAreaView />
         </Card>
       </Modal>
     </SafeAreaView>
@@ -55,8 +52,8 @@ const FullImageModal = ({ visible, onClose, userImage }) => {
 
 const styles = StyleSheet.create({
   contentContainer: {
-    width : "100%",
-    height : "80%"
+    width: "100%",
+    height: "80%",
   },
 
   container: {

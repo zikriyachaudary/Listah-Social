@@ -24,6 +24,7 @@ import LoadingImage from "../../LoadingImage";
 
 import AppLogoImg from "../../../assets/images/edit-app-logo.jpeg";
 import FastImage from "react-native-fast-image";
+import { AppColors } from "../../../util/AppConstant";
 
 /* =============================================================================
 <PostItemHeader />
@@ -86,8 +87,13 @@ const PostItemHeader = ({
       <TouchableOpacity
         disabled={post?.announcement}
         onPress={() => {
-          navigation.navigate("MyPosts", {
-            userId: post.author.userId,
+          if (username == post.author.username) {
+            return;
+          }
+          navigation.push("MyPosts", {
+            userId: isChallenge
+              ? post?.challenge.author.userId
+              : post.author.userId,
             username: username,
             refreshCall: postRefresh,
           });
@@ -101,8 +107,6 @@ const PostItemHeader = ({
               </Text>
             </View>
           )}
-          {/* <Avatar size={68} url={{ uri: `${profileImage}` }} /> */}
-
           {post?.announcement == true ? (
             <FastImage
               style={{
@@ -132,7 +136,6 @@ const PostItemHeader = ({
               }}
             />
           )}
-
           <View style={styles.userInfoContainer}>
             <Text
               style={{
@@ -169,14 +172,39 @@ const PostItemHeader = ({
           <>
             {isAuthor ? (
               <>
-                <MenuItem onPress={_handleEditPress}>Edit</MenuItem>
-                <MenuItem onPress={_handleDeletePress}>Delete</MenuItem>
+                <MenuItem
+                  onPress={_handleEditPress}
+                  textStyle={{ color: AppColors.black.black }}
+                >
+                  Edit
+                </MenuItem>
+                <MenuItem
+                  onPress={_handleDeletePress}
+                  textStyle={{ color: AppColors.black.black }}
+                >
+                  Delete
+                </MenuItem>
               </>
             ) : (
               <>
-                <MenuItem onPress={blockUser}>Block User</MenuItem>
-                <MenuItem onPress={() => reportPost(0)}>Report Post</MenuItem>
-                <MenuItem onPress={() => reportPost(1)}>Report User</MenuItem>
+                <MenuItem
+                  onPress={blockUser}
+                  textStyle={{ color: AppColors.black.black }}
+                >
+                  Block User
+                </MenuItem>
+                <MenuItem
+                  onPress={() => reportPost(0)}
+                  textStyle={{ color: AppColors.black.black }}
+                >
+                  Report Post
+                </MenuItem>
+                <MenuItem
+                  onPress={() => reportPost(1)}
+                  textStyle={{ color: AppColors.black.black }}
+                >
+                  Report User
+                </MenuItem>
               </>
             )}
           </>

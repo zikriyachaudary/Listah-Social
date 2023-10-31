@@ -53,10 +53,14 @@ const PostEditScreen = ({ navigation, updatePost, route }) => {
   const _handleRemove = (arrayHelpers, index) => arrayHelpers.remove(index);
 
   const _handleSubmit = async (values) => {
-    values["title"] = title;
-
+    let obj = {
+      ...values,
+      title: title,
+      author: route.params.post?.author,
+      id: route?.params?.id,
+    };
     setLoading(true);
-    await updatePost(values);
+    await updatePost(obj);
     setLoading(false);
     if (route?.params?.postRefresh) {
       route.params.postRefresh();

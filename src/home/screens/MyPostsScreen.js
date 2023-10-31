@@ -68,35 +68,31 @@ const MyPostsScreen = ({
   const dispatch = useDispatch();
   const selector = useSelector((AppState) => AppState);
 
-  useEffect(() => {
-    fetchUsersData();
-  }, []);
   const _toggleFollowersModal = () => setFollowersModal((prev) => !prev);
 
   const fetchUsersData = async () => {
-    if (route.params.userId) {
-      const mUsersData = await getProfileDataByID(route.params.userId);
-      if (mUsersData.profileImage)
-        setUsersProfileImage(mUsersData.profileImage);
-      setUsersProfileInfo(mUsersData);
-
-      const isFollowed = mUsersData.followers?.find(
-        (user) => user === profile.userId
-      );
-      setFollowUser(isFollowed);
+    const mUsersData = await getProfileDataByID(route.params.userId);
+    if (mUsersData?.profileImage) {
+      setUsersProfileImage(mUsersData.profileImage);
     }
+    setUsersProfileInfo(mUsersData);
+    const isFollowed = mUsersData.followers?.find(
+      (user) => user === profile.userId
+    );
+    setFollowUser(isFollowed);
   };
   // GET POSTS
   useEffect(() => {
-    if (isFocused) {
+    if (isFocused && route?.params?.userId) {
       // getHomePosts();
+      fetchUsersData();
       setLoaderVisible(true);
       getPostsByUserId();
     }
   }, [isFocused]);
 
   const getPostsByUserId = async () => {
-    const totalPosts = await getPostsByID(route.params.userId);
+    const totalPosts = await getPostsByID(route?.params?.userId);
     setUserPosts(totalPosts);
     setLoaderVisible(false);
     // dispatch(startLoader(false));

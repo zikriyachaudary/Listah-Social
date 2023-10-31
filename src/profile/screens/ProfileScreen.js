@@ -3,12 +3,10 @@ import { connect, useDispatch } from "react-redux";
 import { Image, StyleSheet, TouchableOpacity } from "react-native";
 import { useIsFocused, useNavigation } from "@react-navigation/native";
 
-import { Button, Container, Content, Text, View } from "../../common";
+import { Container, Content, Text, View } from "../../common";
 import ProfileHeader from "../components/ProfileHeader";
 import NameIcon from "../../assets/icons/edit-name-icon.svg";
 import EditIcon from "../../assets/icons/edit-email-icon.svg";
-
-import * as Colors from "../../config/colors";
 import { getProfile as selectProfile } from "../redux/selectors";
 import { getProfile as getProfileAction } from "../redux/actions";
 import {
@@ -18,12 +16,14 @@ import {
 import { AppColors, AppImages, normalized } from "../../util/AppConstant";
 import { setDraftPost } from "../../redux/action/AppLogics";
 import { saveUserDraftPost } from "../../util/helperFun";
+import AlertModal from "../../common/AlertModal";
 
 /* =============================================================================
 <ProfileScreen />
 ============================================================================= */
 const ProfileScreen = ({ profile, getProfile, logout, deleteUserAccount }) => {
   const isFocused = useIsFocused();
+  const [alertModal, setAlertModal] = useState(false);
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const email = profile?.email;
@@ -98,7 +98,7 @@ const ProfileScreen = ({ profile, getProfile, logout, deleteUserAccount }) => {
           style={{ ...styles.item, paddingVertical: normalized(5) }}
           activeOpacity={1}
           onPress={() => {
-            _deleteAccount();
+            setAlertModal(true);
           }}
         >
           <Image source={AppImages.profile.delete} style={styles.icon} />
@@ -108,6 +108,21 @@ const ProfileScreen = ({ profile, getProfile, logout, deleteUserAccount }) => {
           </View>
         </TouchableOpacity>
       </Content>
+      {alertModal ? (
+        <AlertModal
+          visible={alertModal}
+          multipleBtn={true}
+          atLeftBtn={() => {
+            setAlertModal(false);
+          }}
+          leftBtnLabel={"No"}
+          rightBtnLabel={"Yes"}
+          onPress={() => {
+            _deleteAccount();
+          }}
+          message={"Are you sure, you want to delete your Account?"}
+        />
+      ) : null}
     </Container>
   );
 };

@@ -696,7 +696,6 @@ export const updatePost = (changes) => async (dispatch) => {
       ...changes,
       author: changes?.author?.userId,
     };
-
     if (post?.items) {
       post.items = await Promise.all(
         post?.items.map(async (item, index) => {
@@ -724,11 +723,11 @@ export const updatePost = (changes) => async (dispatch) => {
         })
       );
     }
-    console.log("post------>", post);
-    await PostsCollection.doc(changes.id).update(post);
+    console.log("post Edit------>", post);
+    await PostsCollection.doc(changes?.id).update(post);
 
     const updatedPost = await (
-      await PostsCollection.doc(changes.id).get()
+      await PostsCollection.doc(changes?.id).get()
     ).data();
     const postAuthor = await (
       await ProfilesCollection.doc(updatedPost?.author).get()
