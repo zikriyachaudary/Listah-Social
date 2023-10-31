@@ -8,7 +8,7 @@ import {
   Modal,
 } from "react-native";
 import FireAuth from "@react-native-firebase/auth";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { Menu, MenuItem } from "react-native-material-menu";
 
 // import Text from '../../Text';
@@ -81,15 +81,18 @@ const PostItemHeader = ({
     setVisible(false);
     postReport(2);
   };
+  const route = useRoute();
 
   return (
     <View horizontal style={styles.header}>
       <TouchableOpacity
         disabled={post?.announcement}
         onPress={() => {
-          if (username == post.author.username) {
+          if (username == post.author.username && route.name == "MyPosts") {
             return;
           }
+
+          console.log("printRouteName - >? " , route.name)
           navigation.push("MyPosts", {
             userId: isChallenge
               ? post?.challenge.author.userId
