@@ -18,7 +18,9 @@ const TextInputComponent = (props) => {
           alignSelf: "center",
           borderRadius: normalized(12),
           paddingHorizontal: normalized(15),
+          color: AppColors.black.black,
         }}
+        placeholderTextColor={AppColors.grey.dark}
         maxLength={props?.maxLength ? props?.maxLength : 200}
         value={props?.value}
         onBlur={() => setIsFocused(false)}

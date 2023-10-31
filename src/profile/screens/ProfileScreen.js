@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { connect, useDispatch } from "react-redux";
 import { Image, StyleSheet, TouchableOpacity } from "react-native";
 import { useIsFocused, useNavigation } from "@react-navigation/native";
