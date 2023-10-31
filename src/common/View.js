@@ -1,10 +1,18 @@
-import React from 'react';
-import {StyleSheet, View as RNView} from 'react-native';
+import React from "react";
+import { StyleSheet, View as RNView } from "react-native";
 
 /* =============================================================================
 <View />
 ============================================================================= */
-const View = ({style, flex, block, center, children, horizontal, ...props}) => (
+const View = ({
+  style,
+  flex,
+  block,
+  center,
+  children,
+  horizontal,
+  ...props
+}) => (
   <RNView
     style={[
       flex && styles.flex,
@@ -13,7 +21,8 @@ const View = ({style, flex, block, center, children, horizontal, ...props}) => (
       horizontal && styles.horizontal,
       style,
     ]}
-    {...props}>
+    {...props}
+  >
     {children}
   </RNView>
 );
@@ -23,15 +32,15 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   block: {
-    width: '100%',
+    width: "100%",
   },
   center: {
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   horizontal: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
 });
 

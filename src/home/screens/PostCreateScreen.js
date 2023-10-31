@@ -201,18 +201,25 @@ const PostCreateScreen = ({
         });
       }
     } else {
+      console.log("initialState.current?.items----->", obj);
       let isOpenAlert = false;
-      if (title2.current?.length > 0) {
+      if (obj?.title?.length > 0) {
         isOpenAlert = true;
-      } else if (des2.current?.length > 0) {
+      } else if (obj?.description?.length > 0) {
         isOpenAlert = true;
-      } else if (initialState.current?.items?.length > 1) {
+      } else if (
+        obj?.items[0]?.name?.length > 0 ||
+        obj?.items[0]?.description?.length > 0 ||
+        obj?.items[0]?.image !== ""
+      ) {
         isOpenAlert = true;
       } else if (
         initialState.current?.items?.length == 0 &&
         (initialState.current?.items[0]?.description?.length > 0 ||
           initialState.current?.items[0]?.title?.length > 0)
       ) {
+        isOpenAlert = true;
+      } else if (obj?.isNumberShowInItems) {
         isOpenAlert = true;
       }
       if (isOpenAlert) {
@@ -250,10 +257,10 @@ const PostCreateScreen = ({
     }
   };
   const _handleSubmit = async (values, { resetForm }) => {
-    if (title?.length == 0) {
+    if (title == "") {
       setTitleError("!Empty Field");
     }
-    if (des?.length == 0) {
+    if (des == "") {
       setDesError("!Empty Field");
     }
     if (title?.length == 0 || des?.length == 0) {
@@ -438,7 +445,7 @@ const PostCreateScreen = ({
                         style={{
                           flexDirection: "row",
                           alignItems: "center",
-                          paddingHorizontal: 18,
+                          paddingHorizontal: normalized(18),
                           justifyContent: "center",
                           alignItems: "center",
                         }}
@@ -454,6 +461,7 @@ const PostCreateScreen = ({
                           }}
                           boxType={"circle"}
                           onValueChange={(newValue) => {
+                            console.log("newValue------>", newValue);
                             // setShhowModal(false)
                             setToggleCheckBox(newValue);
                           }}

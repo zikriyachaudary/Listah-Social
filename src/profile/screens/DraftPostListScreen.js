@@ -14,6 +14,7 @@ import { setDraftPost } from "../../redux/action/AppLogics";
 import { saveUserDraftPost } from "../../util/helperFun";
 import { useIsFocused, useNavigation } from "@react-navigation/native";
 import AlertModal from "../../common/AlertModal";
+import { AppColors } from "../../util/AppConstant";
 
 const DraftPostListScreen = () => {
   const isFocused = useIsFocused();
@@ -67,21 +68,23 @@ const DraftPostListScreen = () => {
                     <Text
                       style={{
                         fontSize: 14,
-                        color: "black",
+                        color: AppColors.black.black,
                         fontWeight: "400",
                         marginVertical: 5,
                       }}
                     >
-                      {item?.title}
+                      {item?.title?.length > 0 ? item?.title : "No title"}
                     </Text>
                     <Text
                       style={{
                         fontSize: 14,
-                        color: "#bcbec2",
+                        color: AppColors.grey.dark,
                         fontWeight: "400",
                       }}
                     >
-                      {item?.description}
+                      {item?.description?.length > 0
+                        ? item?.description
+                        : "No description"}
                     </Text>
                   </View>
                   <TouchableOpacity
