@@ -2,7 +2,12 @@ import React, { useEffect, useRef, useState } from "react";
 import * as yup from "yup";
 import { connect, useDispatch, useSelector } from "react-redux";
 import FastImage from "react-native-fast-image";
-import { BackHandler, Platform, StyleSheet } from "react-native";
+import {
+  BackHandler,
+  Platform,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
 import { Formik, FieldArray } from "formik";
 
 import {
@@ -74,12 +79,18 @@ const PostCreateScreen = ({
       value: "ascendinglist",
       borderColor: "#6d14c4",
       selected: true,
+      labelStyle: {
+        color: "black",
+      },
     },
     {
       id: "2",
       label: "Descending List",
       value: "descendinglist",
       borderColor: "#6d14c4",
+      labelStyle: {
+        color: "black",
+      },
     },
   ]);
   const initialState = useRef({
@@ -352,6 +363,8 @@ const PostCreateScreen = ({
         error={desError}
       />
 
+    
+
       <Formik
         enableReinitialize={true}
         innerRef={formikRef}
@@ -363,6 +376,8 @@ const PostCreateScreen = ({
           <FieldArray
             name="items"
             render={(arrayHelpers, i) => {
+              let isSelect = false
+              
               initialState.current = values;
               return (
                 <Content contentContainerStyle={styles.content}>
@@ -450,22 +465,67 @@ const PostCreateScreen = ({
                           alignItems: "center",
                         }}
                       >
-                        <CheckBox
-                          value={toggleCheckBox}
-                          tintColor="#6d14c4"
-                          onCheckColor="#6d14c4"
-                          onTintColor="#6d14c4"
-                          lineWidth={2}
-                          style={{
-                            transform: [{ scaleX: 0.85 }, { scaleY: 0.85 }],
-                          }}
-                          boxType={"circle"}
-                          onValueChange={(newValue) => {
-                            console.log("newValue------>", newValue);
-                            // setShhowModal(false)
-                            setToggleCheckBox(newValue);
-                          }}
-                        />
+                        {Platform.OS == "android" ? (
+                          <TouchableOpacity
+                            onPress={() => {
+                              console.log("print ---- > ", isSelect);
+                              if (isSelect) {
+                                isSelect = false
+                                setToggleCheckBox(isSelect);
+                              } else {
+                                isSelect = true
+                                setToggleCheckBox(isSelect);
+                              }
+                            }}
+                          >
+                            <View
+                              style={{
+                                width: 25,
+                                height: 25,
+                                borderColor: "#6d14c4",
+
+                                borderWidth: 1,
+                                borderRadius: 5,
+                                marginEnd: 10,
+                                justifyContent: "center",
+                                alignItems: "center",
+                              }}
+                            >
+                              {isSelect && (
+                                <View
+                                  style={{
+                                    width: 20,
+                                    height: 20,
+                                    backgroundColor: "#6d14c4",
+                                    borderRadius: 5,
+                                    justifyContent: "center",
+                                    alignItems: "center",
+                                  }}
+                                ></View>
+                              )}
+                            </View>
+                          </TouchableOpacity>
+                        ) : (
+                          <CheckBox
+                            value={toggleCheckBox}
+                            tintColor="#6d14c4"
+                            onCheckColor="#6d14c4"
+                            onTintColor="#6d14c4"
+                            tintColors={{ true: "black", false: "#a9a9a9" }}
+                            lineWidth={2}
+                            onFillColor="#6d14c4"
+                            style={{
+                              transform: [{ scaleX: 0.85 }, { scaleY: 0.85 }],
+                            }}
+                            boxType={"circle"}
+                            onValueChange={(newValue) => {
+                              console.log("newValue------>", newValue);
+                              // setShhowModal(false)
+                              setToggleCheckBox(newValue);
+                            }}
+                          />
+                        )}
+
                         <Text
                           style={{
                             fontSize: 14,
