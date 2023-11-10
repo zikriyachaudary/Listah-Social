@@ -118,7 +118,9 @@ const AppUserListScreen = (route) => {
               userList?.length > 0 ? (
                 <View>
                   <View style={styles.titleCont}>
-                    <Text style={styles.title}>{`User(${totalUser})`}</Text>
+                    <Text
+                      style={styles.title}
+                    >{`Total Users(${totalUser})`}</Text>
                   </View>
                   <FlatList
                     showsVerticalScrollIndicator={false}
