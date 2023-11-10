@@ -28,6 +28,7 @@ const AppUserListScreen = (route) => {
   const [isLoader, setIsLoader] = useState(false);
   const [adminData, setAdminData] = useState([]);
   const [userList, setUserList] = useState([]);
+  const [totalUser, setTotalUser] = useState(0);
 
   useEffect(() => {
     if (isFocused) {
@@ -44,6 +45,7 @@ const AppUserListScreen = (route) => {
       await fetchAllUsersProfile(async (onResponse) => {
         if (onResponse?.length > 0) {
           await getUserListSize((result) => {
+            setTotalUser(result);
             let pageLimit = paginationLogic(result, 5);
             console.log("pageLimit------->", pageLimit);
           });
@@ -116,7 +118,7 @@ const AppUserListScreen = (route) => {
               userList?.length > 0 ? (
                 <View>
                   <View style={styles.titleCont}>
-                    <Text style={styles.title}>{"User"}</Text>
+                    <Text style={styles.title}>{`User(${totalUser})`}</Text>
                   </View>
                   <FlatList
                     showsVerticalScrollIndicator={false}
