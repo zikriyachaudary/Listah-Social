@@ -54,7 +54,6 @@ const AllUsersListItem = ({
   if (!user) {
     return null;
   }
-
   return (
     <View horizontal style={styles.container}>
       <TouchableWithoutFeedback
@@ -81,8 +80,10 @@ const AllUsersListItem = ({
               borderColor: "yellow",
             }}
           />
+
           <Text style={styles.userNameText} numberOfLines={2}>
             {userName}
+            {user?.verified ? <Text>{` (A+)`}</Text> : null}
           </Text>
         </View>
       </TouchableWithoutFeedback>

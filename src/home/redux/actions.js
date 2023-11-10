@@ -223,6 +223,7 @@ export const getMyHomePosts = async () => {
             userId: author?.userId,
             username: author?.username,
             profileImage: author?.profileImage,
+            verified: author?.verified ? true : false,
           },
         };
       })
@@ -289,6 +290,7 @@ export const getPostsByID = async (userId) => {
     profileImage: userProfileOfPost.profileImage,
     userId: userProfileOfPost.userId,
     username: userProfileOfPost.username,
+    verified: userProfileOfPost?.verified ? true : false,
   };
   let totalUserPost = [];
   userPosts.forEach((doc) => {
@@ -359,6 +361,7 @@ export const refreshHomePosts = (lastDocId) => async (dispatch) => {
             userId: author?.userId,
             username: author?.username,
             profileImage: author?.profileImage,
+            verified: author?.verified ? true : false,
           },
         };
       })
@@ -469,6 +472,7 @@ export const createAnnouncementPost = (postContent) => async (dispatch) => {
         userId: postAuthor?.userId,
         username: postAuthor?.username,
         profileImage: postAuthor?.profileImage,
+        verified: postAuthor?.verified ? true : false,
       },
     };
 
@@ -549,6 +553,7 @@ export const createPost = (postContent) => async (dispatch) => {
         userId: postAuthor?.userId,
         username: postAuthor?.username,
         profileImage: postAuthor?.profileImage,
+        verified: postAuthor?.verified ? true : false,
       },
     };
 
@@ -584,6 +589,7 @@ export const challengePost =
           userId: challengePostAuthor?.userId,
           username: challengePostAuthor?.username,
           profileImage: challengePostAuthor?.profileImage,
+          verified: challengePostAuthor?.verified ? true : false,
         },
 
         createdAt: FireStore.FieldValue.serverTimestamp(),
@@ -654,6 +660,7 @@ export const challengePost =
           userId: postAuthor?.userId,
           username: postAuthor?.username,
           profileImage: postAuthor?.profileImage,
+          verified: postAuthor?.verified ? true : false,
         },
       };
       console.log("postAuthor --- > ", JSON.stringify(populatedPost));
@@ -738,6 +745,7 @@ export const updatePost = (changes) => async (dispatch) => {
         userId: postAuthor?.userId,
         username: postAuthor?.username,
         profileImage: postAuthor?.profileImage,
+        verified: postAuthor?.verified ? true : false,
       },
     };
 
@@ -1092,6 +1100,7 @@ export const likePost = (postId) => async (dispatch) => {
         userId: postAuthor?.userId,
         username: postAuthor?.username,
         profileImage: postAuthor?.profileImage,
+        verified: postAuthor?.verified ? true : false,
       },
     };
 
@@ -1152,6 +1161,7 @@ export const dislikePost = (postId) => async (dispatch) => {
         userId: postAuthor?.userId,
         username: postAuthor?.username,
         profileImage: postAuthor?.profileImage,
+        verified: postAuthor?.verified ? true : false,
       },
     };
 
@@ -1199,6 +1209,7 @@ export const postComment = (commentData) => async (dispatch) => {
         userId: postAuthor?.userId,
         username: postAuthor?.username,
         profileImage: postAuthor?.profileImage,
+        verified: postAuthor?.verified ? true : false,
       },
     };
 

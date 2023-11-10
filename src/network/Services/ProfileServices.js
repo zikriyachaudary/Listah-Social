@@ -69,6 +69,7 @@ export const fetchAllUsersProfile = async (onUpdates) => {
             image: doc?._data?.profileImage,
             userId: doc?._data?.userId,
             name: doc?._data?.username,
+            verified: doc?._data?.verified ? true : false,
           });
         }
       });

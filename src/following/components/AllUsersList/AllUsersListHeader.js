@@ -1,29 +1,29 @@
-import React, { useState } from 'react';
-import { Alert } from 'react-native';
-import { connect } from 'react-redux';
+import React, { useState } from "react";
+import { Alert } from "react-native";
+import { connect } from "react-redux";
 
-import { TextInput, View } from '../../../common';
+import { TextInput, View } from "../../../common";
 
 import {
   searchUser as searchUserAction,
-  getAllUsers as getAllUsersAction
-} from '../../redux/actions';
+  getAllUsers as getAllUsersAction,
+} from "../../redux/actions";
 
 /* =============================================================================
 <AllUsersListHeader />
 ============================================================================= */
 const AllUsersListHeader = ({ searchUser, getAllUsers }) => {
-  const [text, setText] = useState('');
+  const [text, setText] = useState("");
 
   const _handleSubmit = () => {
     if (text) {
       if (text.length >= 3) {
         searchUser(text);
       } else {
-        Alert.alert('Please Enter At least 3 characters')
+        Alert.alert("Please Enter At least 3 characters");
       }
     } else {
-      getAllUsers()
+      getAllUsers();
     }
   };
 
@@ -32,7 +32,7 @@ const AllUsersListHeader = ({ searchUser, getAllUsers }) => {
       <TextInput
         value={text}
         onChange={setText}
-        placeholder='Search User...'
+        placeholder="Search User..."
         onSubmitEditing={_handleSubmit}
       />
     </View>

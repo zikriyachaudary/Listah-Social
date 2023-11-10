@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Container, StackHeader } from "../../common";
 import {
   ActivityIndicator,
+  Dimensions,
   FlatList,
   StyleSheet,
   Text,
@@ -143,6 +144,17 @@ const AppUserListScreen = (route) => {
                                 {item?.name?.length > 0
                                   ? item?.name
                                   : "No name"}
+                                {item?.verified ? (
+                                  <Text
+                                    style={{
+                                      fontFamily: "Poppins-Bold",
+                                      fontSize: normalized(12),
+                                      color: AppColors.grey.dark,
+                                    }}
+                                  >
+                                    {` (A+)`}
+                                  </Text>
+                                ) : null}
                               </Text>
                               <Text style={styles.emailTxt}>
                                 {item?.email?.length > 0

@@ -212,11 +212,6 @@ export const searchUser = (searchTxt) => async (dispatch) => {
       profileSnapshot.forEach((snapshot) => {
         const profile = snapshot.data();
         if (profile.username.toLowerCase().includes(searchTxt.toLowerCase())) {
-          console.log(
-            "profileId - > ",
-            profile.userId,
-            FireAuth().currentUser.uid
-          );
           if (FireAuth().currentUser.uid !== profile.userId) {
             searchedProfiles.push({
               ...profile,

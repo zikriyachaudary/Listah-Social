@@ -24,7 +24,7 @@ import LoadingImage from "../../LoadingImage";
 
 import AppLogoImg from "../../../assets/images/edit-app-logo.jpeg";
 import FastImage from "react-native-fast-image";
-import { AppColors } from "../../../util/AppConstant";
+import { AppColors, normalized } from "../../../util/AppConstant";
 
 /* =============================================================================
 <PostItemHeader />
@@ -91,7 +91,6 @@ const PostItemHeader = ({
             return;
           }
 
-          console.log("printRouteName - >? ", route.name);
           navigation.push("MyPosts", {
             userId: isChallenge
               ? post?.challenge.author.userId
@@ -157,6 +156,19 @@ const PostItemHeader = ({
               }}
             >
               {post?.announcement == true ? "A-Listah" : username}
+              {"  "}
+              {post.author?.verified ? (
+                <Text
+                  style={{
+                    fontFamily: "Poppins-Bold",
+                    fontSize: normalized(12),
+                    color: AppColors.grey.dark,
+                    width: Dimensions.get("screen").width - 200,
+                  }}
+                >
+                  {` (A+)`}
+                </Text>
+              ) : null}
             </Text>
           </View>
         </View>
