@@ -123,20 +123,39 @@ const PostItemHeader = ({
               source={AppLogoImg}
             />
           ) : (
-            <LoadingImage
-              source={{ uri: `${profileImage}` }}
-              style={{
-                width: 68,
-                height: 68,
-                borderRadius: 2,
-                marginVertical: 10,
-                borderWidth: 1.4,
-                borderRadius: 68 / 2,
-                backgroundColor: Colors.outline,
-                borderColor: "yellow",
-              }}
-            />
+            <View style={{ width: post.author?.verified ? 76 : 70 }}>
+              <LoadingImage
+                source={{ uri: `${profileImage}` }}
+                style={{
+                  width: 68,
+                  height: 68,
+                  borderRadius: 2,
+                  marginVertical: 10,
+                  borderWidth: 1.4,
+                  borderRadius: 68 / 2,
+                  backgroundColor: Colors.outline,
+                  borderColor: "yellow",
+                }}
+              />
+
+              {post.author?.verified ? (
+                <Text
+                  style={{
+                    position: "absolute",
+                    bottom: -8,
+                    marginStart: 50,
+                    fontFamily: "Poppins-Bold",
+                    fontSize: normalized(12),
+                    color: Colors.primary,
+                    width: Dimensions.get("screen").width - 200,
+                  }}
+                >
+                  {`(A+)`}
+                </Text>
+              ) : null}
+            </View>
           )}
+
           <View style={styles.userInfoContainer}>
             <Text
               style={{
@@ -156,19 +175,6 @@ const PostItemHeader = ({
               }}
             >
               {post?.announcement == true ? "A-Listah" : username}
-              {"  "}
-              {post.author?.verified ? (
-                <Text
-                  style={{
-                    fontFamily: "Poppins-Bold",
-                    fontSize: normalized(12),
-                    color: AppColors.grey.dark,
-                    width: Dimensions.get("screen").width - 200,
-                  }}
-                >
-                  {` (A+)`}
-                </Text>
-              ) : null}
             </Text>
           </View>
         </View>

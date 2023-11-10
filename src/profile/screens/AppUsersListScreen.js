@@ -23,6 +23,7 @@ import {
   getUserListSize,
 } from "../../network/Services/ProfileServices";
 import { paginationLogic } from "../../util/helperFun";
+import * as Colors from "../../config/colors";
 
 const AppUserListScreen = (route) => {
   const isFocused = useIsFocused();
@@ -77,7 +78,7 @@ const AppUserListScreen = (route) => {
               adminData?.length > 0 ? (
                 <View>
                   <View style={styles.titleCont}>
-                    <Text style={styles.title}>{"Admin"}</Text>
+                    <Text style={styles.title}>{"Admins"}</Text>
                   </View>
                   <FlatList
                     showsVerticalScrollIndicator={false}
@@ -91,10 +92,31 @@ const AppUserListScreen = (route) => {
                             onPress={() => {}}
                             activeOpacity={1}
                           >
+                            <View style = {{
+                                width: normalized(70),
+                                height: normalized(70)
+                            }}>
                             <LoadingImage
                               source={{ uri: `${item?.image}` }}
                               style={styles.profile}
                             />
+
+                            {item?.verified && (
+                                  <Text
+                                    style={{
+                                      position : "absolute",
+                                      bottom: -8,
+                                      end : 0,
+                                      fontFamily: "Poppins-Bold",
+                                      fontSize: normalized(12),
+                                      color: Colors.primary,
+                                    }}
+                                  >
+                                    {`(A+)`}
+                                  </Text>
+                              )}
+                            </View>
+                          
                             <View style={styles.nameCont}>
                               <Text style={styles.nameTxt}>
                                 {item?.name?.length > 0
@@ -106,6 +128,8 @@ const AppUserListScreen = (route) => {
                                   ? item?.email
                                   : "No email"}
                               </Text>
+
+                           
                             </View>
                           </TouchableOpacity>
                           <View style={styles.bottomLine} />
@@ -118,10 +142,10 @@ const AppUserListScreen = (route) => {
             ) : index == 2 ? (
               userList?.length > 0 ? (
                 <View>
-                  <View style={styles.titleCont}>
+                  <View style={{...styles.titleCont, marginTop : 10}}>
                     <Text
                       style={styles.title}
-                    >{`Total Users(${totalUser})`}</Text>
+                    >{`Total Users (${totalUser})`}</Text>
                   </View>
                   <FlatList
                     showsVerticalScrollIndicator={false}
@@ -135,26 +159,36 @@ const AppUserListScreen = (route) => {
                             onPress={() => {}}
                             activeOpacity={1}
                           >
+                             <View style = {{
+                                width: normalized(70),
+                                height: normalized(70)
+                            }}>
                             <LoadingImage
                               source={{ uri: `${item?.image}` }}
                               style={styles.profile}
                             />
+
+                            {item?.verified && (
+                                  <Text
+                                    style={{
+                                      position : "absolute",
+                                      bottom: -8,
+                                      end : 0,
+                                      fontFamily: "Poppins-Bold",
+                                      fontSize: normalized(12),
+                                      color: Colors.primary,
+                                    }}
+                                  >
+                                    {`(A+)`}
+                                  </Text>
+                              )}
+                            </View>
                             <View style={styles.nameCont}>
                               <Text style={styles.nameTxt}>
                                 {item?.name?.length > 0
                                   ? item?.name
                                   : "No name"}
-                                {item?.verified ? (
-                                  <Text
-                                    style={{
-                                      fontFamily: "Poppins-Bold",
-                                      fontSize: normalized(12),
-                                      color: AppColors.grey.dark,
-                                    }}
-                                  >
-                                    {` (A+)`}
-                                  </Text>
-                                ) : null}
+                               
                               </Text>
                               <Text style={styles.emailTxt}>
                                 {item?.email?.length > 0
@@ -241,7 +275,9 @@ const styles = StyleSheet.create({
     marginHorizontal: normalized(15),
     fontSize: normalized(14),
     paddingVertical: hv(4),
-    color: AppColors.black.lightBlack,
+    color: Colors.primary,
+    textDecorationLine : "underline",
+    fontWeight : "bold",
     textAlign: "center",
   },
   titleCont: {

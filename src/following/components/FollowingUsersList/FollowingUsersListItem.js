@@ -59,7 +59,16 @@ const FollowingUsersListItem = ({ user, unFollowUser }) => {
               borderColor: "yellow",
             }}
           />
-          <Text style={styles.userNameTxt}>{userName}</Text>
+          <Text style={styles.userNameTxt}>{userName}
+          {user?.verified ? (
+              <Text
+                style={{
+                  color: Colors.primary,
+                }}
+              >{`\n(A+)`}</Text>
+            ) : null}
+          </Text>
+         
         </View>
       </TouchableWithoutFeedback>
       <Button
