@@ -16,7 +16,7 @@ import { useIsFocused, useNavigation } from "@react-navigation/native";
 import AlertModal from "../../common/AlertModal";
 import { AppColors } from "../../util/AppConstant";
 
-const DraftPostListScreen = () => {
+const DraftPostListScreen = (route) => {
   const isFocused = useIsFocused();
   const dispatch = useDispatch();
   const navigation = useNavigation();

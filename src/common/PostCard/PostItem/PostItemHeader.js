@@ -82,7 +82,6 @@ const PostItemHeader = ({
     postReport(2);
   };
   const route = useRoute();
-
   return (
     <View horizontal style={styles.header}>
       <TouchableOpacity
@@ -92,7 +91,7 @@ const PostItemHeader = ({
             return;
           }
 
-          console.log("printRouteName - >? " , route.name)
+          console.log("printRouteName - >? ", route.name);
           navigation.push("MyPosts", {
             userId: isChallenge
               ? post?.challenge.author.userId

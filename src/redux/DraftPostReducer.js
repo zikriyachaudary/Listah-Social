@@ -2,12 +2,14 @@ import {
   CREATING_POST_FAIL,
   IS_ALERT_SHOW,
   SET_DRAFT_POST,
+  SET_IS_ADMIN,
 } from "./action/types";
 
 const initialState = {
   draftPost: [],
   createPostAPIFail: "",
   isAlertShow: { value: false, message: "" },
+  isAdmin: false,
 };
 const DraftPostReducer = (state = initialState, action) => {
   switch (action.type) {
@@ -28,6 +30,11 @@ const DraftPostReducer = (state = initialState, action) => {
         isAlertShow: action.data,
       };
 
+    case SET_IS_ADMIN:
+      return {
+        ...state,
+        isAdmin: action.data,
+      };
     default:
       return state;
   }

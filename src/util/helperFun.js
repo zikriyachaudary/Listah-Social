@@ -20,3 +20,8 @@ export const saveUserDraftPost = async (data) => {
     console.log("Error storing draftPost", e);
   }
 };
+
+export const paginationLogic = (totalCount, limit) => {
+  let totalPages = 0;
+  return (totalPages = Math.ceil(totalCount / limit));
+};

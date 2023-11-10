@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { connect, useDispatch } from "react-redux";
+import { connect, useDispatch, useSelector } from "react-redux";
 import { Image, StyleSheet, TouchableOpacity } from "react-native";
 import { useIsFocused, useNavigation } from "@react-navigation/native";
 
@@ -7,6 +7,10 @@ import { Container, Content, Text, View } from "../../common";
 import ProfileHeader from "../components/ProfileHeader";
 import NameIcon from "../../assets/icons/edit-name-icon.svg";
 import EditIcon from "../../assets/icons/edit-email-icon.svg";
+import NotificationIcon from "../../assets/icons/nav-notification-icon.svg";
+
+import ProfileIcon from "../../assets/icons/nav-profile-icon.svg";
+
 import { getProfile as selectProfile } from "../redux/selectors";
 import { getProfile as getProfileAction } from "../redux/actions";
 import {
@@ -17,12 +21,17 @@ import { AppColors, AppImages, normalized } from "../../util/AppConstant";
 import { setDraftPost } from "../../redux/action/AppLogics";
 import { saveUserDraftPost } from "../../util/helperFun";
 import AlertModal from "../../common/AlertModal";
+import { Routes } from "../../util/Route";
+import { checkUserAccountRequestStatus } from "../../network/Services/ProfileServices";
+import { RequestStatus } from "../../util/Strings";
 
 /* =============================================================================
 <ProfileScreen />
 ============================================================================= */
 const ProfileScreen = ({ profile, getProfile, logout, deleteUserAccount }) => {
+  const [reqBtnStatus, setReqBtnStatus] = useState(null);
   const isFocused = useIsFocused();
+  const selector = useSelector((AppState) => AppState);
   const [alertModal, setAlertModal] = useState(false);
   const navigation = useNavigation();
   const dispatch = useDispatch();
@@ -34,6 +43,9 @@ const ProfileScreen = ({ profile, getProfile, logout, deleteUserAccount }) => {
   useEffect(() => {
     if (isFocused) {
       getProfile();
+    }
+    if (isFocused && selector?.Auth?.user?.uid) {
+      fetchReqStatus(selector?.Auth?.user?.uid);
     }
     // console.log("profileID -- > " , JSON.stringify(profile.userId))
   }, [isFocused]);
@@ -49,7 +61,11 @@ const ProfileScreen = ({ profile, getProfile, logout, deleteUserAccount }) => {
     await saveUserDraftPost([]);
     deleteUserAccount();
   };
-
+  const fetchReqStatus = async (id) => {
+    await checkUserAccountRequestStatus(id, (res) => {
+      setReqBtnStatus(res);
+    });
+  };
   return (
     <Container>
       <ProfileHeader photoUrl={profileImage} />
@@ -81,6 +97,64 @@ const ProfileScreen = ({ profile, getProfile, logout, deleteUserAccount }) => {
             <Text normal>{"My Draft Post"}</Text>
           </View>
         </TouchableOpacity>
+        {reqBtnStatus?.length > 0 ? (
+          !selector?.DraftPost?.isAdmin ? (
+            <TouchableOpacity
+              style={{ ...styles.item, paddingVertical: normalized(5) }}
+              activeOpacity={1}
+              onPress={() => {
+                if (
+                  reqBtnStatus == RequestStatus.newReq ||
+                  reqBtnStatus == RequestStatus.rejected
+                ) {
+                  navigation.navigate(Routes.Profile.requestForVerify);
+                }
+              }}
+            >
+              <NotificationIcon stroke={AppColors.blue.navy} />
+              <View style={styles.itemInfoContainer}>
+                <Text normal>
+                  {reqBtnStatus == RequestStatus.newReq ||
+                  reqBtnStatus == RequestStatus.rejected
+                    ? "Request for verified Account"
+                    : reqBtnStatus == RequestStatus.pending
+                    ? "Request Pending"
+                    : reqBtnStatus == RequestStatus.accepted
+                    ? "Request Accepted"
+                    : ""}
+                </Text>
+              </View>
+            </TouchableOpacity>
+          ) : (
+            <View>
+              <TouchableOpacity
+                style={{ ...styles.item, paddingVertical: normalized(5) }}
+                activeOpacity={1}
+                onPress={() => {
+                  navigation.navigate(Routes.Profile.appUserList);
+                }}
+              >
+                <ProfileIcon stroke={AppColors.blue.navy} />
+                <View style={styles.itemInfoContainer}>
+                  <Text normal>{"App User"}</Text>
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={{ ...styles.item, paddingVertical: normalized(5) }}
+                activeOpacity={1}
+                onPress={() => {
+                  navigation.navigate(Routes.Profile.userRequestList);
+                }}
+              >
+                <NotificationIcon stroke={AppColors.blue.navy} />
+                <View style={styles.itemInfoContainer}>
+                  <Text normal>{"User Requests"}</Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+          )
+        ) : null}
+
         <TouchableOpacity
           style={{ ...styles.item, paddingVertical: normalized(5) }}
           activeOpacity={1}

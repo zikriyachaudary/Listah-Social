@@ -18,7 +18,8 @@ import { changeAuthState as changeAuthStateAction } from "../auth/redux/actions"
 import FullImageModal from "../common/PostCard/PostItem/FullImageModal";
 import { showFullImage } from "../home/redux/appLogics";
 import { getUserDraftPost } from "../util/helperFun";
-import { setDraftPost } from "../redux/action/AppLogics";
+import { setDraftPost, setIsAlertShow } from "../redux/action/AppLogics";
+import AlertModal from "../common/AlertModal";
 
 const Stack = createNativeStackNavigator();
 
@@ -84,7 +85,15 @@ const AppNavigation = ({ changeAuthState, getProfile, authenticated }) => {
           <Stack.Screen name="AuthStack" component={AuthStack} />
         )}
       </Stack.Navigator>
-
+      {selector?.DraftPost?.isAlertShow?.value ? (
+        <AlertModal
+          visible={selector?.DraftPost?.isAlertShow?.value}
+          onPress={() => {
+            dispatch(setIsAlertShow({ value: false, message: "" }));
+          }}
+          message={selector?.DraftPost?.isAlertShow?.message}
+        />
+      ) : null}
       {selector.Home.showFullImage && selector.Home.fullImagePath !== "" && (
         <FullImageModal
           visible={selector.Home.showFullImage}

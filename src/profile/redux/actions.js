@@ -1,15 +1,15 @@
-import FireStore from '@react-native-firebase/firestore';
-import FireAuth from '@react-native-firebase/auth';
-import * as constants from './constants';
-import { Alert } from 'react-native';
+import FireStore from "@react-native-firebase/firestore";
+import FireAuth from "@react-native-firebase/auth";
+import * as constants from "./constants";
+import { Alert } from "react-native";
+import { setIsAdmin } from "../../redux/action/AppLogics";
 
-const ProfileCollection = FireStore().collection('profiles');
-
+const ProfileCollection = FireStore().collection("profiles");
 
 /**
  * SET_PROFILE
  */
-export const setProfile = payload => ({
+export const setProfile = (payload) => ({
   type: constants.SET_PROFILE,
   payload,
 });
@@ -21,8 +21,10 @@ export const getProfile = () => async (dispatch) => {
   try {
     dispatch({ type: constants.GET_PROFILE.REQUEST });
     const currentUser = FireAuth().currentUser.uid;
-    const profile = await (await ProfileCollection.doc(currentUser).get()).data();
-
+    const profile = await (
+      await ProfileCollection.doc(currentUser).get()
+    ).data();
+    dispatch(setIsAdmin(profile?.isAdmin ? true : false));
     dispatch({ type: constants.GET_PROFILE.SUCCESS, payload: profile });
   } catch (error) {
     Alert.alert(error.message);
@@ -72,9 +74,14 @@ export const updateProfile = (changes) => async (dispatch) => {
 
     await ProfileCollection.doc(currentUser.uid).update(changes);
 
-    const updatedProfile = await (await ProfileCollection.doc(currentUser.uid).get()).data();
+    const updatedProfile = await (
+      await ProfileCollection.doc(currentUser.uid).get()
+    ).data();
 
-    dispatch({ type: constants.PROFILE_UPDATE.SUCCESS, payload: updatedProfile });
+    dispatch({
+      type: constants.PROFILE_UPDATE.SUCCESS,
+      payload: updatedProfile,
+    });
   } catch (error) {
     Alert.alert(error.message);
     dispatch({ type: constants.PROFILE_UPDATE.FAIL, error });
