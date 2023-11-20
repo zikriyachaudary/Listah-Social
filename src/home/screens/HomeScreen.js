@@ -386,6 +386,7 @@ const HomeScreen = ({ posts, getHomePosts, refreshHomePosts, getProfile }) => {
       ) : null}
 
       <FlatList
+        showsVerticalScrollIndicator={false}
         data={!searchPostVisible ? homePosts : filtersPost}
         refreshing={refreshing}
         renderItem={renderItem}

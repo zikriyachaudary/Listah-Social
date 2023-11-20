@@ -62,14 +62,6 @@ const PostCommentItem = ({
 
   useEffect(() => {
     const currentUser = FireAuth().currentUser.uid;
-    console.log(
-      "postAutor - >  ",
-      postAutor.userId,
-      "commentAutor - > ",
-      author,
-      "currentUser - > ",
-      currentUser
-    );
     setShowEditIcon(author == currentUser ? true : false);
 
     if (profile) {

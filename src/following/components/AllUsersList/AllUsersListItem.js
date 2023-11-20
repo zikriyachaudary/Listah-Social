@@ -13,6 +13,8 @@ import { updateHomeData } from "../../../home/redux/appLogics";
 import * as Colors from "../../../config/colors";
 import LoadingImage from "../../../common/LoadingImage";
 import { useNavigation } from "@react-navigation/native";
+import useNotificationManger from "../../../hooks/useNotificationManger";
+import { Notification_Types } from "../../../util/Strings";
 
 /* =============================================================================
 <AllUsersListItem />
@@ -23,6 +25,7 @@ const AllUsersListItem = ({
   unFollowUser,
   followUser,
 }) => {
+  const { followNUnFollowUser } = useNotificationManger();
   const [loading, setLoading] = useState(false);
   const userId = user?.userId;
   const userName = user?.username;
@@ -33,7 +36,12 @@ const AllUsersListItem = ({
 
   const navigation = useNavigation();
   const _handleFollowPress = async () => {
+    console.log("follow------->", userId);
     setLoading(true);
+    await followNUnFollowUser({
+      actionType: Notification_Types.follow,
+      reciverId: userId,
+    });
     await followUser(userId);
     dispatch(updateHomeData(!selector.Home.updateHomeData));
 
@@ -45,6 +53,10 @@ const AllUsersListItem = ({
   const _handleUnFollowPress = async () => {
     // if (isFollowed) {
     setLoading(true);
+    await followNUnFollowUser({
+      actionType: Notification_Types.unFollow,
+      reciverId: userId,
+    });
     await unFollowUser(userId);
     dispatch(updateHomeData(!selector.Home.updateHomeData));
     setLoading(false);
@@ -83,7 +95,7 @@ const AllUsersListItem = ({
 
           <Text style={styles.userNameText} numberOfLines={2}>
             {userName}
-            {user?.verified ? <Text>{` (A+)`}</Text> : null}
+            {user?.verified ? <Text normal>{` (A+)`}</Text> : null}
           </Text>
         </View>
       </TouchableWithoutFeedback>

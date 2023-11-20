@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import { connect } from 'react-redux';
-import FastImage from 'react-native-fast-image'
-import FireAuth from '@react-native-firebase/auth';
-import FireStorage from '@react-native-firebase/storage';
-import { ActivityIndicator, Alert, Image, StyleSheet } from 'react-native';
+import React, { useState } from "react";
+import { connect } from "react-redux";
+import FastImage from "react-native-fast-image";
+import FireAuth from "@react-native-firebase/auth";
+import FireStorage from "@react-native-firebase/storage";
+import { ActivityIndicator, Alert, Image, StyleSheet } from "react-native";
 
 import {
   View,
@@ -13,39 +13,42 @@ import {
   TextInput,
   Touchable,
   ImagePickerButton,
-} from '../../common';
-import CheckIcon from '../../assets/icons/edit-check-icon.svg';
-import * as Colors from '../../config/colors';
+} from "../../common";
+import CheckIcon from "../../assets/icons/edit-check-icon.svg";
+import * as Colors from "../../config/colors";
 
-import { suggestPost as suggestPostAction } from '../redux/actions';
+import { suggestPost as suggestPostAction } from "../redux/actions";
+import { Notification_Types } from "../../util/Strings";
+import useNotificationManger from "../../hooks/useNotificationManger";
 
 /* =============================================================================
 <SuggestionAddScreen />
 ============================================================================= */
 const SuggestionAddScreen = ({ route, navigation, suggestPost }) => {
   const { postId, postTitle, authorId } = route?.params;
-  const [name, setName] = useState('');
-  const [image, setImage] = useState('');
-  const [description, setDescription] = useState('');
+  const { suggestionAtPost } = useNotificationManger();
+  const [name, setName] = useState("");
+  const [image, setImage] = useState("");
+  const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(false);
   const disabled = name || description || image;
 
   const _handleSubmit = async () => {
     if (disabled) {
       setLoading(true);
-      const storageRef = FireStorage().ref('post_media').child(image.fileName);
-      await storageRef.putFile(image.uri)
-      const uploadImgUrl = await storageRef.getDownloadURL();
 
+      const storageRef = FireStorage().ref("post_media").child(image.fileName);
+      await storageRef.putFile(image.uri);
+      const uploadImgUrl = await storageRef.getDownloadURL();
       const payload = {
-        type: 'suggestion',
+        type: "suggestion",
         change: {
-          type: 'add',
+          type: "add",
           item: {
             name,
             description,
             image: uploadImgUrl,
-          }
+          },
         },
         postId,
         postTitle,
@@ -53,32 +56,30 @@ const SuggestionAddScreen = ({ route, navigation, suggestPost }) => {
         authorId,
       };
 
-      await suggestPost(payload, () => {
-        Alert.alert(
-          'Suggestion Successful',
-          'Your suggestion has been send',
-          [
-            { text: 'OK', onPress: () => navigation.navigate('HomeStack') }
-          ],
-        );
+      await suggestPost(payload, async () => {
+        await suggestionAtPost({
+          actionType: Notification_Types.suggestion,
+          reciverId: authorId,
+          extraData: { postId: postId },
+        });
+
+        Alert.alert("Suggestion Successful", "Your suggestion has been send", [
+          { text: "OK", onPress: () => navigation.navigate("HomeStack") },
+        ]);
       });
-    };
+    }
     setLoading(false);
   };
 
-
   return (
     <Container>
-      <StackHeader title={`What would you like to${'\n'}suggest?`} />
+      <StackHeader title={`What would you like to${"\n"}suggest?`} />
       <Content>
         <View horizontal style={styles.changeFieldContainer}>
           {image ? (
             <FastImage style={styles.img} source={image} />
           ) : (
-            <ImagePickerButton
-              btnSize='small'
-              onImageSelect={setImage}
-            />
+            <ImagePickerButton btnSize="small" onImageSelect={setImage} />
           )}
           <TextInput
             value={name}
@@ -97,7 +98,7 @@ const SuggestionAddScreen = ({ route, navigation, suggestPost }) => {
         </View>
         <View horizontal center>
           {loading ? (
-            <ActivityIndicator color={Colors.primary} size='small' />
+            <ActivityIndicator color={Colors.primary} size="small" />
           ) : (
             <Touchable style={styles.actionBtn} onPress={_handleSubmit}>
               <CheckIcon stroke="#6d14c4" />
@@ -111,7 +112,7 @@ const SuggestionAddScreen = ({ route, navigation, suggestPost }) => {
 
 const styles = StyleSheet.create({
   changeFieldContainer: {
-    width: '100%',
+    width: "100%",
     borderRadius: 20,
     marginTop: 50,
   },
@@ -122,8 +123,8 @@ const styles = StyleSheet.create({
     paddingTop: 2,
     marginRight: 5,
     borderRadius: 30 / 2,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   inputContainer: {
     flex: 1,
@@ -154,4 +155,3 @@ const mapDispatchToProps = {
 };
 
 export default connect(null, mapDispatchToProps)(SuggestionAddScreen);
-

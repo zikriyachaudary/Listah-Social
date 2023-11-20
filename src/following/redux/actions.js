@@ -111,7 +111,7 @@ export const getUserFollowings = () => async (dispatch) => {
 /**
  * USER_FOLLOW
  */
-export const followUser = (userId) => async (dispatch) => {
+export const followUser = (userId, onComplete) => async (dispatch) => {
   try {
     dispatch({ type: constants.USER_FOLLOW.REQUEST });
     // ADDING USER_ID TO CURRENT USERS FOLLOWING LIST
@@ -145,7 +145,6 @@ export const followUser = (userId) => async (dispatch) => {
         ...followedUserProfile.notifications,
       ],
     });
-
     dispatch({
       type: constants.USER_FOLLOW.SUCCESS,
       payload: followedUserProfile,

@@ -12,12 +12,7 @@ import { useSelector } from "react-redux";
 /* =============================================================================
 <HomeListHeader />
 ============================================================================= */
-const HomeListHeader = ({
-  postRefresh,
-  filterClick,
-  searchClicked,
-  listSize,
-}) => {
+const HomeListHeader = ({ postRefresh, searchClicked, listSize }) => {
   const navigation = useNavigation();
   const selector = useSelector((AppState) => AppState);
 

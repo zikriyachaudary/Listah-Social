@@ -5,7 +5,12 @@
 #import <React/RCTRootView.h>
 
 #import <React/RCTAppSetupUtils.h>
-#import <Firebase.h>
+
+
+//Push Notification
+#import "Firebase.h"  
+#import "RNFirebaseMessaging.h" 
+#import "FirebasePushNotifications.h" 
 
 #if RCT_NEW_ARCH_ENABLED
 #import <React/CoreModulesPlugins.h>
@@ -32,11 +37,24 @@ static NSString *const kRNConcurrentRoot = @"concurrentRoot";
 
 @implementation AppDelegate
 
+//Push Notification
+- (void)application:(UIApplication *)application didReceiveRemoteNotification:(nonnull NSDictionary *)userInfo
+                                                    fetchCompletionHandler:(nonnull void (^)(UIBackgroundFetchResult))completionHandler{
+[[FirebasePushNotifications instance] didReceiveRemoteNotification:userInfo fetchCompletionHandler:completionHandler];
+}
+
+- (void)application:(UIApplication *)application didRegisterUserNotificationSettings:(UIUserNotificationSettings *)notificationSettings {
+
+[[RNFirebaseMessaging instance] didRegisterUserNotificationSettings:notificationSettings];
+}
+
+//
+
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
 
   [FIRApp configure];
-  
+   [FirebasePushNotifications configure];
   RCTAppSetupPrepareApp(application);
 
   RCTBridge *bridge = [[RCTBridge alloc] initWithDelegate:self launchOptions:launchOptions];
@@ -134,5 +152,12 @@ static NSString *const kRNConcurrentRoot = @"concurrentRoot";
 }
 
 #endif
+
+
+//Push Notification
+- (void)application:(UIApplication *)application didReceiveLocalNotification:(UILocalNotification *)notification {
+[[FirebasePushNotifications instance] didReceiveLocalNotification:notification];
+}
+
 
 @end

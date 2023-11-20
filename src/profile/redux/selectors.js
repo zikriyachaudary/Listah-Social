@@ -1,18 +1,17 @@
-import FireStore from '@react-native-firebase/firestore';
+import FireStore from "@react-native-firebase/firestore";
 
-const ProfileCollection = FireStore().collection('profiles');
+const ProfileCollection = FireStore().collection("profiles");
 
 //  Get Profile
 export const getProfile = (state) => state.Profile.profile;
 
 //  Get Profile
 export const getProfileById = async (state, { id }) => {
-  console.log("printId - > " , id)
   const profile = await (await ProfileCollection.doc(id).get()).data();
   return {
     username: profile?.username,
     profileImage: profile.profileImage,
-    userId: profile.userId
+    userId: profile.userId,
   };
 };
 

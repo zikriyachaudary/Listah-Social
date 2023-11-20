@@ -1,16 +1,18 @@
-import { connect, useSelector } from 'react-redux';
-import React, { useEffect } from 'react';
-import { FlatList, StyleSheet } from 'react-native';
-import { useIsFocused } from '@react-navigation/native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { connect, useSelector } from "react-redux";
+import React, { useEffect, useState } from "react";
+import { ActivityIndicator, FlatList, StyleSheet, View } from "react-native";
+import { useIsFocused } from "@react-navigation/native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { Container } from '../../common';
-import NotificationListItem from '../components/NotificationListItem';
-import NotificationsListHeader from '../components/NotificationsListHeader';
-import NotificationsListEmpty from '../components/NotificationsListEmpty';
+import { Container } from "../../common";
+import NotificationListItem from "../components/NotificationListItem";
+import NotificationsListHeader from "../components/NotificationsListHeader";
+import NotificationsListEmpty from "../components/NotificationsListEmpty";
 
-import { getNotifications as selectNotifications } from '../redux/selectors';
-import { getNotifications as getNotificationsAction } from '../redux/actions';
+import { getNotifications as selectNotifications } from "../redux/selectors";
+import { getNotifications as getNotificationsAction } from "../redux/actions";
+import useNotificationManger from "../../hooks/useNotificationManger";
+import { AppColors } from "../../util/AppConstant";
 
 /* =============================================================================
 <NotificationScreen />
@@ -19,40 +21,62 @@ const NotificationScreen = ({ notifications, getNotifications }) => {
   const isFocused = useIsFocused();
   const insets = useSafeAreaInsets();
   const styles = getStyles(insets);
-  const selector = useSelector((AppState) => AppState)
-
+  const [notificationList, setNotificationList] = useState([]);
+  const selector = useSelector((AppState) => AppState);
+  const [loader, setIsLoader] = useState(false);
+  const { fetchNotificationList } = useNotificationManger();
   // GET_NOTIFICATIONS
   useEffect(() => {
     if (isFocused) {
-      getNotifications(selector.Home.notificationUnread);
-    };
-  }, [isFocused])
+      // getNotifications(selector.Home.notificationUnread);
+      setIsLoader(true);
+      fetchNotificationList((response) => {
+        if (response?.length > 0) {
+          setNotificationList(response);
+        }
+        setTimeout(() => {
+          setIsLoader(false);
+        }, 500);
+      });
+    }
+  }, [isFocused]);
 
   return (
     <Container>
-      <FlatList
-        data={notifications}
-        refreshing={false}
-        renderItem={renderItem}
-        keyExtractor={renderKeyExtractor}
-        contentContainerStyle={styles.content}
-        ListHeaderComponent={NotificationsListHeader}
-        ListEmptyComponent={NotificationsListEmpty}
-      />
+      {loader ? (
+        <View
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        >
+          <ActivityIndicator size={"large"} color={AppColors.blue.navy} />
+        </View>
+      ) : (
+        <FlatList
+          data={notificationList}
+          refreshing={false}
+          renderItem={renderItem}
+          keyExtractor={renderKeyExtractor}
+          contentContainerStyle={styles.content}
+          ListHeaderComponent={NotificationsListHeader}
+          ListEmptyComponent={NotificationsListEmpty}
+        />
+      )}
     </Container>
   );
 };
 
-const renderItem = ({ item }) => <NotificationListItem id={item.id} notification={item} />;
-const renderKeyExtractor = item => `${item.id}`;
+const renderItem = ({ item, index }) => (
+  <NotificationListItem id={index} notification={item} />
+);
+const renderKeyExtractor = (item) => `${item.id}`;
 
-const getStyles = (insets) => StyleSheet.create({
-  content: {
-    flexGrow: 1,
-    paddingTop: insets.top + 20,
-    paddingHorizontal: 18,
-  },
-});
+const getStyles = (insets) =>
+  StyleSheet.create({
+    content: {
+      flexGrow: 1,
+      paddingTop: insets.top + 20,
+      paddingHorizontal: 18,
+    },
+  });
 
 const mapStateToProps = (state) => ({
   notifications: selectNotifications(state),

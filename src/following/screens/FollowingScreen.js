@@ -37,7 +37,6 @@ const FollowingScreen = ({ getUserFollowings, getAllUsers }) => {
       getUserFollowings();
     }
   }, [isFocused]);
-
   return (
     <Container>
       <TabView

@@ -34,6 +34,8 @@ import {
   likeUnlikeUserPosts,
 } from "../../../home/redux/actions";
 import { CHALLENGE_REQUEST } from "../../../suggestion/redux/constants";
+import { Notification_Types } from "../../../util/Strings";
+import useNotificationManger from "../../../hooks/useNotificationManger";
 
 /* =============================================================================
 <PostActions />
@@ -48,9 +50,10 @@ const PostActions = ({
   likeUserOpenClicked,
 }) => {
   const toast = useToast();
+  const { likeNUnLikePost } = useNotificationManger();
   const navigation = useNavigation();
   const [likesCount, setLikesCount] = useState(post?.likes);
-  const likedPosts = profile?.likedPosts;
+
   const authorId = post?.author?.userId;
   const [commentsCount, setCommentsCount] = useState(post?.comments?.length);
   const [liked, setLiked] = useState();
@@ -65,24 +68,22 @@ const PostActions = ({
         : false;
     setLiked(isLiked);
   }, []);
-  // useEffect(() => {
-  //   setLiked(likedPosts?.find((_id) => {
-  //     if (_id === id) {
-  //       return true
-  //     }
-  //     return false
-  //   }))
-  // }, [likedPosts?.length])
 
   const _handlePostReact = async () => {
     setLoading(true);
 
-    await likeUnlikeUserPosts(post?.id);
-    // if (!liked) {
-    //   await likePost(post?.id);
-    // } else {
-    //   await dislikePost(post?.id);
-    // }
+    await likeUnlikeUserPosts(post?.id, async (response) => {
+      if (response?.status) {
+        await likeNUnLikePost({
+          actionType: liked
+            ? Notification_Types.unlike
+            : Notification_Types?.like,
+          reciverId: post?.author?.userId,
+          extraData: { postId: post?.id },
+        });
+      }
+    });
+
     postRefresh();
     if (liked) {
       setLikesCount(likesCount - 1);
@@ -122,8 +123,6 @@ const PostActions = ({
   };
 
   const _handleSuggestionPress = () => {
-    console.log("post --- > ", post);
-
     if (FireAuth().currentUser.uid === authorId) {
       toast.show("Post Author can't suggest");
     } else {

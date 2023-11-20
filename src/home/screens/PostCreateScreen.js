@@ -39,6 +39,7 @@ import { saveUserDraftPost } from "../../util/helperFun";
 import { useIsFocused } from "@react-navigation/native";
 import TextInputComponent from "../../common/TextInputComponent";
 import { AppColors, ScreenSize, normalized } from "../../util/AppConstant";
+import useNotificationManger from "../../hooks/useNotificationManger";
 
 /* =============================================================================
 <PostCreateScreen />
@@ -50,6 +51,7 @@ const PostCreateScreen = ({
   route,
   createAnnouncementPost,
 }) => {
+  const { generateMultiplePushNotification } = useNotificationManger();
   const dispatch = useDispatch();
   const selector = useSelector((AppState) => AppState);
   const [title, setTitle] = useState("");
@@ -283,7 +285,14 @@ const PostCreateScreen = ({
     values["isNumberShowInItems"] = toggleCheckBox;
 
     if (route.params && route.params.isAnnouncement) {
-      await createAnnouncementPost(values);
+      await createAnnouncementPost(values, async (res) => {
+        if (res?.status) {
+          await generateMultiplePushNotification({
+            receiverList: selector?.sliceReducer?.allUserFCMToken,
+            extraData: { postId: res?.message },
+          });
+        }
+      });
     } else {
       await createPost(values);
     }
@@ -363,8 +372,6 @@ const PostCreateScreen = ({
         error={desError}
       />
 
-    
-
       <Formik
         enableReinitialize={true}
         innerRef={formikRef}
@@ -376,8 +383,8 @@ const PostCreateScreen = ({
           <FieldArray
             name="items"
             render={(arrayHelpers, i) => {
-              let isSelect = false
-              
+              let isSelect = false;
+
               initialState.current = values;
               return (
                 <Content contentContainerStyle={styles.content}>
@@ -470,10 +477,10 @@ const PostCreateScreen = ({
                             onPress={() => {
                               console.log("print ---- > ", isSelect);
                               if (isSelect) {
-                                isSelect = false
+                                isSelect = false;
                                 setToggleCheckBox(isSelect);
                               } else {
-                                isSelect = true
+                                isSelect = true;
                                 setToggleCheckBox(isSelect);
                               }
                             }}

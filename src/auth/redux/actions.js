@@ -1,9 +1,10 @@
-import FireStore from '@react-native-firebase/firestore';
-import auth from '@react-native-firebase/auth';
-import * as constants from './constants';
-import { Alert } from 'react-native';
+import FireStore from "@react-native-firebase/firestore";
+import auth from "@react-native-firebase/auth";
+import * as constants from "./constants";
+import { Alert } from "react-native";
+import { setUpdateFBToken } from "../../redux/action/AppLogics";
 
-const ProfileCollection = FireStore().collection('profiles');
+const ProfileCollection = FireStore().collection("profiles");
 
 /**
  * AUTH_STATE_CHANGE
@@ -19,18 +20,13 @@ export const changeAuthState = (payload) => ({
 export const login = (email, password) => async (dispatch) => {
   try {
     dispatch({ type: constants.LOGIN.REQUEST });
-
     await auth().signInWithEmailAndPassword(email, password);
-
-    
     const currentUser = auth().currentUser.toJSON();
-
     dispatch({ type: constants.LOGIN.SUCCESS, payload: currentUser });
+    dispatch(setUpdateFBToken(true));
   } catch (error) {
-    const errList = error.message.split("] ")
-    console.log(
-      "login -- > " , errList[errList.length - 1]
-    )
+    const errList = error.message.split("] ");
+    console.log("login -- > ", errList[errList.length - 1]);
     Alert.alert(errList[errList.length - 1]);
     dispatch({ type: constants.LOGIN.FAIL, error });
   } finally {
@@ -42,16 +38,15 @@ export const deleteLoginAccount = () => async (dispatch) => {
   try {
     dispatch({ type: constants.LOGIN.REQUEST });
     const currentUser = auth().currentUser.toJSON();
-    await auth().currentUser.delete()
+    await auth().currentUser.delete();
     dispatch({ type: constants.LOGIN.SUCCESS, payload: currentUser });
-
   } catch (error) {
     Alert.alert(error.message);
     dispatch({ type: constants.LOGIN.FAIL, error });
-  }finally {
+  } finally {
     dispatch({ type: constants.LOGIN.COMPLETE });
   }
-}
+};
 
 /**
  * FORGOT_PASSWORD
@@ -83,15 +78,8 @@ export const forgotPassword = (email, cb) => async (dispatch) => {
 export const register = (info) => async (dispatch) => {
   try {
     dispatch({ type: constants.REGISTER.REQUEST });
-    const {
-      email,
-      password,
-      username,
-      profileImage,
-    } = info;
-
+    const { email, password, username, profileImage } = info;
     await auth().createUserWithEmailAndPassword(email, password);
-
     await auth().currentUser.updateProfile({
       displayName: username,
       photoURL: profileImage,
@@ -110,10 +98,9 @@ export const register = (info) => async (dispatch) => {
     };
 
     await profileDoc.set(profile);
-
     const currentUser = auth().currentUser.toJSON();
-
     dispatch({ type: constants.REGISTER.SUCCESS, payload: currentUser });
+    dispatch(setUpdateFBToken(true));
   } catch (error) {
     Alert.alert(error.message);
     dispatch({ type: constants.REGISTER.FAIL, error });
@@ -151,11 +138,11 @@ export const deleteUserAccount = () => async (dispatch) => {
     const user = auth().currentUser;
 
     if (user) {
-      console.log("enter --- > " , auth().currentUser.uid)
+      console.log("enter --- > ", auth().currentUser.uid);
       await ProfileCollection.doc(auth().currentUser.uid).delete();
-      console.log("done --- > " , auth().currentUser.uid)
+      console.log("done --- > ", auth().currentUser.uid);
 
-      await auth().currentUser.delete()
+      await auth().currentUser.delete();
       // console.log("enter111 --- > " , auth().currentUser.uid)
 
       // await auth().signOut();
@@ -163,7 +150,7 @@ export const deleteUserAccount = () => async (dispatch) => {
 
     dispatch({ type: constants.LOGOUT.SUCCESS });
   } catch (error) {
-    console.log("showError - > " , error)
+    console.log("showError - > ", error);
     Alert.alert(error.message);
     dispatch({ type: constants.LOGOUT.FAIL, error });
   } finally {

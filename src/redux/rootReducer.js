@@ -8,6 +8,7 @@ import FollowingReducer from "../following/redux/reducer";
 import NotificationsReducer from "../notification/redux/reducer";
 import SuggestionReducer from "../suggestion/redux/reducer";
 import DraftPostReducer from "./DraftPostReducer";
+import SliceReducer from "./SliceReducer";
 
 const rootReducer = combineReducers({
   Auth: AuthReducer,
@@ -18,6 +19,7 @@ const rootReducer = combineReducers({
   Notifications: NotificationsReducer,
   Suggestion: SuggestionReducer,
   DraftPost: DraftPostReducer,
+  sliceReducer: SliceReducer,
 });
 
 export default rootReducer;

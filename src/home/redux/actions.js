@@ -3,6 +3,7 @@ import FireStore from "@react-native-firebase/firestore";
 import FireAuth from "@react-native-firebase/auth";
 import FireStorage from "@react-native-firebase/storage";
 import ImageResizer from "react-native-image-resizer";
+import firestore from "@react-native-firebase/firestore";
 
 import { setProfile } from "../../profile/redux/actions";
 import {
@@ -404,86 +405,87 @@ export const refreshHomePosts = (lastDocId) => async (dispatch) => {
   }
 };
 
-export const createAnnouncementPost = (postContent) => async (dispatch) => {
-  try {
-    dispatch({ type: constants.CREATE_POST.REQUEST });
-    const { title, description, items, order, isNumberShowInItems } =
-      postContent;
-    const postId = Date.now();
-    const authorId = FireAuth().currentUser.uid;
+export const createAnnouncementPost =
+  (postContent, onComplete) => async (dispatch) => {
+    try {
+      dispatch({ type: constants.CREATE_POST.REQUEST });
+      const { title, description, items, order, isNumberShowInItems } =
+        postContent;
+      const postId = Date.now();
+      const authorId = FireAuth().currentUser.uid;
 
-    const post = {
-      id: postId,
-      title,
-      order,
-      isNumberShowInItems,
-      description,
-      likes: 0,
-      shares: 0,
-      comments: [],
-      likedUsers: [],
-      author: authorId,
-      announcement: true,
-      createdAt: FireStore.FieldValue.serverTimestamp(),
-    };
+      const post = {
+        id: postId,
+        title,
+        order,
+        isNumberShowInItems,
+        description,
+        likes: 0,
+        shares: 0,
+        comments: [],
+        likedUsers: [],
+        author: authorId,
+        announcement: true,
+        createdAt: FireStore.FieldValue.serverTimestamp(),
+      };
 
-    if (items) {
-      post.items = await Promise.all(
-        items.map(async (item, index) => {
-          let uploadImgUrl = "";
-          console.log("printItem - > ", item);
-          if (item.image && item.image.uri != "") {
-            const compressedImage = await ImageResizer.createResizedImage(
-              item.image.uri,
-              1000,
-              1000,
-              "PNG",
-              100,
-              0
-            );
-            const storageRef = FireStorage()
-              .ref("post_media")
-              .child(item.image.fileName);
-            await storageRef.putFile(compressedImage.uri);
-            uploadImgUrl = await storageRef.getDownloadURL();
-          }
+      if (items) {
+        post.items = await Promise.all(
+          items.map(async (item, index) => {
+            let uploadImgUrl = "";
+            console.log("printItem - > ", item);
+            if (item.image && item.image.uri != "") {
+              const compressedImage = await ImageResizer.createResizedImage(
+                item.image.uri,
+                1000,
+                1000,
+                "PNG",
+                100,
+                0
+              );
+              const storageRef = FireStorage()
+                .ref("post_media")
+                .child(item.image.fileName);
+              await storageRef.putFile(compressedImage.uri);
+              uploadImgUrl = await storageRef.getDownloadURL();
+            }
 
-          return {
-            id: index,
-            name: item.name,
-            image: uploadImgUrl,
-            description: item.description,
-          };
-        })
-      );
+            return {
+              id: index,
+              name: item.name,
+              image: uploadImgUrl,
+              description: item.description,
+            };
+          })
+        );
+      }
+
+      await AnnouncementCollection.doc(`${postId}`).set(post);
+      onComplete({ status: true, message: postId });
+
+      const createdPost = await (
+        await AnnouncementCollection.doc(postId).get()
+      ).data();
+      const postAuthor = await (
+        await ProfilesCollection.doc(createdPost?.author).get()
+      ).data();
+      const populatedPost = {
+        ...createPost,
+        author: {
+          userId: postAuthor?.userId,
+          username: postAuthor?.username,
+          profileImage: postAuthor?.profileImage,
+          verified: postAuthor?.verified ? true : false,
+        },
+      };
+      dispatch({ type: constants.CREATE_POST.SUCCESS, payload: populatedPost });
+    } catch (error) {
+      dispatch({ type: constants.CREATE_POST.FAIL, error });
+      dispatch(setCreatePostFailError(error));
+    } finally {
+      dispatch({ type: constants.CREATE_POST.COMPLETE });
     }
-
-    await AnnouncementCollection.doc(`${postId}`).set(post);
-
-    const createdPost = await (
-      await AnnouncementCollection.doc(postId).get()
-    ).data();
-    const postAuthor = await (
-      await ProfilesCollection.doc(createdPost?.author).get()
-    ).data();
-    const populatedPost = {
-      ...createPost,
-      author: {
-        userId: postAuthor?.userId,
-        username: postAuthor?.username,
-        profileImage: postAuthor?.profileImage,
-        verified: postAuthor?.verified ? true : false,
-      },
-    };
-
-    dispatch({ type: constants.CREATE_POST.SUCCESS, payload: populatedPost });
-  } catch (error) {
-    dispatch({ type: constants.CREATE_POST.FAIL, error });
-    dispatch(setCreatePostFailError(error));
-  } finally {
-    dispatch({ type: constants.CREATE_POST.COMPLETE });
-  }
-};
+  };
 
 /**
  * CREATE POST
@@ -567,7 +569,7 @@ export const createPost = (postContent) => async (dispatch) => {
 };
 
 export const challengePost =
-  (postContent, previousPost) => async (dispatch) => {
+  (postContent, previousPost, onComplete) => async (dispatch) => {
     try {
       dispatch({ type: constants.UPDATED_POST.REQUEST });
       const { items, order, isNumberShowInItems } = postContent;
@@ -626,7 +628,6 @@ export const challengePost =
         );
       }
 
-      console.log("previosPosst -- > ", previousPost);
       const postObj = previousPost;
       postObj["author"] =
         previousPost.author && previousPost.author.userId
@@ -647,7 +648,6 @@ export const challengePost =
       const updatedPost = await (
         await PostsCollection.doc(previousPost.id).get()
       ).data();
-      console.log("updatedPost --- > ", JSON.stringify(updatedPost?.author));
 
       const postAuthor = await (
         await ProfilesCollection.doc(updatedPost?.author).get()
@@ -663,8 +663,8 @@ export const challengePost =
           verified: postAuthor?.verified ? true : false,
         },
       };
+      onComplete({ status: true, message: "success" });
       console.log("postAuthor --- > ", JSON.stringify(populatedPost));
-
       dispatch({
         type: constants.UPDATED_POST.SUCCESS,
         payload: populatedPost,
@@ -673,9 +673,9 @@ export const challengePost =
       console.log("errorCatch ", JSON.stringify(error));
       Alert.alert(error.message);
       dispatch({ type: constants.UPDATED_POST.FAIL, error });
+      onComplete({ status: false, message: "fail" });
     } finally {
       console.log("errorCatchfinally ");
-
       dispatch({ type: constants.UPDATED_POST.COMPLETE });
     }
   };
@@ -956,11 +956,11 @@ export const addReplyInComment = async (commentData, postId) => {
   }
 };
 
-export const likeUnlikeUserPosts = async (postId) => {
+export const likeUnlikeUserPosts = async (postId, onComplete) => {
   const currentUserUid = FireAuth().currentUser.uid;
-  try {
-    const filterPost = await (await PostsCollection.doc(postId).get()).data();
 
+  try {
+    const filterPost = await PostsCollection.doc(postId).get().data();
     if (filterPost.likedUsers.find((id) => id == currentUserUid)) {
       const likeUserList = filterPost.likedUsers.filter(
         (item) => item !== currentUserUid
@@ -971,7 +971,6 @@ export const likeUnlikeUserPosts = async (postId) => {
         likes: likeCount,
       });
     } else {
-      console.log("Added 000 > ");
       const likeUserList = filterPost.likedUsers;
       likeUserList.push(currentUserUid);
       const likeCount = filterPost.likes + 1;
@@ -980,7 +979,10 @@ export const likeUnlikeUserPosts = async (postId) => {
         likes: likeCount,
       });
     }
+    onComplete({ status: true, message: "success!" });
   } catch (error) {
+    onComplete({ status: false, message: "Fail!" });
+
     console.log("printError - > ", error, error.message);
   }
 };
@@ -1184,7 +1186,7 @@ export const dislikePost = (postId) => async (dispatch) => {
 /**
  * COMMENT_POST
  */
-export const postComment = (commentData) => async (dispatch) => {
+export const postComment = (commentData, onComplete) => async (dispatch) => {
   try {
     dispatch({ type: constants.COMMENT_POST.REQUEST });
 
@@ -1216,9 +1218,10 @@ export const postComment = (commentData) => async (dispatch) => {
     if (populatedPost?.likes >= 2) {
       dispatch(updateDiscoveryPost(populatedPost));
     }
-
+    onComplete({ status: true, message: "success" });
     dispatch({ type: constants.COMMENT_POST.SUCCESS, payload: populatedPost });
   } catch (error) {
+    onComplete({ status: false, message: "fail" });
     dispatch({ type: constants.COMMENT_POST.FAIL, error });
   } finally {
     dispatch({ type: constants.COMMENT_POST.COMPLETE });

@@ -106,6 +106,7 @@ export const AppColors = {
 };
 
 export const AppImages = {
+  appIcon: require("../assets/images/appIcon.png"),
   profile: {
     logout: require("../assets/images/logout.png"),
     delete: require("../assets/images/delete.png"),

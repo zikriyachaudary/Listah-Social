@@ -35,6 +35,8 @@ import {
   unFollowUser as unFollowUserAction,
   followUser as followUserAction,
 } from "../../following/redux/actions";
+import { Notification_Types } from "../../util/Strings";
+import useNotificationManger from "../../hooks/useNotificationManger";
 
 // import View from '../../common/View';
 // import Avatar from '../../common/Avatar';
@@ -61,7 +63,7 @@ const MyPostsScreen = ({
   const navigation = useNavigation();
   const [userProfileImage, setUsersProfileImage] = useState();
   const [userProfileInfo, setUsersProfileInfo] = useState();
-
+  const { followNUnFollowUser } = useNotificationManger();
   const [isFollowUser, setFollowUser] = useState();
   const [followersModal, setFollowersModal] = useState(false);
   const [followersOrFollowingList, setFollowersOrFollowingList] = useState([]);
@@ -131,6 +133,10 @@ const MyPostsScreen = ({
 
   const _handleFollowPress = async () => {
     setLoading(true);
+    await followNUnFollowUser({
+      actionType: Notification_Types.follow,
+      reciverId: route.params.userId,
+    });
     await followUser(route.params.userId);
     dispatch(updateHomeData(!selector.Home.updateHomeData));
     setFollowUser(!isFollowUser);
@@ -141,7 +147,10 @@ const MyPostsScreen = ({
   const _handleUnFollowPress = async () => {
     // if (isFollowed) {
     setLoading(true);
-    console.log("usersId11 -- > ", route.params.userId);
+    await followNUnFollowUser({
+      actionType: Notification_Types.unFollow,
+      reciverId: route.params.userId,
+    });
     await unFollowUser(route.params.userId);
     dispatch(updateHomeData(!selector.Home.updateHomeData));
     setFollowUser(!isFollowUser);

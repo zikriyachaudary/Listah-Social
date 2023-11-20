@@ -31,6 +31,8 @@ import {
 } from "../../../../home/redux/actions";
 import { updateHomeData } from "../../../../home/redux/appLogics";
 import { useEffect } from "react";
+import { Notification_Types } from "../../../../util/Strings";
+import useNotificationManger from "../../../../hooks/useNotificationManger";
 
 /* =============================================================================
  PostItemCommentModal />
@@ -44,6 +46,7 @@ const PostItemCommentModal = ({
   postComment,
   postRefresh,
 }) => {
+  const { commentPostNoti } = useNotificationManger();
   const [comments, setComments] = useState([]);
   const [isEmptyVisible, setIsEmptyVisible] = useState(false);
   const [text, setText] = useState("");
@@ -56,17 +59,14 @@ const PostItemCommentModal = ({
 
   useEffect(() => {
     return () => {
-      console.log("isAddCommentModal - > ", isAddComment);
       if (isAddComment) {
         dispatch(updateHomeData(!selector.Home.updateHomeData));
       }
     };
   }, []);
-
   const _handleComment = async () => {
     try {
       if (text) {
-        console.log("itemEnable -- > ", isEditComment, isEditViewEnable);
         if (isEditViewEnable) {
           if (isEditViewEnable.text) {
             const editComment = isEditViewEnable;
@@ -106,8 +106,17 @@ const PostItemCommentModal = ({
             subCommentList: [],
             likedUsers: [],
           };
-          await postComment(payload);
-          console.log("success -- >");
+
+          await postComment(payload, async (response) => {
+            if (response?.status) {
+              await commentPostNoti({
+                actionType: Notification_Types.comment,
+                reciverId: post?.author?.userId,
+                extraData: { postId: post?.id },
+              });
+            }
+          });
+
           // postRefresh()
           isAddComment = true;
           console.log("refresCall");
@@ -132,11 +141,7 @@ const PostItemCommentModal = ({
     }
     setText("");
   };
-  const handleTouchablePress = () => {
-    if (shouldDismissKeyboard) {
-      Keyboard.dismiss();
-    }
-  };
+
   const renderListEmptyComponent = () => (
     <View center style={styles.emptyListContainer}>
       <Text>No Comments Yet</Text>

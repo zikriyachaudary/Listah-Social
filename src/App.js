@@ -1,7 +1,6 @@
 import React from "react";
 import { Provider } from "react-redux";
 import { ToastProvider } from "react-native-toast-notifications";
-
 import AppNavigation from "./navigation/AppNavigation";
 import configureStore from "./redux/configureStore";
 

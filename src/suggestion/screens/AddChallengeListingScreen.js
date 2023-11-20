@@ -19,23 +19,17 @@ import AddIcon from "../../assets/icons/edit-plus-square.svg";
 import { connect, useDispatch, useSelector } from "react-redux";
 
 import { getLoading } from "../redux/selectors";
-import { challengePost as challengePostAction } from "../redux/actions";
-import { useEffect } from "react";
 import { RadioGroup } from "react-native-radio-buttons-group";
 import CheckBox from "@react-native-community/checkbox";
-import { createPost as createPostAction } from "../redux/actions";
 import { challengePost, createPost } from "../../home/redux/actions";
 import { updateHomeData } from "../../home/redux/appLogics";
 import { UPDATE_CHALLENGE_FEATURE } from "../redux/constants";
+import { Notification_Types } from "../../util/Strings";
+import useNotificationManger from "../../hooks/useNotificationManger";
 
-const AddChallengeListingScreen = ({
-  createPost,
-  challengePost,
-  navigation,
-  route,
-}) => {
+const AddChallengeListingScreen = ({ challengePost, navigation, route }) => {
   const post = route.params.post;
-  const items = post?.items;
+  const { challengeAtPost } = useNotificationManger();
   const [isShowAddBtn, setShowAddBtn] = useState(true);
   const [loading, setLoading] = useState(false);
   const [radioButtons, setRadioButtons] = useState([
@@ -82,23 +76,27 @@ const AddChallengeListingScreen = ({
       setShowAddBtn(false);
     }
   };
-
   const _handleSubmit = async (values) => {
-    console.log("clickkkkkk", values);
     values["order"] = radioButtons.find((item) => item.selected).id;
     values["isNumberShowInItems"] = toggleCheckBox;
     setLoading(true);
-    await challengePost(values, post);
+
+    await challengePost(values, post, async (response) => {
+      if (response?.status) {
+        await challengeAtPost({
+          actionType: Notification_Types.challenge,
+          reciverId: post?.author?.userId,
+          extraData: { postId: post?.id },
+        });
+      }
+    });
     setLoading(false);
     UPDATE_CHALLENGE_FEATURE.isUpdate = true;
     dispatch(updateHomeData(!selector.Home.updateHomeData));
-
-    navigation.goBack();
     navigation.goBack();
   };
 
   const onPressRadioButton = (radioButtonsArray) => {
-    console.log("radiooooooo ", radioButtonsArray);
     setRadioButtons(radioButtonsArray);
   };
   return (

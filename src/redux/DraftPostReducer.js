@@ -35,6 +35,7 @@ const DraftPostReducer = (state = initialState, action) => {
         ...state,
         isAdmin: action.data,
       };
+
     default:
       return state;
   }

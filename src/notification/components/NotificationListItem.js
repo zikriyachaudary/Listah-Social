@@ -6,9 +6,10 @@ import {
   TouchableWithoutFeedback,
 } from "react-native";
 
-import { Avatar, Text, Touchable, View } from "../../common";
+import { Text, Touchable, View } from "../../common";
 import LoadingImage from "../../common/LoadingImage";
 import * as Colors from "../../config/colors";
+import { Notification_Types } from "../../util/Strings";
 
 /* =============================================================================
 <NotificationListItem />
@@ -16,8 +17,6 @@ import * as Colors from "../../config/colors";
 const NotificationListItem = ({ notification }) => {
   const navigation = useNavigation();
   const type = notification?.type;
-  const senderProfileUsername = notification?.sender?.username;
-  const senderProfilePic = notification?.sender?.profileImage;
 
   const _handleSuggestionPress = () => {
     navigation.navigate("SuggestionStack", {
@@ -44,7 +43,7 @@ const NotificationListItem = ({ notification }) => {
             url={{ uri: `${senderProfilePic}` }}
           /> */}
           <LoadingImage
-            source={{ uri: `${senderProfilePic}` }}
+            source={{ uri: `${notification?.sender?.image}` }}
             style={{
               width: 50,
               height: 50,
@@ -56,7 +55,7 @@ const NotificationListItem = ({ notification }) => {
             }}
           />
         </TouchableOpacity>
-        <Text sm>{`${senderProfileUsername} has a suggestion for you`}</Text>
+        <Text sm>{notification?.message}</Text>
       </Touchable>
     );
   }
@@ -67,17 +66,25 @@ const NotificationListItem = ({ notification }) => {
   return (
     <TouchableWithoutFeedback
       onPress={() => {
-        navigation.navigate("MyPosts", {
-          userId: notification.sender.userId,
-          username: notification.sender.username,
-          refreshCall: postRefresh,
-        });
+        if (
+          notification?.actionType == Notification_Types.announced ||
+          notification?.actionType == Notification_Types.challenge ||
+          notification?.actionType == Notification_Types.comment ||
+          notification?.actionType == Notification_Types.follow ||
+          notification?.actionType == Notification_Types.like ||
+          notification?.actionType == Notification_Types.suggestion
+        ) {
+          navigation.navigate("MyPosts", {
+            userId: notification.sender.id,
+            username: notification.sender.name,
+            refreshCall: postRefresh,
+          });
+        }
       }}
     >
       <View horizontal style={styles.container}>
-        {/* <Avatar style={styles.profileImg} url={{ uri: `${senderProfilePic}` }} /> */}
         <LoadingImage
-          source={{ uri: `${senderProfilePic}` }}
+          source={{ uri: `${notification?.sender?.image}` }}
           style={{
             width: 50,
             height: 50,
@@ -96,7 +103,9 @@ const NotificationListItem = ({ notification }) => {
             flexWrap: "wrap",
           }}
           sm
-        >{`${senderProfileUsername} is now Following you`}</Text>
+        >
+          {notification?.message}
+        </Text>
       </View>
     </TouchableWithoutFeedback>
   );
