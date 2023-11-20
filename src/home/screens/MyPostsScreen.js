@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { connect, useDispatch, useSelector } from "react-redux";
 import {
   ActivityIndicator,
+  Dimensions,
   FlatList,
   StyleSheet,
   TouchableOpacity,
@@ -37,6 +38,7 @@ import {
 } from "../../following/redux/actions";
 import { Notification_Types } from "../../util/Strings";
 import useNotificationManger from "../../hooks/useNotificationManger";
+import { normalized } from "../../util/AppConstant";
 
 // import View from '../../common/View';
 // import Avatar from '../../common/Avatar';
@@ -175,20 +177,36 @@ const MyPostsScreen = ({
             paddingHorizontal: 15,
           }}
         >
-          <LoadingImage
-            source={{ uri: `${userProfileImage}` }}
-            style={{
-              width: 68,
-              height: 68,
-              borderRadius: 2,
-              marginVertical: 10,
-              borderWidth: 1.4,
-              borderRadius: 68 / 2,
-              backgroundColor: Colors.outline,
-              borderColor: "yellow",
-            }}
-          />
-
+          <View style={{ width: userProfileInfo?.verified ? 76 : 70 }}>
+            <LoadingImage
+              source={{ uri: `${userProfileImage}` }}
+              style={{
+                width: 68,
+                height: 68,
+                borderRadius: 2,
+                marginVertical: 10,
+                borderWidth: 1.4,
+                borderRadius: 68 / 2,
+                backgroundColor: Colors.outline,
+                borderColor: "yellow",
+              }}
+            />
+            {userProfileInfo && userProfileInfo?.verified ? (
+              <Text
+                style={{
+                  position: "absolute",
+                  bottom: 0,
+                  marginStart: 50,
+                  fontFamily: "Poppins-Bold",
+                  fontSize: normalized(12),
+                  color: Colors.primary,
+                  width: Dimensions.get("screen").width - 200,
+                }}
+              >
+                {`(A+)`}
+              </Text>
+            ) : null}
+          </View>
           <View
             style={{
               flex: 1,

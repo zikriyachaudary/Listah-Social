@@ -95,7 +95,13 @@ const AllUsersListItem = ({
 
           <Text style={styles.userNameText} numberOfLines={2}>
             {userName}
-            {user?.verified ? <Text normal>{` (A+)`}</Text> : null}
+            {user?.verified ? (
+              <Text
+                style={{
+                  color: Colors.primary,
+                }}
+              >{`\n(A+)`}</Text>
+            ) : null}
           </Text>
         </View>
       </TouchableWithoutFeedback>

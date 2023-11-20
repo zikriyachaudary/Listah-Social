@@ -94,6 +94,7 @@ export const fetchAdminUserList = async (onComplete) => {
           image: doc?._data?.profileImage,
           userId: doc?._data?.userId,
           name: doc?._data?.username,
+          verified: doc?._data?.verified
         });
       });
       setTimeout(() => {
