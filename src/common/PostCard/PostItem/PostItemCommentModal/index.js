@@ -108,7 +108,10 @@ const PostItemCommentModal = ({
           };
 
           await postComment(payload, async (response) => {
-            if (response?.status) {
+            if (
+              response?.status &&
+              post?.author?.userId != selector?.Auth?.user?.uid
+            ) {
               await commentPostNoti({
                 actionType: Notification_Types.comment,
                 reciverId: post?.author?.userId,

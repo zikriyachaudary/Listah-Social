@@ -65,29 +65,24 @@ const useNotificationManger = (props) => {
     }
   };
   const followNUnFollowUser = async (obj) => {
-    let findedUserIndex = selector?.sliceReducer?.allUserFCMToken.findIndex(
-      (item) => item?.userId == obj?.reciverId?.toString()
-    );
-    if (findedUserIndex == -1) {
-      return;
-    }
+    let updatedReciverData = null;
+    let completeNotiList = [];
     let sender = {
       id: selector?.Profile?.profile?.userId,
       name: selector?.Profile?.profile?.username,
       image: selector?.Profile?.profile?.profileImage,
     };
-    let completeNotiList = [];
-    await firestore()
-      .collection(Collections.NOTIFICATION)
-      .doc(obj?.reciverId)
-      .get()
-      .then((snapDoc) => {
-        if (snapDoc?._data) {
-          if (snapDoc?._data?.notification_List?.length > 0) {
-            completeNotiList = snapDoc?._data?.notification_List;
-          }
-        }
-      });
+    await getupdatedFCM(obj?.reciverId?.toString(), (res) => {
+      if (res?.userId) {
+        updatedReciverData = res;
+        completeNotiList = res?.notification_List;
+      }
+    });
+
+    if (!updatedReciverDat?.userId) {
+      return;
+    }
+
     let newObj = {
       reciverId: obj?.reciverId,
       message: `${selector?.Profile?.profile?.username} ${Notification_Messages.followMsg}`,
@@ -116,8 +111,11 @@ const useNotificationManger = (props) => {
       .doc(obj?.reciverId)
       .update({ notification_List: newArr })
       .then(() => {
-        if (obj?.actionType == Notification_Types.follow) {
-          sendPushNoti(newObj);
+        if (
+          obj?.actionType == Notification_Types.follow &&
+          updatedReciverData?.fcmToken
+        ) {
+          sendPushNoti(newObj, updatedReciverData?.fcmToken);
         }
       })
       .catch((error) => {
@@ -125,30 +123,24 @@ const useNotificationManger = (props) => {
       });
   };
   const likeNUnLikePost = async (obj) => {
-    let findedUserIndex = selector?.sliceReducer?.allUserFCMToken.findIndex(
-      (item) => item?.userId == obj?.reciverId?.toString()
-    );
-    if (findedUserIndex == -1) {
-      return;
-    }
-
+    let updatedReciverData = null;
     let completeNotiList = [];
     let sender = {
       id: selector?.Profile?.profile?.userId,
       name: selector?.Profile?.profile?.username,
       image: selector?.Profile?.profile?.profileImage,
     };
-    await firestore()
-      .collection(Collections.NOTIFICATION)
-      .doc(obj?.reciverId)
-      .get()
-      .then((snapDoc) => {
-        if (snapDoc?._data) {
-          if (snapDoc?._data?.notification_List?.length > 0) {
-            completeNotiList = snapDoc?._data?.notification_List;
-          }
-        }
-      });
+    await getupdatedFCM(obj?.reciverId?.toString(), (res) => {
+      if (res?.userId) {
+        updatedReciverData = res;
+        completeNotiList = res?.notification_List;
+      }
+    });
+
+    if (!updatedReciverData?.userId) {
+      return;
+    }
+
     let newObj = {
       reciverId: obj?.reciverId,
       message: `${selector?.Profile?.profile?.username} ${Notification_Messages.likeMsg}`,
@@ -177,8 +169,11 @@ const useNotificationManger = (props) => {
       .doc(obj?.reciverId)
       .update({ notification_List: newArr })
       .then(() => {
-        if (obj?.actionType == Notification_Types.like) {
-          sendPushNoti(newObj);
+        if (
+          obj?.actionType == Notification_Types.like &&
+          updatedReciverData?.fcmToken
+        ) {
+          sendPushNoti(newObj, updatedReciverData?.fcmToken);
         }
       })
       .catch((error) => {
@@ -186,29 +181,23 @@ const useNotificationManger = (props) => {
       });
   };
   const suggestionAtPost = async (obj) => {
-    let findedUserIndex = selector?.sliceReducer?.allUserFCMToken.findIndex(
-      (item) => item?.userId == obj?.reciverId?.toString()
-    );
-    if (findedUserIndex == -1) {
-      return;
-    }
+    let updatedReciverData = null;
+    let completeNotiList = [];
     let sender = {
       id: selector?.Profile?.profile?.userId,
       name: selector?.Profile?.profile?.username,
       image: selector?.Profile?.profile?.profileImage,
     };
-    let completeNotiList = [];
-    await firestore()
-      .collection(Collections.NOTIFICATION)
-      .doc(obj?.reciverId)
-      .get()
-      .then((snapDoc) => {
-        if (snapDoc?._data) {
-          if (snapDoc?._data?.notification_List?.length > 0) {
-            completeNotiList = snapDoc?._data?.notification_List;
-          }
-        }
-      });
+    await getupdatedFCM(obj?.reciverId?.toString(), (res) => {
+      if (res?.userId) {
+        updatedReciverData = res;
+        completeNotiList = res?.notification_List;
+      }
+    });
+
+    if (!updatedReciverData?.userId) {
+      return;
+    }
     let newObj = {
       reciverId: obj?.reciverId,
       message: `${selector?.Profile?.profile?.username} ${Notification_Messages.suggestion}`,
@@ -224,36 +213,32 @@ const useNotificationManger = (props) => {
       .doc(obj?.reciverId)
       .update({ notification_List: newArr })
       .then(() => {
-        sendPushNoti(newObj);
+        if (updatedReciverData?.fcmToken) {
+          sendPushNoti(newObj, updatedReciverData?.fcmToken);
+        }
       })
       .catch((error) => {
         console.error("Error updating array value:", error);
       });
   };
   const challengeAtPost = async (obj) => {
-    let findedUserIndex = selector?.sliceReducer?.allUserFCMToken.findIndex(
-      (item) => item?.userId == obj?.reciverId?.toString()
-    );
-    if (findedUserIndex == -1) {
-      return;
-    }
+    let updatedReciverData = null;
+    let completeNotiList = [];
     let sender = {
       id: selector?.Profile?.profile?.userId,
       name: selector?.Profile?.profile?.username,
       image: selector?.Profile?.profile?.profileImage,
     };
-    let completeNotiList = [];
-    await firestore()
-      .collection(Collections.NOTIFICATION)
-      .doc(obj?.reciverId)
-      .get()
-      .then((snapDoc) => {
-        if (snapDoc?._data) {
-          if (snapDoc?._data?.notification_List?.length > 0) {
-            completeNotiList = snapDoc?._data?.notification_List;
-          }
-        }
-      });
+    await getupdatedFCM(obj?.reciverId?.toString(), (res) => {
+      if (res?.userId) {
+        updatedReciverData = res;
+        completeNotiList = res?.notification_List;
+      }
+    });
+
+    if (!updatedReciverData?.userId) {
+      return;
+    }
     let newObj = {
       reciverId: obj?.reciverId,
       message: `${selector?.Profile?.profile?.username} ${Notification_Messages.challenge}`,
@@ -269,36 +254,32 @@ const useNotificationManger = (props) => {
       .doc(obj?.reciverId)
       .update({ notification_List: newArr })
       .then(() => {
-        sendPushNoti(newObj);
+        if (updatedReciverData?.fcmToken) {
+          sendPushNoti(newObj, updatedReciverData?.fcmToken);
+        }
       })
       .catch((error) => {
         console.error("Error updating array value:", error);
       });
   };
   const commentPostNoti = async (obj) => {
-    let findedUserIndex = selector?.sliceReducer?.allUserFCMToken.findIndex(
-      (item) => item?.userId == obj?.reciverId?.toString()
-    );
-    if (findedUserIndex == -1) {
-      return;
-    }
+    let updatedReciverData = null;
+    let completeNotiList = [];
     let sender = {
       id: selector?.Profile?.profile?.userId,
       name: selector?.Profile?.profile?.username,
       image: selector?.Profile?.profile?.profileImage,
     };
-    let completeNotiList = [];
-    await firestore()
-      .collection(Collections.NOTIFICATION)
-      .doc(obj?.reciverId)
-      .get()
-      .then((snapDoc) => {
-        if (snapDoc?._data) {
-          if (snapDoc?._data?.notification_List?.length > 0) {
-            completeNotiList = snapDoc?._data?.notification_List;
-          }
-        }
-      });
+    await getupdatedFCM(obj?.reciverId?.toString(), (res) => {
+      if (res?.userId) {
+        updatedReciverData = res;
+        completeNotiList = res?.notification_List;
+      }
+    });
+
+    if (!updatedReciverData?.userId) {
+      return;
+    }
     let newObj = {
       reciverId: obj?.reciverId,
       message: `${selector?.Profile?.profile?.username} ${Notification_Messages.comment}`,
@@ -314,13 +295,15 @@ const useNotificationManger = (props) => {
       .doc(obj?.reciverId)
       .update({ notification_List: newArr })
       .then(() => {
-        sendPushNoti(newObj);
+        if (updatedReciverData?.fcmToken) {
+          sendPushNoti(newObj, updatedReciverData?.fcmToken);
+        }
       })
       .catch((error) => {
         console.error("Error updating array value:", error);
       });
   };
-  const sendPushNoti = async (obj) => {
+  const sendPushNoti = async (obj, fcmToken) => {
     console.log("obj-------->", obj);
     //////////////////  Obj will look like ////////////////////
     // let obj = {
@@ -332,23 +315,19 @@ const useNotificationManger = (props) => {
     ///////////////////////////////////////////////////////////
 
     let title = selector?.Profile?.profile?.username;
-    let findedUserIndex = selector?.sliceReducer?.allUserFCMToken.findIndex(
-      (item) => item?.userId == obj?.reciverId?.toString()
-    );
-    let finededUserToken =
-      selector?.sliceReducer?.allUserFCMToken[findedUserIndex].fcmToken;
-    if (findedUserIndex != -1 && finededUserToken) {
+
+    if (fcmToken) {
       let notification = {
         title: title,
         body: obj?.message,
       };
       let params = {
-        to: finededUserToken,
+        to: fcmToken,
         notification: notification,
         data: {
           ...obj?.extraData,
           actionType: obj?.actionType,
-          senderid: selector?.Profile?.profile?.userId,
+          senderId: selector?.Profile?.profile?.userId,
           senderName: selector?.Profile?.profile?.username,
         },
       };
@@ -402,7 +381,7 @@ const useNotificationManger = (props) => {
           data: {
             ...obj?.extraData,
             actionType: Notification_Types.announced,
-            senderid: sender?.id,
+            senderId: sender?.id,
             senderName: sender?.name,
           },
         };
@@ -460,6 +439,19 @@ const useNotificationManger = (props) => {
       .then(() => {})
       .catch((error) => {
         console.error("Error updating array value:", error);
+      });
+  };
+  const getupdatedFCM = async (uId, onComplete) => {
+    await firestore()
+      .collection(Collections.NOTIFICATION)
+      .doc(uId)
+      .get()
+      .then((snapDoc) => {
+        if (snapDoc?._data) {
+          onComplete(snapDoc?._data);
+        } else {
+          onComplete(null);
+        }
       });
   };
   return {

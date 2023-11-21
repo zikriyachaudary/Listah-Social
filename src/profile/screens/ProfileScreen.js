@@ -24,6 +24,8 @@ import AlertModal from "../../common/AlertModal";
 import { Routes } from "../../util/Route";
 import { checkUserAccountRequestStatus } from "../../network/Services/ProfileServices";
 import { RequestStatus } from "../../util/Strings";
+import useNotificationManger from "../../hooks/useNotificationManger";
+import AppLoader from "../../common/AppLoader";
 
 /* =============================================================================
 <ProfileScreen />
@@ -31,8 +33,10 @@ import { RequestStatus } from "../../util/Strings";
 const ProfileScreen = ({ profile, getProfile, logout, deleteUserAccount }) => {
   const [reqBtnStatus, setReqBtnStatus] = useState(null);
   const isFocused = useIsFocused();
+  const { checkNUpdateFCMToken } = useNotificationManger();
   const selector = useSelector((AppState) => AppState);
   const [alertModal, setAlertModal] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const email = profile?.email;
@@ -51,15 +55,27 @@ const ProfileScreen = ({ profile, getProfile, logout, deleteUserAccount }) => {
   }, [isFocused]);
 
   const _handleLogout = async () => {
-    dispatch(setDraftPost([]));
+    setIsLoading(true);
+    await checkNUpdateFCMToken({
+      fcmToken: "",
+      userId: selector?.Auth?.user?.uid,
+    });
     await saveUserDraftPost([]);
+    dispatch(setDraftPost([]));
     logout();
+    setIsLoading(false);
   };
 
   const _deleteAccount = async () => {
+    setIsLoading(true);
+    await checkNUpdateFCMToken({
+      fcmToken: "",
+      userId: selector?.Auth?.user?.uid,
+    });
     dispatch(setDraftPost([]));
     await saveUserDraftPost([]);
     deleteUserAccount();
+    setIsLoading(false);
   };
   const fetchReqStatus = async (id) => {
     await checkUserAccountRequestStatus(id, (res) => {
@@ -197,6 +213,7 @@ const ProfileScreen = ({ profile, getProfile, logout, deleteUserAccount }) => {
           message={"Are you sure, you want to delete your Account?"}
         />
       ) : null}
+      {isLoading ? <AppLoader visisble={isLoading} /> : null}
     </Container>
   );
 };

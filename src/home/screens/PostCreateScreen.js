@@ -31,6 +31,7 @@ import CheckBox from "@react-native-community/checkbox";
 import { setPostRefresh } from "../redux/appLogics";
 import { makeid } from "../../util/functions";
 import {
+  setAllUserFCMToken,
   setCreatePostFailError,
   setDraftPost,
 } from "../../redux/action/AppLogics";
@@ -51,7 +52,8 @@ const PostCreateScreen = ({
   route,
   createAnnouncementPost,
 }) => {
-  const { generateMultiplePushNotification } = useNotificationManger();
+  const { generateMultiplePushNotification, userSubscribed } =
+    useNotificationManger();
   const dispatch = useDispatch();
   const selector = useSelector((AppState) => AppState);
   const [title, setTitle] = useState("");
@@ -60,7 +62,7 @@ const PostCreateScreen = ({
   const [des, setDes] = useState("");
   const des2 = useRef("");
   const [desError, setDesError] = useState("");
-
+  const [isLoading, setIsLoading] = useState(false);
   const toast = useToast();
   const isFocused = useIsFocused();
   const formikRef = useRef();
@@ -279,16 +281,24 @@ const PostCreateScreen = ({
     if (title?.length == 0 || des?.length == 0) {
       return;
     }
+    setIsLoading(true);
+
     values["title"] = title;
     values["description"] = des;
     values["order"] = radioButtons.find((item) => item.selected).id;
     values["isNumberShowInItems"] = toggleCheckBox;
-
     if (route.params && route.params.isAnnouncement) {
       await createAnnouncementPost(values, async (res) => {
         if (res?.status) {
+          let receiverUser = [];
+          await userSubscribed(selector?.Auth?.user?.uid, (res) => {
+            if (res?.length > 0) {
+              dispatch(setAllUserFCMToken(res));
+              receiverUser = res;
+            }
+          });
           await generateMultiplePushNotification({
-            receiverList: selector?.sliceReducer?.allUserFCMToken,
+            receiverList: receiverUser,
             extraData: { postId: res?.message },
           });
         }
@@ -304,6 +314,9 @@ const PostCreateScreen = ({
       resetForm();
       navigation.goBack();
     }
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 800);
   };
   const updateDraftFun = async (obj) => {
     let draftArr;
@@ -557,7 +570,7 @@ const PostCreateScreen = ({
                   <View center>
                     <Button
                       title="Upload"
-                      loading={loading}
+                      loading={isLoading}
                       onPress={handleSubmit}
                     />
                   </View>

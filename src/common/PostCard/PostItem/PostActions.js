@@ -1,4 +1,4 @@
-import { connect } from "react-redux";
+import { connect, useSelector } from "react-redux";
 import React, { useEffect, useState } from "react";
 import FireAuth from "@react-native-firebase/auth";
 import { useNavigation } from "@react-navigation/native";
@@ -44,16 +44,14 @@ const PostActions = ({
   id,
   post,
   profile,
-  likePost,
-  dislikePost,
   postRefresh,
   likeUserOpenClicked,
 }) => {
+  const selector = useSelector((AppState) => AppState);
   const toast = useToast();
   const { likeNUnLikePost } = useNotificationManger();
   const navigation = useNavigation();
   const [likesCount, setLikesCount] = useState(post?.likes);
-
   const authorId = post?.author?.userId;
   const [commentsCount, setCommentsCount] = useState(post?.comments?.length);
   const [liked, setLiked] = useState();
@@ -71,9 +69,8 @@ const PostActions = ({
 
   const _handlePostReact = async () => {
     setLoading(true);
-
-    await likeUnlikeUserPosts(post?.id, async (response) => {
-      if (response?.status) {
+    await likeUnlikeUserPosts(post?.id.toString(), async (response) => {
+      if (response?.status && authorId != selector?.Auth?.user?.uid) {
         await likeNUnLikePost({
           actionType: liked
             ? Notification_Types.unlike

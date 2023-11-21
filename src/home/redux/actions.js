@@ -958,9 +958,18 @@ export const addReplyInComment = async (commentData, postId) => {
 
 export const likeUnlikeUserPosts = async (postId, onComplete) => {
   const currentUserUid = FireAuth().currentUser.uid;
+  let filterPost;
 
   try {
-    const filterPost = await PostsCollection.doc(postId).get().data();
+    await firestore()
+      .collection("posts")
+      .doc(postId)
+      .get()
+      .then((snapDoc) => {
+        if (snapDoc?._data) {
+          filterPost = snapDoc?._data;
+        }
+      });
     if (filterPost.likedUsers.find((id) => id == currentUserUid)) {
       const likeUserList = filterPost.likedUsers.filter(
         (item) => item !== currentUserUid

@@ -82,7 +82,10 @@ const AddChallengeListingScreen = ({ challengePost, navigation, route }) => {
     setLoading(true);
 
     await challengePost(values, post, async (response) => {
-      if (response?.status) {
+      if (
+        response?.status &&
+        post?.author?.userId != selector?.Auth?.user?.uid
+      ) {
         await challengeAtPost({
           actionType: Notification_Types.challenge,
           reciverId: post?.author?.userId,

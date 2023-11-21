@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { connect } from "react-redux";
+import { connect, useSelector } from "react-redux";
 import FastImage from "react-native-fast-image";
 import FireAuth from "@react-native-firebase/auth";
 import FireStorage from "@react-native-firebase/storage";
@@ -25,6 +25,8 @@ import useNotificationManger from "../../hooks/useNotificationManger";
 <SuggestionAddScreen />
 ============================================================================= */
 const SuggestionAddScreen = ({ route, navigation, suggestPost }) => {
+  const selector = useSelector((AppState) => AppState);
+
   const { postId, postTitle, authorId } = route?.params;
   const { suggestionAtPost } = useNotificationManger();
   const [name, setName] = useState("");
@@ -57,11 +59,12 @@ const SuggestionAddScreen = ({ route, navigation, suggestPost }) => {
       };
 
       await suggestPost(payload, async () => {
-        await suggestionAtPost({
-          actionType: Notification_Types.suggestion,
-          reciverId: authorId,
-          extraData: { postId: postId },
-        });
+        if (authorId != selector?.Auth?.user?.uid)
+          await suggestionAtPost({
+            actionType: Notification_Types.suggestion,
+            reciverId: authorId,
+            extraData: { postId: postId },
+          });
 
         Alert.alert("Suggestion Successful", "Your suggestion has been send", [
           { text: "OK", onPress: () => navigation.navigate("HomeStack") },

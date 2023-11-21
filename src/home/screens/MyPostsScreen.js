@@ -17,16 +17,13 @@ import MyPostsListEmpty from "../components/MyPostsListEmpty";
 import { getMyPosts } from "../redux/selectors";
 import {
   blockUsers,
-  getHomePosts as getHomePostsAction,
+  getHomePosts,
   getPostsByID,
   getProfileDataByID,
-  refreshHomePosts as refreshHomePostsAction,
+  refreshHomePosts,
 } from "../redux/actions";
 import { getProfile } from "../../profile/redux/selectors";
-import { constants, startLoader } from "../redux/constants";
 import * as Colors from "../../config/colors";
-import { ScrollView } from "react-native-gesture-handler";
-import FireAuth from "@react-native-firebase/auth";
 import Text from "../../common/Text";
 import LoadingImage from "../../common/LoadingImage";
 import { getUserFollowings as selectUserFollowings } from "../../following/redux/selectors";
@@ -48,15 +45,7 @@ import { normalized } from "../../util/AppConstant";
 <MyPostsScreen />
 
 ============================================================================= */
-const MyPostsScreen = ({
-  posts,
-  profile,
-  refreshHomePosts,
-  route,
-  userFollowings,
-  unFollowUser,
-  followUser,
-}) => {
+const MyPostsScreen = ({ profile, route, unFollowUser, followUser }) => {
   const [loading, setLoading] = useState(false);
 
   const isFocused = useIsFocused();

@@ -51,7 +51,7 @@ const NotificationScreen = ({ notifications, getNotifications }) => {
         </View>
       ) : (
         <FlatList
-          data={notificationList}
+          data={notificationList?.reverse()}
           refreshing={false}
           renderItem={renderItem}
           keyExtractor={renderKeyExtractor}

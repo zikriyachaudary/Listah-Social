@@ -36,7 +36,6 @@ const AllUsersListItem = ({
 
   const navigation = useNavigation();
   const _handleFollowPress = async () => {
-    console.log("follow------->", userId);
     setLoading(true);
     await followNUnFollowUser({
       actionType: Notification_Types.follow,

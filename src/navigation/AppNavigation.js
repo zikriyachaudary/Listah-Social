@@ -3,10 +3,7 @@ import { connect, useDispatch, useSelector } from "react-redux";
 import { Platform, SafeAreaView, StatusBar } from "react-native";
 import RNSplashScreen from "react-native-splash-screen";
 import FirebaseAuth from "@react-native-firebase/auth";
-import {
-  NavigationContainer,
-  createNavigationContainerRef,
-} from "@react-navigation/native";
+import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { notifications } from "react-native-firebase-push-notifications";
 import { View, Text } from "../common";
@@ -31,8 +28,8 @@ import AlertModal from "../common/AlertModal";
 import LocalNotification from "../common/LocalNotification";
 import useNotificationManger from "../hooks/useNotificationManger";
 import { Notification_Types } from "../util/Strings";
+import { navigate, navigationRef } from "./RootNavigation";
 const Stack = createNativeStackNavigator();
-export const navigationRef = createNavigationContainerRef();
 
 /* =============================================================================
 <AppNavigation />
@@ -42,13 +39,7 @@ const AppNavigation = ({ changeAuthState, getProfile, authenticated }) => {
   const [initializing, setInitializing] = useState(true);
   const userCompleteObj = useRef(null);
   const selector = useSelector((AppState) => AppState);
-  const refNavigation = (name, params) => {
-    if (name && params) {
-      navigationRef.current?.navigate(name, params);
-    } else {
-      return navigationRef.current;
-    }
-  };
+
   const dispatch = useDispatch();
   // firebase user state check
   useEffect(() => {
@@ -84,7 +75,10 @@ const AppNavigation = ({ changeAuthState, getProfile, authenticated }) => {
     const token = await notifications.getToken();
     await userSubscribed(userCompleteObj.current?.uid, (res) => {
       if (res?.length > 0) {
-        dispatch(setAllUserFCMToken(res));
+        let filterUser = res.filter(
+          (mitem) => mitem.userId !== userCompleteObj.current?.uid
+        );
+        dispatch(setAllUserFCMToken(filterUser));
       }
     });
     if (token && userCompleteObj.current?.uid) {
@@ -128,11 +122,10 @@ const AppNavigation = ({ changeAuthState, getProfile, authenticated }) => {
     const notification = await notifications
       .getInitialNotification()
       .then(async (remoteMessage) => {
-        console.log("remoteMessage initial--------->", remoteMessage);
         if (remoteMessage?.notification) {
           dispatch(setPushNotifi(notification));
           setTimeout(() => {
-            // openDetail();
+            openDetail();
           }, 3000);
         }
       });
@@ -142,9 +135,9 @@ const AppNavigation = ({ changeAuthState, getProfile, authenticated }) => {
   const postRefresh = () => {
     console.log("click");
   };
+
   const openDetail = () => {
     let obj = selector?.sliceReducer?.push_Noti?._data;
-    console.log("updatedData------>", obj);
     if (
       obj?.actionType == Notification_Types.announced ||
       obj?.actionType == Notification_Types.challenge ||
@@ -153,8 +146,8 @@ const AppNavigation = ({ changeAuthState, getProfile, authenticated }) => {
       obj?.actionType == Notification_Types.like ||
       obj?.actionType == Notification_Types.suggestion
     ) {
-      refNavigation("MyPosts", {
-        userId: obj?.senderid,
+      navigate("MyPosts", {
+        userId: obj?.senderId,
         username: obj?.senderName,
         refreshCall: postRefresh,
       });
@@ -166,7 +159,7 @@ const AppNavigation = ({ changeAuthState, getProfile, authenticated }) => {
       if (notification?._body) {
         dispatch(setPushNotifi(notification));
         setTimeout(() => {
-          // openDetail();
+          openDetail();
         }, 3000);
       }
     });
@@ -178,6 +171,7 @@ const AppNavigation = ({ changeAuthState, getProfile, authenticated }) => {
     //Android will not have any info set on the notification properties (title, subtitle, etc..), but _data will still contain information
 
     notifications.onNotification(async (notification) => {
+      console.log("notification------->", notification);
       if (notification?._body) {
         dispatch(setPushNotifi(notification));
       }
@@ -198,7 +192,7 @@ const AppNavigation = ({ changeAuthState, getProfile, authenticated }) => {
   }
 
   return (
-    <NavigationContainer theme={THEME}>
+    <NavigationContainer theme={THEME} ref={navigationRef}>
       <StatusBar
         translucent
         backgroundColor="transparent"

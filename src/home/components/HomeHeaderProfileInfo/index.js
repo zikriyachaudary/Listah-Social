@@ -30,11 +30,13 @@ const HomeHeaderProfileInfo = ({ profile }) => {
   };
 
   const _handleMyPostedPress = () => {
-    console.log("printProfile = > ", profile);
-    navigation.navigate("MyPosts", {
-      userId: profile.userId,
-      username: profile.username,
-    });
+    console.log("printProfile = > ", profile?.userId);
+    if (profile?.userId) {
+      navigation.navigate("MyPosts", {
+        userId: profile.userId,
+        username: profile.username,
+      });
+    }
   };
 
   return (
