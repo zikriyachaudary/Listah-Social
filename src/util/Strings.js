@@ -23,10 +23,10 @@ export const Notification_Types = {
 };
 
 export const Notification_Messages = {
-  followMsg: "is now Following you",
-  likeMsg: "is Liked your Post",
+  followMsg: "is now following you",
+  likeMsg: " liked your post",
   suggestion: "give a suggestion at your post",
-  challenge: "Challenge at your post",
-  comment: "Comment on your post",
+  challenge: "challenged your post",
+  comment: "commented on your post",
   announcment: "announced a post",
 };
