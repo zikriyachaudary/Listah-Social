@@ -576,7 +576,6 @@ export const challengePost =
       const postId = Date.now();
       const authorId = FireAuth().currentUser.uid;
 
-      console.log("showChallenge - > ", previousPost);
       const challengePostAuthor = await (
         await ProfilesCollection.doc(authorId).get()
       ).data();

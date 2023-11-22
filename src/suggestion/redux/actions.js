@@ -18,6 +18,7 @@ export const suggestPost = (suggestion, cb) => async (dispatch) => {
     const authorProfile = await (
       await ProfileCollection.doc(suggestion?.authorId).get()
     ).data();
+    console.log("authorProfile------->", authorProfile);
 
     await ProfileCollection.doc(suggestion?.authorId).update({
       notifications: [

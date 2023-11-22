@@ -216,7 +216,6 @@ const PostCreateScreen = ({
         });
       }
     } else {
-      console.log("initialState.current?.items----->", obj);
       let isOpenAlert = false;
       if (obj?.title?.length > 0) {
         isOpenAlert = true;
@@ -288,18 +287,21 @@ const PostCreateScreen = ({
     values["order"] = radioButtons.find((item) => item.selected).id;
     values["isNumberShowInItems"] = toggleCheckBox;
     if (route.params && route.params.isAnnouncement) {
-      await createAnnouncementPost(values, async (res) => {
-        if (res?.status) {
-          let receiverUser = [];
-          await userSubscribed(selector?.Auth?.user?.uid, (res) => {
-            if (res?.length > 0) {
+      await createAnnouncementPost(values, async (response) => {
+        if (response?.status) {
+          let isUserFetch = false;
+
+          await userSubscribed(selector?.Auth?.user?.uid, async (res) => {
+            if (res?.length > 0 && !isUserFetch) {
               dispatch(setAllUserFCMToken(res));
-              receiverUser = res;
+              setTimeout(async () => {
+                await generateMultiplePushNotification({
+                  receiverList: res,
+                  extraData: { postId: response?.message.toString() },
+                });
+              }, 800);
             }
-          });
-          await generateMultiplePushNotification({
-            receiverList: receiverUser,
-            extraData: { postId: res?.message },
+            isUserFetch = true;
           });
         }
       });

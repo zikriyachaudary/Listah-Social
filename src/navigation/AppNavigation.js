@@ -49,6 +49,9 @@ const AppNavigation = ({ changeAuthState, getProfile, authenticated }) => {
         onAppStart();
         changeAuthState(user.toJSON());
         registerDevice();
+        onNotificationListener();
+        onNotificationOpenedListener();
+        getInitialNotification();
       }
       setInitializing(false);
       RNSplashScreen.hide();
@@ -73,6 +76,12 @@ const AppNavigation = ({ changeAuthState, getProfile, authenticated }) => {
 
   const getToken = async () => {
     const token = await notifications.getToken();
+    if (token && userCompleteObj.current?.uid) {
+      await checkNUpdateFCMToken({
+        fcmToken: token,
+        userId: userCompleteObj.current?.uid,
+      });
+    }
     await userSubscribed(userCompleteObj.current?.uid, (res) => {
       if (res?.length > 0) {
         let filterUser = res.filter(
@@ -81,15 +90,6 @@ const AppNavigation = ({ changeAuthState, getProfile, authenticated }) => {
         dispatch(setAllUserFCMToken(filterUser));
       }
     });
-    if (token && userCompleteObj.current?.uid) {
-      await checkNUpdateFCMToken({
-        fcmToken: token,
-        userId: userCompleteObj.current?.uid,
-      });
-      onNotificationListener();
-      onNotificationOpenedListener();
-      getInitialNotification();
-    }
   };
   const getPermissionsForNotification = async () => {
     const isPermission = await hasPermission();
@@ -171,7 +171,6 @@ const AppNavigation = ({ changeAuthState, getProfile, authenticated }) => {
     //Android will not have any info set on the notification properties (title, subtitle, etc..), but _data will still contain information
 
     notifications.onNotification(async (notification) => {
-      console.log("notification------->", notification);
       if (notification?._body) {
         dispatch(setPushNotifi(notification));
       }

@@ -22,7 +22,6 @@ const NotificationScreen = ({ notifications, getNotifications }) => {
   const insets = useSafeAreaInsets();
   const styles = getStyles(insets);
   const [notificationList, setNotificationList] = useState([]);
-  const selector = useSelector((AppState) => AppState);
   const [loader, setIsLoader] = useState(false);
   const { fetchNotificationList } = useNotificationManger();
   // GET_NOTIFICATIONS
@@ -33,6 +32,8 @@ const NotificationScreen = ({ notifications, getNotifications }) => {
       fetchNotificationList((response) => {
         if (response?.length > 0) {
           setNotificationList(response);
+        } else {
+          setNotificationList([]);
         }
         setTimeout(() => {
           setIsLoader(false);

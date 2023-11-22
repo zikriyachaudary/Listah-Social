@@ -79,7 +79,7 @@ const useNotificationManger = (props) => {
       }
     });
 
-    if (!updatedReciverDat?.userId) {
+    if (!updatedReciverData?.userId) {
       return;
     }
 
@@ -95,7 +95,10 @@ const useNotificationManger = (props) => {
       newArr = [...completeNotiList, newObj];
     } else {
       completeNotiList.map((el) => {
-        if (el?.actionType != Notification_Types.follow) {
+        if (
+          el?.actionType != Notification_Types.follow &&
+          el?.actionType != Notification_Types.unFollow
+        ) {
           newArr.push(el);
         } else if (
           el?.reciverId != obj?.reciverId?.toString() &&
@@ -153,7 +156,10 @@ const useNotificationManger = (props) => {
       newArr = [...completeNotiList, newObj];
     } else {
       completeNotiList.map((el) => {
-        if (el?.actionType != Notification_Types.like) {
+        if (
+          el?.actionType != Notification_Types.like &&
+          el?.actionType != Notification_Types.unlike
+        ) {
           newArr.push(el);
         } else if (
           el?.reciverId != obj?.reciverId &&
@@ -235,7 +241,6 @@ const useNotificationManger = (props) => {
         completeNotiList = res?.notification_List;
       }
     });
-
     if (!updatedReciverData?.userId) {
       return;
     }
@@ -344,65 +349,20 @@ const useNotificationManger = (props) => {
       .doc(selector?.Profile?.profile?.userId)
       .get()
       .then((snapDoc) => {
-        if (snapDoc?._data) {
-          if (snapDoc?._data?.notification_List?.length > 0) {
-            onComplete(snapDoc?._data?.notification_List);
-          } else {
-            onComplete([]);
-          }
+        if (snapDoc?._data && snapDoc?._data?.notification_List?.length > 0) {
+          onComplete(snapDoc?._data?.notification_List);
+        } else {
+          onComplete([]);
         }
       });
   };
   const generateMultiplePushNotification = async (obj) => {
-    let title = selector?.Profile?.profile?.username;
-    let promiseList = [];
+    const extraData = obj?.extraData;
     let message = `${selector?.Profile?.profile?.username} ${Notification_Messages.announcment}`;
-    for (let i = 0; i < obj?.receiverList.length; i++) {
+    for (let i = 0; i < obj?.receiverList?.length; i++) {
       let receiver = obj?.receiverList[i];
-      await updateMultiUserNotiList(message, receiver?.userId, obj?.extraData);
-      let findedUserIndex = selector?.sliceReducer?.allUserFCMToken.findIndex(
-        (item) => item?.userId == receiver?.userId?.toString()
-      );
-      let sender = {
-        id: selector?.Profile?.profile?.userId,
-        name: selector?.Profile?.profile?.username,
-        image: selector?.Profile?.profile?.profileImage,
-      };
-      let finededUserToken =
-        selector?.sliceReducer?.allUserFCMToken[findedUserIndex].fcmToken;
-      if (findedUserIndex != -1 && finededUserToken) {
-        let notification = {
-          title: title,
-          body: message,
-        };
-        let params = {
-          to: finededUserToken,
-          notification: notification,
-          data: {
-            ...obj?.extraData,
-            actionType: Notification_Types.announced,
-            senderId: sender?.id,
-            senderName: sender?.name,
-          },
-        };
-        let promise = new Promise((resolve, reject) => {
-          sendPushNotification(params, (type) => {
-            if (type) {
-              console.log("notification send to ", receiver?.userId);
-              resolve(true);
-            } else {
-              reject(false);
-            }
-          });
-        });
-        promiseList.push(promise);
-      }
+      await updateMultiUserNotiList(message, receiver?.userId, extraData);
     }
-    Promise.all(promiseList)
-      .then(() => {
-        console.log("notification send to");
-      })
-      .catch(() => {});
   };
   const updateMultiUserNotiList = async (msg, userId, data) => {
     let sender = {
@@ -410,6 +370,7 @@ const useNotificationManger = (props) => {
       name: selector?.Profile?.profile?.username,
       image: selector?.Profile?.profile?.profileImage,
     };
+    let updatedReciverData = null;
     let completeNotiList = [];
     await firestore()
       .collection(Collections.NOTIFICATION)
@@ -418,6 +379,7 @@ const useNotificationManger = (props) => {
       .then((snapDoc) => {
         if (snapDoc?._data) {
           if (snapDoc?._data?.notification_List?.length > 0) {
+            updatedReciverData = snapDoc?._data;
             completeNotiList = snapDoc?._data?.notification_List;
           }
         }
@@ -436,7 +398,11 @@ const useNotificationManger = (props) => {
       .collection(Collections.NOTIFICATION)
       .doc(userId)
       .update({ notification_List: newArr })
-      .then(() => {})
+      .then(() => {
+        if (updatedReciverData?.fcmToken) {
+          sendPushNoti(newObj, updatedReciverData?.fcmToken);
+        }
+      })
       .catch((error) => {
         console.error("Error updating array value:", error);
       });

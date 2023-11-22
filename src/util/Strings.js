@@ -24,7 +24,7 @@ export const Notification_Types = {
 
 export const Notification_Messages = {
   followMsg: "is now following you",
-  likeMsg: " liked your post",
+  likeMsg: "liked your post",
   suggestion: "give a suggestion at your post",
   challenge: "challenged your post",
   comment: "commented on your post",

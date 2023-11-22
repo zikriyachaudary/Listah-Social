@@ -38,10 +38,15 @@ const SuggestionAddScreen = ({ route, navigation, suggestPost }) => {
   const _handleSubmit = async () => {
     if (disabled) {
       setLoading(true);
+      let uploadImgUrl = "";
+      if (image?.fileName?.length > 0) {
+        const storageRef = FireStorage()
+          .ref("post_media")
+          .child(image.fileName);
+        await storageRef.putFile(image.uri);
+        uploadImgUrl = await storageRef.getDownloadURL();
+      }
 
-      const storageRef = FireStorage().ref("post_media").child(image.fileName);
-      await storageRef.putFile(image.uri);
-      const uploadImgUrl = await storageRef.getDownloadURL();
       const payload = {
         type: "suggestion",
         change: {
@@ -57,14 +62,14 @@ const SuggestionAddScreen = ({ route, navigation, suggestPost }) => {
         sender: FireAuth().currentUser.uid,
         authorId,
       };
-
       await suggestPost(payload, async () => {
-        if (authorId != selector?.Auth?.user?.uid)
+        if (authorId != selector?.Auth?.user?.uid) {
           await suggestionAtPost({
             actionType: Notification_Types.suggestion,
             reciverId: authorId,
             extraData: { postId: postId },
           });
+        }
 
         Alert.alert("Suggestion Successful", "Your suggestion has been send", [
           { text: "OK", onPress: () => navigation.navigate("HomeStack") },
