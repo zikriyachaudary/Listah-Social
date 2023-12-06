@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { connect, useDispatch, useSelector } from "react-redux";
 import { Platform, SafeAreaView, StatusBar } from "react-native";
-import RNSplashScreen from "react-native-splash-screen";
 import FirebaseAuth from "@react-native-firebase/auth";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -11,7 +10,7 @@ import HomeTab from "./HomeTab/index";
 import AuthStack from "../auth/screens/AuthStack";
 import SuggestionStack from "../suggestion/screens/SuggestionStack";
 import * as Colors from "../config/colors";
-
+import SplashScreen from "react-native-splash-screen";
 import { getUser } from "../auth/redux/selectors";
 import { getProfile as getProfileAction } from "../profile/redux/actions";
 import { changeAuthState as changeAuthStateAction } from "../auth/redux/actions";
@@ -54,7 +53,9 @@ const AppNavigation = ({ changeAuthState, getProfile, authenticated }) => {
         getInitialNotification();
       }
       setInitializing(false);
-      RNSplashScreen.hide();
+      setTimeout(() => {
+        SplashScreen.hide();
+      }, 2000);
     });
   }, []);
 

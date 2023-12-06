@@ -3,7 +3,8 @@ package com.listaapp;
 import com.facebook.react.ReactActivity;
 import com.facebook.react.ReactActivityDelegate;
 import com.facebook.react.ReactRootView;
-
+import android.os.Bundle;
+import org.devio.rn.splashscreen.SplashScreen;
 public class MainActivity extends ReactActivity {
 
   /**
@@ -27,6 +28,7 @@ public class MainActivity extends ReactActivity {
 
   public static class MainActivityDelegate extends ReactActivityDelegate {
     public MainActivityDelegate(ReactActivity activity, String mainComponentName) {
+      SplashScreen.show(this);  // here
       super(activity, mainComponentName);
     }
 

@@ -3,33 +3,38 @@ import { connect } from "react-redux";
 import {
   Alert,
   Image,
+  KeyboardAvoidingView,
   Modal,
+  Platform,
   SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   TouchableWithoutFeedback,
+  View,
 } from "react-native";
-import FastImage from "react-native-fast-image";
 import ImageResizer from "react-native-image-resizer";
 import FireStore from "@react-native-firebase/storage";
 import CheckBox from "@react-native-community/checkbox";
 
-import {
-  View,
-  Button,
-  Content,
-  Container,
-  TextInput,
-  StackHeader,
-  ImagePickerButton,
-} from "../../common";
 import ChevronLeftIcon from "../../assets/icons/edit-chevron-left.svg";
 
 import { View as RNView } from "react-native";
 import { register as registerAction } from "../redux/actions";
-import * as Colors from "../../config/colors";
+import { AppStyles } from "../../util/AppStyles";
+import {
+  AppColors,
+  AppHorizontalMargin,
+  AppImages,
+  EmailValidator,
+  hv,
+  normalized,
+} from "../../util/AppConstant";
+import { Button, ImagePickerButton, StackHeader } from "../../common";
+import ImagePickerModal from "../../common/ImagePickerButton/ImagePickerModal";
+import FastImage from "react-native-fast-image";
+import TextInputComponent from "../../common/TextInputComponent";
 
 /* =============================================================================
 <RegisterScreen />
@@ -37,7 +42,8 @@ import * as Colors from "../../config/colors";
 const regex =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/;
 
-const RegisterScreen = ({ register }) => {
+const RegisterScreen = ({ register, navigation }) => {
+  const [modal, setModal] = useState(false);
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [image, setImage] = useState();
@@ -45,8 +51,38 @@ const RegisterScreen = ({ register }) => {
   const [loading, setLoading] = useState(false);
   const [showModal, setShhowModal] = useState(false);
   const disabled = !username || !email || !image || !password;
+  const [userNameError, setUserNameError] = useState("");
+  const [emailErrorMsg, setEmailErrorMsg] = useState("");
+  const [passErroMsg, setPasswordErrorMsg] = useState("");
+  const [toggleCheckBoxError, setToggleCheckBoxError] = useState("");
   const [toggleCheckBox, setToggleCheckBox] = useState(false);
-
+  const checkValidation = () => {
+    let emailValid = EmailValidator(email);
+    if (username == "") {
+      setUserNameError("Please enter User Name");
+    }
+    if (email == "") {
+      setEmailErrorMsg("Please enter email");
+    } else if (!emailValid) {
+      setEmailErrorMsg("Please enter valid email");
+    }
+    if (password == "") {
+      setPasswordErrorMsg("Please enter password");
+    }
+    if (!toggleCheckBox) {
+      setToggleCheckBoxError("Please accept Term & Conditions");
+    }
+    if (
+      email == "" ||
+      !emailValid ||
+      password == "" ||
+      username == "" ||
+      !toggleCheckBox
+    ) {
+      return;
+    }
+    _handleSubmit();
+  };
   const _handleSubmit = async () => {
     if (!toggleCheckBox) {
       Alert.alert("Please accept terms and condition");
@@ -105,7 +141,6 @@ const RegisterScreen = ({ register }) => {
           >
             <TouchableOpacity
               onPress={() => {
-                console.log("clicked");
                 setToggleCheckBox(!toggleCheckBox);
                 setShhowModal(false);
               }}
@@ -124,7 +159,7 @@ const RegisterScreen = ({ register }) => {
                     }
                   </Text>
 
-                  <RNView
+                  {/* <RNView
                     style={{
                       flexDirection: "row",
                       alignItems: "center",
@@ -146,7 +181,7 @@ const RegisterScreen = ({ register }) => {
                     >
                       Agree
                     </Text>
-                  </RNView>
+                  </RNView> */}
                 </RNView>
               </ScrollView>
             </TouchableOpacity>
@@ -157,96 +192,220 @@ const RegisterScreen = ({ register }) => {
   };
 
   return (
-    <Container>
-      <Content>
-        <StackHeader />
-        <View center style={styles.imgContainer}>
-          {image ? (
-            <FastImage source={image} style={styles.image} />
-          ) : (
-            <View style={styles.image} center>
-              <Text
-                style={{
-                  textAlign: "center",
-                  fontSize: 13,
-                  paddingHorizontal: 10,
+    <View style={AppStyles.MainStyle}>
+      <StackHeader
+        title="Create Account"
+        left={
+          <Image
+            source={AppImages.Auth.backIcon}
+            style={{ tintColor: AppColors.blue.navy }}
+          />
+        }
+        onLeftPress={() => {
+          navigation.goBack();
+        }}
+      />
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        keyboardVerticalOffset={Platform.OS === "ios" ? hv(35) : hv(30)}
+      >
+        <ScrollView
+          style={styles.containerStyle}
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={{ alignSelf: "center" }}>
+            {image ? (
+              <TouchableOpacity
+                activeOpacity={1}
+                onPress={() => {
+                  setModal(true);
                 }}
               >
-                No Image Uploaded Yet
-              </Text>
-            </View>
-          )}
-        </View>
-        <TextInput
-          value={username}
-          onChange={setUsername}
-          placeholder="User Name"
-        />
-        <TextInput value={email} onChange={setEmail} placeholder="Email" />
-        <TextInput
-          value={password}
-          placeholder="Password"
-          secureTextEntry={true}
-          onChange={setPassword}
-        />
-        <ImagePickerButton onImageSelect={setImage} />
-        <View>
-          <Text
-            style={{
-              marginBottom: 20,
+                <FastImage source={image} style={styles.imageCont} />
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity
+                style={styles.imageCont}
+                activeOpacity={1}
+                onPress={() => {
+                  setModal(true);
+                }}
+              >
+                <Image
+                  source={AppImages.Auth.Camera}
+                  resizeMode="contain"
+                  style={{
+                    height: "30%",
+                    width: "30%",
+                  }}
+                />
+              </TouchableOpacity>
+            )}
+            <Text style={styles.uploadTxt}>Upload Logo</Text>
+          </View>
+          <TextInputComponent
+            value={username}
+            container={styles.inputMainCont}
+            setValue={(val) => {
+              setUsername(val);
             }}
-          >
-            {"When you Register, you agree to "}
+            placeholder="User Name"
+            error={userNameError}
+          />
+          <TextInputComponent
+            value={email}
+            container={styles.inputMainCont}
+            setValue={(val) => {
+              setEmail(val);
+            }}
+            placeholder="Email"
+            error={emailErrorMsg}
+          />
+          <TextInputComponent
+            value={password}
+            showLastIcon={true}
+            showFirstIcon={true}
+            container={styles.inputMainCont}
+            setValue={(val) => {
+              setPassword(val);
+            }}
+            placeholder="Password"
+            secureEntry={true}
+            error={passErroMsg}
+          />
+          <View style={styles.termCont}>
+            <TouchableWithoutFeedback
+              onPress={() => setToggleCheckBox(!toggleCheckBox)}
+            >
+              <CheckBox
+                value={toggleCheckBox}
+                onValueChange={(newValue) => {
+                  setShhowModal(false);
+                  setToggleCheckBoxError("");
+                  setToggleCheckBox(newValue);
+                }}
+              />
+            </TouchableWithoutFeedback>
+            <Text style={styles.termsTxt}>
+              Yes I agree to{" "}
+              <Text
+                style={{ ...styles.termsTxt, color: AppColors.blue.navy }}
+                onPress={() => {
+                  setShhowModal(true);
+                }}
+              >
+                terms & conditions{" "}
+              </Text>
+            </Text>
+          </View>
+          {toggleCheckBoxError?.length > 0 ? (
             <Text
-              onPress={() => {
-                setShhowModal(true);
-              }}
               style={{
-                textDecorationLine: "underline",
-                fontWeight: "bold",
-                color: "black",
+                marginHorizontal: normalized(20),
+                marginTop: normalized(3),
+                color: AppColors.blue.navy,
+                marginBottom: hv(10),
               }}
             >
-              {"Terms and Condition"}
+              {toggleCheckBoxError}
             </Text>
-            {" and acknowledge"}
+          ) : (
+            <View style={{ marginVertical: normalized(10) }} />
+          )}
+          <Button title="Sign up" loading={loading} onPress={checkValidation} />
+          <Text style={styles.bottomTxt}>
+            Already have an account?{" "}
+            <Text
+              onPress={() => {
+                navigation.navigate("Login");
+              }}
+              style={styles.signUpBtn}
+            >
+              {" "}
+              Sign in
+            </Text>
           </Text>
-        </View>
-        <View center>
-          <Button
-            title="Sign up"
-            loading={loading}
-            disabled={disabled}
-            onPress={_handleSubmit}
-          />
-        </View>
-
-        {termsAndConditionModal()}
-      </Content>
-    </Container>
+        </ScrollView>
+      </KeyboardAvoidingView>
+      {termsAndConditionModal()}
+      {modal ? (
+        <ImagePickerModal
+          visible={modal}
+          onClose={() => {
+            setModal(!modal);
+          }}
+          onAdd={(img) => {
+            setImage(img);
+          }}
+        />
+      ) : null}
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  imgBtnContainer: {
-    marginVertical: 20,
+  containerStyle: {
+    flex: 1,
+    marginHorizontal: AppHorizontalMargin,
   },
-  imgBtn: {
+  imageCont: {
+    backgroundColor: "#959595",
+    height: normalized(120),
+    width: normalized(120),
+    borderRadius: normalized(120 / 2),
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  uploadTxt: {
+    fontSize: normalized(14),
+    color: "#8391A1",
+    alignSelf: "center",
+    marginVertical: normalized(10),
+  },
+  inputMainCont: {
+    width: "92%",
+  },
+  bottomTxt: {
+    fontSize: normalized(13),
+    color: AppColors.black.black,
+    alignSelf: "center",
+    marginVertical: normalized(20),
+  },
+  signUpBtn: {
+    fontSize: normalized(13),
+    color: AppColors.blue.navy,
+    alignSelf: "center",
+    marginVertical: normalized(20),
+  },
+  termCont: {
+    flexDirection: "row",
+    // justifyContent: 'center',
+    alignItems: "center",
+    marginTop: normalized(20),
+    marginStart: normalized(10),
+  },
+  checkCont: {
+    borderRadius: normalized(5),
+    height: normalized(20),
+    width: normalized(20),
     borderWidth: 1,
-    borderColor: Colors.primary,
-    backgroundColor: "#fff",
+    borderColor: "#E4DFDF",
+    justifyContent: "center",
+    alignItems: "center",
   },
-  imgBtnTxt: {
-    color: Colors.primary,
+  termsTxt: {
+    fontSize: normalized(14),
+    color: AppColors.black.black,
+    marginStart: normalized(5),
   },
-  imgContainer: {
-    marginBottom: 20,
-  },
-  image: {
-    width: 120,
-    height: 120,
-    backgroundColor: "#d1d1d1",
-    borderRadius: 120 / 2,
+  socialCont: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 20,
+    marginHorizontal: 10,
+    alignSelf: "center",
   },
 });
 

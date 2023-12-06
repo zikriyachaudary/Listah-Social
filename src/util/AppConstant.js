@@ -61,12 +61,21 @@ export const getResponsiveFont = (fontSize) => {
       : 1.5;
   return Math.round(scaleFactor * fontSize);
 };
+export const EmailValidator = (email) => {
+  let validEmailRegex = /^[\w.-]{1,25}@[\w-]{1,24}\.\w{2,10}$/i;
+  return validEmailRegex.test(email);
+};
 
 export const AppColors = {
   blue: {
     navy: "#6d14c4",
+    lightNavy: "#544be3",
     light: "#1C5FAE",
     lightBlue: "#dce9f7",
+  },
+  gradient: {
+    dark: "#0f0e24",
+    light: "#6d14c4",
   },
   white: {
     white: "#FFF",
@@ -104,11 +113,19 @@ export const AppColors = {
     light: "#D3A23B",
   },
 };
+export const colorsList = [AppColors.gradient.dark, AppColors.gradient.light];
 
 export const AppImages = {
   appIcon: require("../assets/images/appIcon.png"),
   profile: {
     logout: require("../assets/images/logout.png"),
     delete: require("../assets/images/delete.png"),
+  },
+  Auth: {
+    backIcon: require("../assets/images/Auth/backIcon.png"),
+    Camera: require("../assets/images/Auth/Camera.png"),
+    closeEye: require("../assets/images/Auth/closeEye.png"),
+    eye: require("../assets/images/Auth/eye.png"),
+    logo: require("../assets/images/Auth/logo.png"),
   },
 };
