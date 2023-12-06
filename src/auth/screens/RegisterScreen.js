@@ -54,6 +54,7 @@ const RegisterScreen = ({ register, navigation }) => {
   const [userNameError, setUserNameError] = useState("");
   const [emailErrorMsg, setEmailErrorMsg] = useState("");
   const [passErroMsg, setPasswordErrorMsg] = useState("");
+  const [imageError, setImageError] = useState("");
   const [toggleCheckBoxError, setToggleCheckBoxError] = useState("");
   const [toggleCheckBox, setToggleCheckBox] = useState(false);
   const checkValidation = () => {
@@ -72,12 +73,16 @@ const RegisterScreen = ({ register, navigation }) => {
     if (!toggleCheckBox) {
       setToggleCheckBoxError("Please accept Term & Conditions");
     }
+    if (!image) {
+      setImageError("Please select you profile!");
+    }
     if (
       email == "" ||
       !emailValid ||
       password == "" ||
       username == "" ||
-      !toggleCheckBox
+      !toggleCheckBox ||
+      !image
     ) {
       return;
     }
@@ -242,8 +247,20 @@ const RegisterScreen = ({ register, navigation }) => {
                 />
               </TouchableOpacity>
             )}
-            <Text style={styles.uploadTxt}>Upload Logo</Text>
+            <Text style={styles.uploadTxt}>Upload Profile</Text>
           </View>
+          {imageError?.length > 0 && !image ? (
+            <Text
+              style={{
+                marginHorizontal: normalized(20),
+                color: AppColors.blue.navy,
+                marginBottom: hv(10),
+                alignSelf: "center",
+              }}
+            >
+              {imageError}
+            </Text>
+          ) : null}
           <TextInputComponent
             value={username}
             container={styles.inputMainCont}
@@ -361,7 +378,7 @@ const styles = StyleSheet.create({
     fontSize: normalized(14),
     color: "#8391A1",
     alignSelf: "center",
-    marginVertical: normalized(10),
+    marginTop: normalized(10),
   },
   inputMainCont: {
     width: "92%",

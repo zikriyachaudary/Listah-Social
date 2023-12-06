@@ -1,57 +1,186 @@
-import React, { useState } from 'react';
-import { StyleSheet } from 'react-native';
-import { connect } from 'react-redux';
-
+import React, { useState } from "react";
 import {
-  View,
-  Button,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
   Text,
-  Content,
-  StackHeader,
-  TextInput,
-  Container,
-} from '../../common';
+  View,
+} from "react-native";
+import { connect } from "react-redux";
 
-import { forgotPassword as forgotPasswordAction } from '../redux/actions';
-import { getLoading } from '../redux/selectors';
+import { Button, StackHeader } from "../../common";
+
+import { forgotPassword as forgotPasswordAction } from "../redux/actions";
+import { getLoading } from "../redux/selectors";
+import { AppStyles } from "../../util/AppStyles";
+import {
+  AppColors,
+  AppHorizontalMargin,
+  AppImages,
+  EmailValidator,
+  hv,
+  normalized,
+} from "../../util/AppConstant";
+import TextInputComponent from "../../common/TextInputComponent";
 
 /* =============================================================================
 <ForgotPasswordScreen />
 ============================================================================= */
 const ForgotPasswordScreen = ({ loading, forgotPassword, navigation }) => {
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState("");
+  const [emailErrorMsg, setEmailErrorMsg] = useState("");
 
   const _handleForgotPassword = () => {
+    let emailValid = EmailValidator(email);
+    if (email == "") {
+      setEmailErrorMsg("Please enter email");
+    } else if (!emailValid) {
+      setEmailErrorMsg("Please enter valid email");
+    }
+    if (email == "" || !emailValid) {
+      return;
+    }
     if (email) {
       forgotPassword(email, () => navigation.goBack());
-    };
+    }
   };
 
   return (
-    <Container>
-      <StackHeader />
-      <Content>
-        <Text sm>Enter your email to reset your password</Text>
-        <TextInput placeholder='Email' value={email} onChange={setEmail} />
-        <View center style={styles.btn}>
-          <Button title='Submit' loading={loading} onPress={_handleForgotPassword} />
-        </View>
-      </Content>
-    </Container>
+    <View style={AppStyles.MainStyle}>
+      <StackHeader
+        title=" "
+        left={
+          <Image
+            source={AppImages.Auth.backIcon}
+            style={{ tintColor: AppColors.blue.navy }}
+          />
+        }
+        onLeftPress={() => {
+          navigation.goBack();
+        }}
+      />
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        keyboardVerticalOffset={Platform.OS === "ios" ? hv(35) : hv(30)}
+      >
+        <ScrollView
+          style={styles.containerStyle}
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.childContainer}>
+            <View
+              style={{
+                flexDirection: "row",
+                height: hv(100),
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Image source={AppImages.appIcon} style={styles.logoStyle} />
+
+              <Text
+                style={{
+                  marginStart: normalized(10),
+                  fontSize: normalized(22),
+                  fontWeight: "600",
+                  color: AppColors.blue.lightNavy,
+                }}
+              >
+                Listah
+              </Text>
+            </View>
+            <Text style={styles.topDesTxt}>
+              Enter your email to reset your password
+            </Text>
+            <TextInputComponent
+              value={email}
+              container={styles.inputMainCont}
+              setValue={(val) => {
+                setEmailErrorMsg("");
+                setEmail(val);
+              }}
+              placeholder="Email"
+              error={emailErrorMsg}
+            />
+            <View style={{ marginVertical: hv(50) }}>
+              <Button
+                title="Submit"
+                loading={loading}
+                onPress={_handleForgotPassword}
+              />
+            </View>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </View>
   );
 };
 const styles = StyleSheet.create({
   btn: {
     marginTop: 20,
-  }
-})
+  },
+  containerStyle: {
+    flex: 1,
+    marginHorizontal: AppHorizontalMargin,
+  },
+  childContainer: {
+    flex: 1,
+    justifyContent: "center",
+  },
+  logoStyle: {
+    height: normalized(80),
+    width: normalized(80),
+  },
+  topDesTxt: {
+    color: "#8391A1",
+    fontSize: normalized(13),
+    marginTop: normalized(10),
+    marginBottom: normalized(30),
+    alignSelf: "center",
+  },
+  inputMainCont: {
+    width: "92%",
+  },
+  secondCont: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginVertical: normalized(30),
+    marginHorizontal: AppHorizontalMargin,
+  },
+
+  signInWithTxt: {
+    marginVertical: normalized(30),
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    marginHorizontal: AppHorizontalMargin,
+  },
+  simpleLine: {
+    height: normalized(0.4),
+    backgroundColor: "#8391A1",
+    width: normalized(110),
+  },
+  signInTxt: {
+    fontSize: normalized(13),
+    color: "#8391A1",
+    marginHorizontal: normalized(15),
+  },
+});
 
 const mapStateToProps = (state) => ({
   loading: getLoading(state),
-})
+});
 
 const mapDispatchToProps = {
   forgotPassword: forgotPasswordAction,
-}
+};
 
-export default connect(mapStateToProps, mapDispatchToProps)(ForgotPasswordScreen);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(ForgotPasswordScreen);
