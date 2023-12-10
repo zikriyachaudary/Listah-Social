@@ -32,6 +32,7 @@ const AllUsersList = ({ allUsers, refreshAllUsers, loading }) => {
 
   return (
     <FlatList
+      showsVerticalScrollIndicator={false}
       data={allUsers}
       refreshing={false}
       renderItem={renderItem}

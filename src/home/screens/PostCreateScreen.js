@@ -39,8 +39,15 @@ import AlertModal from "../../common/AlertModal";
 import { saveUserDraftPost } from "../../util/helperFun";
 import { useIsFocused } from "@react-navigation/native";
 import TextInputComponent from "../../common/TextInputComponent";
-import { AppColors, ScreenSize, normalized } from "../../util/AppConstant";
+import {
+  AppColors,
+  AppImages,
+  ScreenSize,
+  hv,
+  normalized,
+} from "../../util/AppConstant";
 import useNotificationManger from "../../hooks/useNotificationManger";
+import CustomHeader from "../../common/CommonHeader";
 
 /* =============================================================================
 <PostCreateScreen />
@@ -359,12 +366,23 @@ const PostCreateScreen = ({
 
   return (
     <Container style={styles.content}>
-      <StackHeader
+      <CustomHeader
+        atBackPress={() => {
+          fetchCurrentStates();
+        }}
+        leftIcon={AppImages.Common.backArrow}
+        isStatusBar={true}
+        logo={AppImages.Common.appLogo}
+        mainStyle={{ backgroundColor: AppColors.blue.royalBlue }}
+      />
+      {/* <StackHeader
         onLeftPress={() => {
           fetchCurrentStates();
         }}
-      />
+      /> */}
+      <View style={{ marginVertical: hv(8) }} />
       <TextInputComponent
+        mainContainer={{ marginHorizontal: normalized(15) }}
         value={title}
         maxLength={55}
         setValue={(val) => {
@@ -377,6 +395,7 @@ const PostCreateScreen = ({
       />
 
       <TextInputComponent
+        mainContainer={{ marginHorizontal: normalized(15) }}
         value={des}
         setValue={(val) => {
           setDesError("");
@@ -425,32 +444,41 @@ const PostCreateScreen = ({
                                 }}
                               />
                             )}
-                            <TextInput
-                              value={item.name}
-                              inputStyle={styles.input}
-                              placeholder="Enter name..."
-                              containerStyle={styles.inputContainer}
-                              errorText={
-                                errors?.items && errors?.items[index]
-                                  ? errors?.items[index].name
-                                  : null
-                              }
-                              onChange={handleChange(`items.${index}.name`)}
-                            />
-                            <TextInput
-                              value={item.description}
-                              inputStyle={styles.input}
-                              placeholder="Enter description..."
-                              containerStyle={styles.inputContainer}
-                              errorText={
-                                errors?.items && errors?.items[index]
-                                  ? errors?.items[index].description
-                                  : null
-                              }
-                              onChange={handleChange(
-                                `items.${index}.description`
-                              )}
-                            />
+
+                            <View
+                              style={{
+                                width: "70%",
+                                height: hv(120),
+                              }}
+                            >
+                              <TextInput
+                                value={item.name}
+                                inputStyle={styles.input}
+                                placeholder="Enter name..."
+                                containerStyle={styles.inputContainer}
+                                errorText={
+                                  errors?.items && errors?.items[index]
+                                    ? errors?.items[index].name
+                                    : null
+                                }
+                                onChange={handleChange(`items.${index}.name`)}
+                              />
+                              <TextInput
+                                value={item.description}
+                                inputStyle={styles.input}
+                                placeholder="Enter description..."
+                                containerStyle={styles.inputContainer}
+                                errorText={
+                                  errors?.items && errors?.items[index]
+                                    ? errors?.items[index].description
+                                    : null
+                                }
+                                onChange={handleChange(
+                                  `items.${index}.description`
+                                )}
+                              />
+                            </View>
+
                             <Touchable
                               center
                               style={styles.deleteBtn}
@@ -621,9 +649,10 @@ const styles = StyleSheet.create({
   dynamicFieldContainer: {
     width: ScreenSize.width - normalized(Platform.OS == "ios" ? 30 : 40),
     borderRadius: normalized(10),
-    alignItems: "flex-start",
-    height: normalized(60),
+    alignItems: "center",
+    height: normalized(120),
     marginTop: normalized(7),
+    justifyContent: "space-between",
   },
   content: {
     justifyContent: "space-between",
@@ -647,6 +676,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
   },
   input: {
+    width: normalized(150),
     height: 40,
   },
   addBtn: {

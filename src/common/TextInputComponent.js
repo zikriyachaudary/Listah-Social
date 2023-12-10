@@ -13,7 +13,7 @@ const TextInputComponent = (props) => {
   const [secureEntry, setSecureEntry] = useState(props?.secureEntry);
   const [isFocused, setIsFocused] = useState(false);
   return (
-    <View style={{ marginVertical: normalized(5) }}>
+    <View style={[{ marginVertical: normalized(5) }, props?.mainContainer]}>
       <View
         style={[
           styles.inputContainer,

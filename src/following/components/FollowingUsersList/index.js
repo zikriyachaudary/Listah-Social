@@ -1,24 +1,25 @@
-import React, { useEffect } from 'react';
-import { connect } from 'react-redux';
-import { ActivityIndicator, FlatList, StyleSheet } from 'react-native';
+import React, { useEffect } from "react";
+import { connect } from "react-redux";
+import { ActivityIndicator, FlatList, StyleSheet } from "react-native";
 
-import { Text, View } from '../../../common';
-import FollowingUsersListItem from './FollowingUsersListItem';
-import * as Colors from '../../../config/colors';
+import { Text, View } from "../../../common";
+import FollowingUsersListItem from "./FollowingUsersListItem";
+import * as Colors from "../../../config/colors";
 
-
-import { getLoading, getUserFollowings as selectUserFollowings } from '../../redux/selectors';
-import { removeDuplicates } from '../../../util/functions';
+import {
+  getLoading,
+  getUserFollowings as selectUserFollowings,
+} from "../../redux/selectors";
+import { removeDuplicates } from "../../../util/functions";
 
 /* =============================================================================
 <FollowingUsersList />
 ============================================================================= */
 const FollowingUsersList = ({ userFollowings, loading }) => {
-
   const _renderListEmptyComponent = () => (
     <View center style={styles.emptyComponentContainer}>
       {loading ? (
-        <ActivityIndicator size='large' color={Colors.primary} />
+        <ActivityIndicator size="large" color={Colors.primary} />
       ) : (
         <Text>No Followers</Text>
       )}
@@ -27,6 +28,7 @@ const FollowingUsersList = ({ userFollowings, loading }) => {
 
   return (
     <FlatList
+      showsVerticalScrollIndicator={false}
       data={userFollowings}
       refreshing={false}
       renderItem={renderItem}
@@ -37,8 +39,10 @@ const FollowingUsersList = ({ userFollowings, loading }) => {
   );
 };
 
-const renderKeyExtractor = item => `${item?.userId}`;
-const renderItem = ({ item, i }) => <FollowingUsersListItem key={i} user={item} />;
+const renderKeyExtractor = (item) => `${item?.userId}`;
+const renderItem = ({ item, i }) => (
+  <FollowingUsersListItem key={i} user={item} />
+);
 
 const styles = StyleSheet.create({
   content: {
@@ -46,7 +50,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 18,
   },
   emptyComponentContainer: {
-    height: '100%',
+    height: "100%",
   },
 });
 

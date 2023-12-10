@@ -5,7 +5,6 @@ export const platformVersion = Platform.Version;
 export type ScreenProps = NativeStackScreenProps<any, any>;
 
 export const ScreenSize = Dimensions.get("window");
-
 const templateWidth = 375;
 const templateHeight = 812;
 
@@ -69,6 +68,7 @@ export const EmailValidator = (email) => {
 export const AppColors = {
   blue: {
     navy: "#6d14c4",
+    royalBlue: "#5647e4",
     lightNavy: "#544be3",
     light: "#1C5FAE",
     lightBlue: "#dce9f7",
@@ -103,6 +103,7 @@ export const AppColors = {
     simpleGrey: "#CCCCCC",
     dark: "#767D90",
     simple: "#FBFBFB",
+    Analogous: "#979797",
   },
   red: {
     dark: "#AC3049",
@@ -117,6 +118,17 @@ export const colorsList = [AppColors.gradient.dark, AppColors.gradient.light];
 
 export const AppImages = {
   appIcon: require("../assets/images/appIcon.png"),
+  Common: {
+    appLogo: require("../assets/images/Common/logo.png"),
+    PlusBtn: require("../assets/images/Common/PlusBtn.png"),
+    SplashBg: require("../assets/images/Common/SplashBg.png"),
+    versus_icon: require("../assets/images/Common/versus-icon.png"),
+    global: require("../assets/images/Common/global.png"),
+    handIcon: require("../assets/images/Common/handIcon.png"),
+    memberIcon: require("../assets/images/Common/memberIcon.png"),
+    menuIcon: require("../assets/images/Common/menuIcon.png"),
+    backArrow: require("../assets/images/Common/backArrow.png"),
+  },
   profile: {
     logout: require("../assets/images/logout.png"),
     delete: require("../assets/images/delete.png"),

@@ -15,6 +15,7 @@ import LoadingImage from "../../../common/LoadingImage";
 import { useNavigation } from "@react-navigation/native";
 import useNotificationManger from "../../../hooks/useNotificationManger";
 import { Notification_Types } from "../../../util/Strings";
+import { AppColors, normalized } from "../../../util/AppConstant";
 
 /* =============================================================================
 <AllUsersListItem />
@@ -66,62 +67,67 @@ const AllUsersListItem = ({
     return null;
   }
   return (
-    <View horizontal style={styles.container}>
-      <TouchableWithoutFeedback
-        onPress={() => {
-          navigation.navigate("MyPosts", {
-            userId: userId,
-            username: userName,
-            refreshCall: postRefresh,
-          });
-        }}
-      >
-        <View horizontal>
-          {/* <Avatar url={{ uri: `${userProfileImage}` }} /> */}
-          <LoadingImage
-            source={{ uri: `${userProfileImage}` }}
-            style={{
-              width: 68,
-              height: 68,
-              borderRadius: 2,
-              marginVertical: 10,
-              borderWidth: 1.4,
-              borderRadius: 68 / 2,
-              backgroundColor: Colors.outline,
-              borderColor: "yellow",
-            }}
-          />
+    <>
+      <View horizontal style={styles.container}>
+        <TouchableWithoutFeedback
+          onPress={() => {
+            navigation.navigate("MyPosts", {
+              userId: userId,
+              username: userName,
+              refreshCall: postRefresh,
+            });
+          }}
+        >
+          <View horizontal>
+            {/* <Avatar url={{ uri: `${userProfileImage}` }} /> */}
+            <LoadingImage
+              source={{ uri: `${userProfileImage}` }}
+              style={{
+                width: 68,
+                height: 68,
+                borderRadius: 2,
+                marginVertical: 10,
+                borderWidth: 1.4,
+                borderRadius: 68 / 2,
+                backgroundColor: Colors.outline,
+                borderColor: "yellow",
+              }}
+            />
 
-          <Text style={styles.userNameText} numberOfLines={2}>
-            {userName}
-            {user?.verified ? (
-              <Text
-                style={{
-                  color: Colors.primary,
-                }}
-              >{`\n(A+)`}</Text>
-            ) : null}
-          </Text>
-        </View>
-      </TouchableWithoutFeedback>
-      {isFollowed ? (
-        <Button
-          title="Unfollow"
-          style={styles.btn}
-          loading={loading}
-          btnTxtStyles={styles.btnTxtStyles}
-          onPress={_handleUnFollowPress}
-        />
-      ) : (
-        <Button
-          title="Follow"
-          style={styles.btn}
-          loading={loading}
-          btnTxtStyles={styles.btnTxtStyles}
-          onPress={_handleFollowPress}
-        />
-      )}
-    </View>
+            <Text style={styles.userNameText} numberOfLines={2}>
+              {userName}
+              {user?.verified ? (
+                <Text
+                  style={{
+                    color: Colors.primary,
+                  }}
+                >{`\n(A+)`}</Text>
+              ) : null}
+            </Text>
+          </View>
+        </TouchableWithoutFeedback>
+        {isFollowed ? (
+          <Button
+            title="Unfollow"
+            style={styles.btn}
+            loading={loading}
+            btnTxtStyles={styles.btnTxtStyles}
+            onPress={_handleUnFollowPress}
+          />
+        ) : (
+          <Button
+            title="Follow"
+            style={styles.btn}
+            loading={loading}
+            btnTxtStyles={styles.btnTxtStyles}
+            onPress={_handleFollowPress}
+          />
+        )}
+      </View>
+      <View
+        style={{ backgroundColor: AppColors.grey.simpleGrey, height: 0.5 }}
+      />
+    </>
   );
 };
 
@@ -136,7 +142,9 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
   },
   btn: {
-    width: 120,
+    width: normalized(85),
+    height: normalized(30),
+    paddingHorizontal: 0,
   },
   btnTxtStyles: {
     fontSize: 12,

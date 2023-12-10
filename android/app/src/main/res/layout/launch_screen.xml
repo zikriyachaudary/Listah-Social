@@ -18,20 +18,9 @@
         android:layout_marginLeft = "30dp">
         <ImageView
             android:id="@+id/logo"
-            android:layout_width="120dp"
-            android:layout_height="100dp"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
             android:src="@drawable/app_logo" />
-
-        <TextView
-            android:layout_width='match_parent'
-            android:layout_height="100dp"
-            android:layout_marginLeft="10dp"
-            android:text="@string/listah"
-            android:textColor="@android:color/white"
-            android:textSize="40dp"
-            android:layout_marginTop="20dp"
-            android:textStyle="bold" />
-
     </LinearLayout>
 
 

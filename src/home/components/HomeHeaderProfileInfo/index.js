@@ -1,15 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
-import { StyleSheet } from "react-native";
+import { StyleSheet, Image } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
 import { Text, Touchable, View } from "../../../common";
-import ListIcon from "../../../assets/icons/edit-list-icon.svg";
-import GlobeIcon from "../../../assets/icons/edit-globe-icon.svg";
-import UsersIcon from "../../../assets/icons/edit-users-icon.svg";
 import ProfileFollowersListModal from "./ProfileFollowersListModal";
 
 import { getProfile } from "../../../profile/redux/selectors";
+import { AppColors, AppImages, normalized } from "../../../util/AppConstant";
 
 /* =============================================================================
 <HomeHeaderProfileInfo />
@@ -42,16 +40,15 @@ const HomeHeaderProfileInfo = ({ profile }) => {
   return (
     <View horizontal style={styles.container}>
       <Touchable center style={styles.item} onPress={_handleMyPostedPress}>
-        <ListIcon />
-        <Text sm>My Posts</Text>
+        <Image source={AppImages.Common.menuIcon} />
       </Touchable>
       <Touchable center style={styles.item} onPress={_toggleFollowersModal}>
-        <UsersIcon />
-        <Text sm>{`Followers: ${followers?.length || 0}`}</Text>
+        <Image source={AppImages.Common.memberIcon} />
+        <Text style={styles.textStyle}>{` ${followers?.length || 0}`}</Text>
       </Touchable>
       <Touchable center style={styles.item} onPress={_handleFollowingPress}>
-        <GlobeIcon />
-        <Text sm>{`Following: ${followings?.length || 0} `}</Text>
+        <Image source={AppImages.Common.global} />
+        <Text style={styles.textStyle}>{` ${followings?.length || 0}`}</Text>
       </Touchable>
       <ProfileFollowersListModal
         followers={followers}
@@ -67,8 +64,17 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   item: {
-    flex: 1,
-    paddingVertical: 10,
+    height: normalized(45),
+    width: normalized(65),
+    padding: 10,
+  },
+  textStyle: {
+    color: AppColors.blue.royalBlue,
+    position: "absolute",
+    right: 0,
+    bottom: 0,
+    fontSize: normalized(16),
+    fontWeight: "400",
   },
 });
 

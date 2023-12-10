@@ -28,6 +28,8 @@ import LocalNotification from "../common/LocalNotification";
 import useNotificationManger from "../hooks/useNotificationManger";
 import { Notification_Types } from "../util/Strings";
 import { navigate, navigationRef } from "./RootNavigation";
+import RNSplashScreen from "../auth/screens/SplashScreen";
+import { AppColors } from "../util/AppConstant";
 const Stack = createNativeStackNavigator();
 
 /* =============================================================================
@@ -37,6 +39,7 @@ const AppNavigation = ({ changeAuthState, getProfile, authenticated }) => {
   const { checkNUpdateFCMToken, userSubscribed } = useNotificationManger();
   const [initializing, setInitializing] = useState(true);
   const userCompleteObj = useRef(null);
+  const [showSplash, setShowSplash] = useState(true);
   const selector = useSelector((AppState) => AppState);
 
   const dispatch = useDispatch();
@@ -53,9 +56,10 @@ const AppNavigation = ({ changeAuthState, getProfile, authenticated }) => {
         getInitialNotification();
       }
       setInitializing(false);
+      SplashScreen.hide();
       setTimeout(() => {
-        SplashScreen.hide();
-      }, 2000);
+        setShowSplash(false);
+      }, 3000);
     });
   }, []);
 
@@ -193,27 +197,37 @@ const AppNavigation = ({ changeAuthState, getProfile, authenticated }) => {
 
   return (
     <NavigationContainer theme={THEME} ref={navigationRef}>
-      <StatusBar
-        translucent
-        backgroundColor="transparent"
-        barStyle="dark-content"
-      />
+      {/* <StatusBar
+        // translucent
+        backgroundColor={AppColors.blue.navy}
+        // barStyle="dark-content"
+      /> */}
+
       <Stack.Navigator
         screenOptions={{
           headerShown: false,
           animation: "slide_from_right",
         }}
       >
-        {authenticated ? (
-          // <Stack.Screen name="EMPTY_SCREEN" component={EMPTY_SCREEN} />
-          <>
-            <Stack.Screen name="HomeTab" component={HomeTab} />
-            <Stack.Screen name="SuggestionStack" component={SuggestionStack} />
-          </>
+        {showSplash ? (
+          <Stack.Screen name="RNSplashScreen" component={RNSplashScreen} />
         ) : (
-          <Stack.Screen name="AuthStack" component={AuthStack} />
+          <>
+            {authenticated ? (
+              <>
+                <Stack.Screen name="HomeTab" component={HomeTab} />
+                <Stack.Screen
+                  name="SuggestionStack"
+                  component={SuggestionStack}
+                />
+              </>
+            ) : (
+              <Stack.Screen name="AuthStack" component={AuthStack} />
+            )}
+          </>
         )}
       </Stack.Navigator>
+
       {selector?.DraftPost?.isAlertShow?.value ? (
         <AlertModal
           visible={selector?.DraftPost?.isAlertShow?.value}

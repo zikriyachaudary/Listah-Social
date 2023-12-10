@@ -27,6 +27,7 @@ import { getProfile } from "../../../profile/redux/selectors";
 import Touchable from "../../Touchable";
 import { challengePostLikeUnlike } from "../../../home/redux/actions";
 import { CHALLENGE_REQUEST } from "../../../suggestion/redux/constants";
+import { AppColors, AppImages } from "../../../util/AppConstant";
 /* =============================================================================
 <PostItem />
 ============================================================================= */
@@ -209,7 +210,7 @@ const PostItem = ({
               aspectRatio: 1,
               // transform: [{ rotate: '13deg'}]
             }}
-            source={require("../../../assets/icons/versus-icon.png")}
+            source={AppImages.Common.versus_icon}
           />
           <PostItemHeader
             id={id}
@@ -330,16 +331,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderRadius: 6,
     paddingTop: 5,
-    backgroundColor: "#fff",
+    backgroundColor: AppColors.white.white,
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
-      height: 8,
+      height: 12,
     },
-    shadowOpacity: 0.44,
-    shadowRadius: 10.32,
+    shadowOpacity: 0.58,
+    shadowRadius: 16.0,
 
-    elevation: 16,
+    elevation: 24,
   },
   item: {
     marginTop: 10,

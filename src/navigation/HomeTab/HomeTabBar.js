@@ -6,9 +6,10 @@ import { View, Touchable, Text } from "../../common";
 import HomeIcon from "../../assets/icons/nav-home-icon.svg";
 import NotificationIcon from "../../assets/icons/nav-notification-icon.svg";
 import FollowingIcon from "../../assets/icons/nav-following-icon.svg";
-import DiscoverIcon from "../../assets/icons/nav-discover-icon.svg";
 // import DiscoverIcon from '../../assets/icons/nav-search-bottom.svg';
-import AddIcon from "../../assets/icons/edit-plus-square.svg";
+import AddIcon from "../../assets/icons/plus-btn.svg";
+
+import NavSearch from "../../assets/images/Common/Search.svg";
 
 import ProfileIcon from "../../assets/icons/nav-profile-icon.svg";
 import * as Colors from "../../config/colors";
@@ -32,7 +33,6 @@ const HomeTabBar = ({ state, navigation }) => {
             target: route.key,
             canPreventDefault: true,
           });
-
           if (!isFocused && !event.defaultPrevented) {
             navigation.navigate(route.name);
           }
@@ -57,11 +57,11 @@ const HomeTabBar = ({ state, navigation }) => {
                 "Notification" && <View style={styles.badgeView} />}
 
             {isFocused ? ICONS[index][1] : ICONS[index][0]}
-            <Text xs style={isFocused ? styles.activeTxt : styles.txt}>
+            {/* <Text xs style={isFocused ? styles.activeTxt : styles.txt}>
               {route.name.slice(0, route.name.indexOf("Stack")) == "Discover"
                 ? "Add Post"
                 : route.name.slice(0, route.name.indexOf("Stack"))}
-            </Text>
+            </Text> */}
           </Touchable>
         );
       })}
@@ -85,7 +85,11 @@ const ICONS = {
     <NotificationIcon stroke="#999" />,
     <NotificationIcon stroke={Colors.primary} />,
   ],
-  4: [<ProfileIcon stroke="#999" />, <ProfileIcon stroke={Colors.primary} />],
+  4: [
+    // <ProfileIcon stroke="#999" />, <ProfileIcon stroke={Colors.primary} />
+    <NavSearch stroke="#999" />,
+    <NavSearch stroke={Colors.primary} />,
+  ],
 };
 
 const styles = StyleSheet.create({

@@ -1,27 +1,20 @@
-import React, { useEffect } from "react";
-import { connect, useDispatch, useSelector } from "react-redux";
+import React, { useEffect, useLayoutEffect } from "react";
+import { connect, useSelector } from "react-redux";
 import {
   ActivityIndicator,
-  AppState,
-  Dimensions,
   Platform,
   StyleSheet,
-  TouchableOpacity,
   View,
   Image,
   FlatList,
   SafeAreaView,
   TextInput,
 } from "react-native";
-// import { FlatList } from 'react-native-gesture-handler';
 import { useIsFocused, useNavigation } from "@react-navigation/native";
-import ChevronLeftIcon from "../../assets/icons/edit-chevron-left.svg";
-
-import { PostItem, Container, Text, Button } from "../../common";
-import HomeListHeader from "../components/HomeListHeader";
-import HomeListEmpty from "../components/HomeListEmpty";
-import ListFooter from "../components/ListFooter";
-
+import { useState } from "react";
+import { ReactNativeModal } from "react-native-modal";
+import FastImage from "react-native-fast-image";
+import { UPDATE_CHALLENGE_FEATURE } from "../../suggestion/redux/constants";
 import { getPosts as selectPosts } from "../redux/selectors";
 import { getProfile as getProfileAction } from "../../profile/redux/actions";
 import {
@@ -31,46 +24,21 @@ import {
   getMyHomePosts,
   refreshHomePosts as refreshHomePostsAction,
 } from "../redux/actions";
-import { useState } from "react";
-import * as Colors from "../../config/colors";
-import Modal, { ReactNativeModal } from "react-native-modal";
-import { RadioGroup } from "react-native-radio-buttons-group";
-import CheckBox from "@react-native-community/checkbox";
-import { getLoginUserNotificationCount } from "../../notification/redux/actions";
-import { UPDATE_CHALLENGE_FEATURE } from "../../suggestion/redux/constants";
-import FastImage from "react-native-fast-image";
+import { PostItem } from "../../common";
 import { AppColors, AppImages, normalized } from "../../util/AppConstant";
 import CustomHeader from "../../common/CommonHeader";
 
-let reportPostItem = null;
-/* =============================================================================
-<HomeScreen />
-============================================================================= */
 let allHomePosts = [];
-let lastSelectedId = "1";
-const HomeScreen = ({ posts, getHomePosts, refreshHomePosts, getProfile }) => {
+/* =============================================================================
+<search screen/>
+============================================================================= */
+const SearchScreen = ({ posts, getProfile }) => {
   const isFocused = useIsFocused();
   const [loaderVisible, setLoaderVisible] = useState(true);
-
   const [searchPostVisible, setSearchPostVisible] = useState(false);
-  const dispatch = useDispatch();
   const [refreshing, setRefreshing] = useState(false);
   const navigation = useNavigation();
-  const [radioButtons, setRadioButtons] = useState([
-    {
-      id: "1", // acts as primary key, should be unique and non-empty string
-      label: "Ascending List",
-      value: "ascendinglist",
-      borderColor: "#6d14c4",
-      selected: true,
-    },
-    {
-      id: "2",
-      label: "Descending List",
-      value: "descendinglist",
-      borderColor: "#6d14c4",
-    },
-  ]);
+
   const [reportPostModal, setReportPostModal] = useState(true);
   const [toggleCheckBox, setToggleCheckBox] = useState(false);
   const selector = useSelector((AppState) => AppState);
@@ -82,14 +50,11 @@ const HomeScreen = ({ posts, getHomePosts, refreshHomePosts, getProfile }) => {
 
   const [isUpdate, setUpdate] = useState(false);
   const [reportText, setReportTxt] = useState("");
-
-  useEffect(() => {
-    // setIsFilterPopup(true);
-    setLoaderVisible(true);
-    getMyUserHomePosts();
-    // getHomePosts();
-    getProfile();
-  }, [selector.Home.updateHomeData]);
+  useLayoutEffect(() => {
+    if (isFocused) {
+      setSearchPostVisible(true);
+    }
+  }, [isFocused]);
 
   useEffect(() => {
     setLoaderVisible(true);
@@ -138,33 +103,7 @@ const HomeScreen = ({ posts, getHomePosts, refreshHomePosts, getProfile }) => {
       setRefreshing(false);
       setLoaderVisible(false);
     }, 20);
-
-    // applyFilterOnList(allHomePosts)
-    // setTimeout(() => {
-    //   setLoaderVisible(false)
-    // }, 500)
   };
-
-  // const applyFilterOnList = (mHomePosts) => {
-  //   const filterArray = radioButtons.filter((item) => item.selected)
-  //   setHomePosts([])
-  //   setTimeout(() => {
-  //     if (filterArray.length > 0) {
-  //       // console.log("filterId - > ", filterArray[0].id, allHomePosts[0])
-  //       if (filterArray[0].id == "1") {
-  //         setHomePosts(mHomePosts.reverse())
-  //       } else {
-  //         setHomePosts(mHomePosts.reverse())
-  //       }
-  //     } else {
-  //       setHomePosts(mHomePosts)
-  //     }
-  //     setLoaderVisible(false)
-  //     setRefreshing(false)
-
-  //   },400)
-
-  // }
 
   const _handlePostsGet = () => {
     if (posts) {
@@ -209,81 +148,19 @@ const HomeScreen = ({ posts, getHomePosts, refreshHomePosts, getProfile }) => {
     />
   );
 
-  const ReportPostModal = () => {
-    return (
-      <Modal
-        isVisible={reportPostModal}
-        deviceWidth={Dimensions.get("window").width}
-        deviceHeight={Dimensions.get("window").height}
-        onRequestClose={() => {
-          console.log("called11");
-          setReportTxt("");
-          setReportPostModal(false);
-        }}
-        // onBackdropPress={() =>{
-        //   setReportTxt("")
-        //   setReportPostModal(false)
-        // }}
-        backdropOpacity={0.2}
-      >
-        <View style={styles.modalStyle}>
-          <View
-            style={{
-              margin: 30,
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <Text
-              style={{
-                fontSize: 18,
-                color: "black",
-              }}
-            >
-              Reason for reporting this post?
-            </Text>
-
-            <View
-              style={{
-                borderColor: "gray",
-                borderWidth: 1,
-                width: "100%",
-                marginVertical: 20,
-                borderRadius: 5,
-              }}
-            >
-              <TextInput
-                style={{
-                  padding: 20,
-                  fontSize: 16,
-                }}
-                placeholder={"Please add reason..."}
-                onChangeText={(text) => {
-                  setReportTxt(text);
-                }}
-              />
-            </View>
-          </View>
-        </View>
-      </Modal>
-    );
-  };
-
   useIsFocused();
 
   const emptyComponent = () => {
     return (
       <View style={styles.container}>
         {loaderVisible ? (
-          <ActivityIndicator size="large" color={Colors.primary} />
+          <ActivityIndicator size="large" color={AppColors.blue.navy} />
         ) : (
           homePosts.length == 0 && (
             <Text sm center>
               Nothing to show yet
             </Text>
           )
-
-          // homePosts.length == 0 && <Text sm center>You don't have any followers. follow people to see there posts</Text>
         )}
       </View>
     );
@@ -298,16 +175,7 @@ const HomeScreen = ({ posts, getHomePosts, refreshHomePosts, getProfile }) => {
         }}
       >
         <FastImage
-          // onLoadStart={() => setLoading(true)}
-          // onLoadEnd={() => setLoading(false)}
-          // onError={() => {
-          //   setLoading(false);
-          //   if (props.placeHolder) {
-          //     setSource(props.placeHolder);
-          //   }
-          // }}
           source={require("../../assets/images/edit-app-logo.jpeg")}
-          // <UploadIcon />
           style={{
             flex: 0.9,
           }}
@@ -332,69 +200,49 @@ const HomeScreen = ({ posts, getHomePosts, refreshHomePosts, getProfile }) => {
 
   return (
     <View>
-      {searchPostVisible ? (
-        <View style={styles.searchTopStyle}>
-          <TouchableOpacity
-            onPress={() => {
-              setFiltersPost([]);
-              setSearchTxt("");
-              setSearchPostVisible(!searchPostVisible);
-            }}
-          >
-            <View
-              style={{
-                paddingHorizontal: 5,
-                backgroundColor: "white",
-              }}
-            >
-              <ChevronLeftIcon />
-            </View>
-          </TouchableOpacity>
-
-          <TextInput
-            style={{
-              flex: 1,
-              height: 40,
-              fontSize: 16,
-              color: "black",
-            }}
-            placeholder="Search in post..."
-            placeholderTextColor={"gray"}
-            value={searchTxt}
-            onChange={(txt) => {
-              let usersFiltersPost = [];
-              homePosts.forEach((obj) => {
-                if (
-                  obj.searchTxt
-                    .toLowerCase()
-                    .includes(String(txt.nativeEvent.text).toLowerCase())
-                ) {
-                  usersFiltersPost.push(obj);
-                }
-              });
-              console.log("filter -- > ", usersFiltersPost);
-              setFiltersPost(
-                txt.nativeEvent.text == "" ? [] : usersFiltersPost
-              );
-              setSearchTxt(txt);
-            }}
-          />
-        </View>
-      ) : null}
-
       <CustomHeader
         isStatusBar={true}
         logo={AppImages.Common.appLogo}
         mainStyle={{ backgroundColor: AppColors.blue.royalBlue }}
       />
+
+      <View style={styles.searchTopStyle}>
+        <TextInput
+          style={{
+            flex: 1,
+            height: 40,
+            fontSize: 16,
+            color: "black",
+          }}
+          placeholder="Search in post..."
+          placeholderTextColor={"gray"}
+          value={searchTxt}
+          onChange={(txt) => {
+            let usersFiltersPost = [];
+            homePosts.forEach((obj) => {
+              if (
+                obj.searchTxt
+                  .toLowerCase()
+                  .includes(String(txt.nativeEvent.text).toLowerCase())
+              ) {
+                usersFiltersPost.push(obj);
+              }
+            });
+            console.log("filter -- > ", usersFiltersPost?.length);
+            setFiltersPost(txt.nativeEvent.text == "" ? [] : usersFiltersPost);
+            setSearchTxt(txt);
+          }}
+        />
+      </View>
+
       <FlatList
         style={{
           backgroundColor: AppColors.white.lightSky,
-          marginBottom: normalized(90),
+          marginBottom: normalized(170),
           paddingHorizontal: 18,
           paddingVertical: 10,
           zIndex: 0,
-          height: "88%",
+          height: "74%",
         }}
         showsVerticalScrollIndicator={false}
         data={!searchPostVisible ? homePosts : filtersPost}
@@ -404,28 +252,7 @@ const HomeScreen = ({ posts, getHomePosts, refreshHomePosts, getProfile }) => {
           return item.id;
         }}
         // contentContainerStyle={styles.content}
-        ListHeaderComponent={() => {
-          return !searchPostVisible ? (
-            <HomeListHeader
-              postRefresh={() => {
-                getMyUserHomePosts();
-              }}
-              filterClick={() => {
-                const filterArray = radioButtons.filter(
-                  (item) => item.selected
-                );
-                if (filterArray.length > 0) lastSelectedId = filterArray[0].id;
-                setIsFilterPopup(!isFilterPopup);
-              }}
-              listSize={homePosts.length}
-              searchClicked={() => {
-                navigation.navigate("Profile");
-              }}
-            />
-          ) : null;
-        }}
         ListEmptyComponent={emptyComponent}
-        ListFooterComponent={ListFooter}
         onEndReached={_handlePostsGet}
         onRefresh={_handleRefresh}
         extraData={isUpdate}
@@ -451,7 +278,6 @@ const styles = StyleSheet.create({
     backgroundColor: AppColors.white.lightSky,
     paddingVertical: 10,
     zIndex: 0,
-    marginBottom: normalized(160),
   },
   searchTopStyle: {
     flexDirection: "row",
@@ -477,4 +303,4 @@ const mapDispatchToProps = {
   getHomePosts: getHomePostsAction,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(HomeScreen);
+export default connect(mapStateToProps, mapDispatchToProps)(SearchScreen);

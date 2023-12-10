@@ -72,27 +72,7 @@ const ForgotPasswordScreen = ({ loading, forgotPassword, navigation }) => {
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.childContainer}>
-            <View
-              style={{
-                flexDirection: "row",
-                height: hv(100),
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              <Image source={AppImages.appIcon} style={styles.logoStyle} />
-
-              <Text
-                style={{
-                  marginStart: normalized(10),
-                  fontSize: normalized(22),
-                  fontWeight: "600",
-                  color: AppColors.blue.lightNavy,
-                }}
-              >
-                Listah
-              </Text>
-            </View>
+            <Image source={AppImages.Common.appLogo} style={styles.logoStyle} />
             <Text style={styles.topDesTxt}>
               Enter your email to reset your password
             </Text>
@@ -132,8 +112,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   logoStyle: {
-    height: normalized(80),
-    width: normalized(80),
+    height: normalized(110),
+    width: normalized(120),
+    alignSelf: "center",
   },
   topDesTxt: {
     color: "#8391A1",

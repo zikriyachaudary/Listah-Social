@@ -14,6 +14,7 @@ import LoadingImage from "../../LoadingImage";
 import Touchable from "../../Touchable";
 import { getProfile } from "../../../profile/redux/selectors";
 import { connect } from "react-redux";
+import { AppColors, hv, normalized } from "../../../util/AppConstant";
 const PostInnerItems = ({ post, userPosts, profile }) => {
   const [showMore, setShowMore] = useState(false);
   const [showMoreChallengePost, setShowMoreChallengePost] = useState(false);
@@ -21,7 +22,6 @@ const PostInnerItems = ({ post, userPosts, profile }) => {
   const [postItems, setPostItems] = useState(
     userPosts.length > 3 ? userPosts.slice(0, 3) : userPosts
   );
- 
 
   useEffect(() => {
     if (showMore) {
@@ -33,57 +33,79 @@ const PostInnerItems = ({ post, userPosts, profile }) => {
   return (
     <View>
       {postItems?.length >= 0 &&
-        postItems?.map((item, index) => (
-          <View horizontal style={styles.item} key={index}>
-            {post.isNumberShowInItems && (
-              <View style={styles.indexCounter}>
-                <Text sm bold>
-                  {post.order && post.order == "1"
-                    ? index === 0
-                      ? 1
-                      : index + 1
-                    : userPosts?.length - index}
+        postItems?.map((item, index) => {
+          return (
+            <View horizontal style={styles.item} key={index}>
+              {post?.isNumberShowInItems ? (
+                <View style={styles.innerStyle}>
+                  {post.isNumberShowInItems && (
+                    <View style={styles.indexCounter}>
+                      <Text sm bold style={{ color: AppColors.white.white }}>
+                        {post.order && post.order == "1"
+                          ? index === 0
+                            ? 1
+                            : index + 1
+                          : userPosts?.length - index}
+                      </Text>
+                    </View>
+                  )}
+
+                  <Text
+                    style={{
+                      fontSize: normalized(12),
+                      color: AppColors.black.black,
+                      fontWeight: "500",
+                      marginStart: normalized(10),
+                    }}
+                    adjustsFontSizeToFit={true}
+                    numberOfLines={4}
+                  >
+                    {item.name || "--"}
+                  </Text>
+                </View>
+              ) : (
+                <Text
+                  style={{
+                    fontSize: normalized(12),
+                    color: AppColors.black.black,
+                    fontWeight: "500",
+                    marginHorizontal: normalized(10),
+                    flex: 0.5,
+                  }}
+                  adjustsFontSizeToFit={true}
+                  numberOfLines={4}
+                >
+                  {item.name || "--"}
+                </Text>
+              )}
+
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  flex: post?.isNumberShowInItems ? 0.5 : 1,
+                }}
+              >
+                {item?.image ? (
+                  <LoadingImage
+                    source={{ uri: `${item?.image}` }}
+                    style={{
+                      width: normalized(50),
+                      height: normalized(50),
+                      borderRadius: 2,
+                      borderWidth: 1.4,
+                      borderColor: "yellow",
+                    }}
+                  />
+                ) : null}
+
+                <Text center xs light style={styles.descriptionTxt}>
+                  {item.description || "--"}
                 </Text>
               </View>
-            )}
-
-            {item.image && (
-              <View style={styles.imgContainer}>
-                <LoadingImage
-                  source={{ uri: `${item.image}` }}
-                  style={{
-                    width: 58,
-                    height: 58,
-                    borderRadius: 2,
-                    marginVertical: 10,
-                    borderWidth: 1.4,
-                    borderColor: "yellow",
-                  }}
-                />
-                {/* <Avatar style={{ borderRadius: 2 }} size={58} url={{ uri: `${item.image}` }} /> */}
-              </View>
-            )}
-
-            <Text
-              style={{
-                flex: 0.3,
-                marginEnd: 8,
-                fontSize: 12
-              }}
-              adjustsFontSizeToFit={true}
-              numberOfLines={4}
-              flex
-              center
-              sm
-              medium
-            >
-              {item.name  || "--"}
-            </Text>
-            <Text center xs light style={styles.descriptionTxt}>
-              {item.description || "--"}
-            </Text>
-          </View>
-        ))}
+            </View>
+          );
+        })}
 
       {userPosts.length > 3 && (
         <View style={{ flex: 1, alignItems: "flex-end" }}>
@@ -101,7 +123,6 @@ const PostInnerItems = ({ post, userPosts, profile }) => {
           </TouchableOpacity>
         </View>
       )}
-
     </View>
   );
 };
@@ -110,34 +131,32 @@ const mapStateToProps = (state) => ({
 });
 export default connect(mapStateToProps)(PostInnerItems);
 
-
 const styles = StyleSheet.create({
   item: {
-    marginTop: 10,
-    paddingBottom: 10,
-    borderBottomWidth: 0.3,
-    borderBottomColor: "#999",
+    marginTop: hv(10),
+    paddingHorizontal: normalized(10),
+    paddingVertical: normalized(10),
+    borderWidth: 1,
+    borderColor: AppColors.black.dark,
     justifyContent: "space-between",
+    alignItems: "center",
   },
   indexCounter: {
-    width: 30,
-    height: 30,
-    marginRight: 12,
-    borderWidth: 2,
-    paddingTop: 2,
-    borderRadius: 30 / 2,
+    width: normalized(25),
+    height: normalized(25),
+    borderRadius: 25 / 2,
     alignItems: "center",
     justifyContent: "center",
+    backgroundColor: AppColors.grey.Analogous,
   },
   imgContainer: {
-    marginRight: 5,
-    flex: 0.3,
+    marginHorizontal: 5,
   },
   userInfoContainer: {
     marginLeft: 15,
   },
   descriptionTxt: {
-    flex: 0.5
+    flex: 1.5,
   },
   menuBtn: {
     paddingVertical: 20,
@@ -147,7 +166,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 20,
     marginVertical: 20,
-    alignItems: 'center',
+    alignItems: "center",
   },
   btnTxt: {
     marginTop: 5,
@@ -157,5 +176,10 @@ const styles = StyleSheet.create({
     marginLeft: 5,
     marginTop: 5,
     color: Colors.primary,
+  },
+  innerStyle: {
+    flexDirection: "row",
+    alignItems: "center",
+    flex: 0.5,
   },
 });

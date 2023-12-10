@@ -10,6 +10,13 @@ import ReportPost from "./ReportPost";
 import { getLoginUserNotificationCount } from "../../notification/redux/actions";
 import AddChallengeListingScreen from "../../suggestion/screens/AddChallengeListingScreen";
 import AcceptRejectChallenge from "./AcceptRejectChallenge";
+import ProfileScreen from "../../profile/screens/ProfileScreen";
+import EditProfileScreen from "../../profile/screens/EditProfileScreen";
+import DraftPostListScreen from "../../profile/screens/DraftPostListScreen";
+import { Routes } from "../../util/Route";
+import UserRequestListScreen from "../../profile/screens/UserRequestList";
+import AppUserListScreen from "../../profile/screens/AppUsersListScreen";
+import RequestForVerifyAccountScreen from "../../profile/screens/RequestForVerifyAccountScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -44,6 +51,23 @@ const HomeStack = () => {
         component={AddChallengeListingScreen}
       />
       <Stack.Screen name="PostEdit" component={PostEditScreen} />
+
+      {/* <Tab.Screen name="ProfileStack" component={ProfileStack} /> */}
+      <Stack.Screen name="Profile" component={ProfileScreen} />
+      <Stack.Screen name="EditProfile" component={EditProfileScreen} />
+      <Stack.Screen name="DraftPostListing" component={DraftPostListScreen} />
+      <Stack.Screen
+        name={Routes.Profile.userRequestList}
+        component={UserRequestListScreen}
+      />
+      <Stack.Screen
+        name={Routes.Profile.appUserList}
+        component={AppUserListScreen}
+      />
+      <Stack.Screen
+        name={Routes.Profile.requestForVerify}
+        component={RequestForVerifyAccountScreen}
+      />
     </Stack.Navigator>
   );
 };

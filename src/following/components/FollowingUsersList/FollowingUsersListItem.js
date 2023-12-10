@@ -8,6 +8,7 @@ import { unFollowUser as unFollowUserAction } from "../../redux/actions";
 import * as Colors from "../../../config/colors";
 import LoadingImage from "../../../common/LoadingImage";
 import { useNavigation } from "@react-navigation/native";
+import { AppColors, normalized } from "../../../util/AppConstant";
 
 /* =============================================================================
 <FollowingUsersListItem />
@@ -34,51 +35,56 @@ const FollowingUsersListItem = ({ user, unFollowUser }) => {
   };
 
   return (
-    <View horizontal style={styles.container}>
-      <TouchableWithoutFeedback
-        onPress={() => {
-          navigation.navigate("MyPosts", {
-            userId: userId,
-            username: userName,
-            refreshCall: postRefresh,
-          });
-        }}
-      >
-        <View horizontal>
-          {/* <Avatar url={{ uri: `${userProfileImage}` }} /> */}
-          <LoadingImage
-            source={{ uri: `${userProfileImage}` }}
-            style={{
-              width: 68,
-              height: 68,
-              borderRadius: 2,
-              marginVertical: 10,
-              borderWidth: 1.4,
-              borderRadius: 68 / 2,
-              backgroundColor: Colors.outline,
-              borderColor: "yellow",
-            }}
-          />
-          <Text style={styles.userNameTxt}>{userName}
-          {user?.verified ? (
-              <Text
-                style={{
-                  color: Colors.primary,
-                }}
-              >{`\n(A+)`}</Text>
-            ) : null}
-          </Text>
-         
-        </View>
-      </TouchableWithoutFeedback>
-      <Button
-        title="Unfollow"
-        loading={loading}
-        style={styles.btn}
-        btnTxtStyles={styles.btnTxtStyles}
-        onPress={_handleUnFollowPress}
+    <>
+      <View horizontal style={styles.container}>
+        <TouchableWithoutFeedback
+          onPress={() => {
+            navigation.navigate("MyPosts", {
+              userId: userId,
+              username: userName,
+              refreshCall: postRefresh,
+            });
+          }}
+        >
+          <View horizontal>
+            {/* <Avatar url={{ uri: `${userProfileImage}` }} /> */}
+            <LoadingImage
+              source={{ uri: `${userProfileImage}` }}
+              style={{
+                width: 68,
+                height: 68,
+                borderRadius: 2,
+                marginVertical: 10,
+                borderWidth: 1.4,
+                borderRadius: 68 / 2,
+                backgroundColor: Colors.outline,
+                borderColor: "yellow",
+              }}
+            />
+            <Text style={styles.userNameTxt}>
+              {userName}
+              {user?.verified ? (
+                <Text
+                  style={{
+                    color: Colors.primary,
+                  }}
+                >{`\n(A+)`}</Text>
+              ) : null}
+            </Text>
+          </View>
+        </TouchableWithoutFeedback>
+        <Button
+          title="Unfollow"
+          loading={loading}
+          style={styles.btn}
+          btnTxtStyles={styles.btnTxtStyles}
+          onPress={_handleUnFollowPress}
+        />
+      </View>
+      <View
+        style={{ backgroundColor: AppColors.grey.simpleGrey, height: 0.5 }}
       />
-    </View>
+    </>
   );
 };
 
@@ -93,7 +99,9 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
   },
   btn: {
-    width: 120,
+    width: normalized(85),
+    height: normalized(30),
+    paddingHorizontal: 0,
   },
   btnTxtStyles: {
     fontSize: 12,

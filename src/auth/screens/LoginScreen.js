@@ -11,7 +11,6 @@ import {
   View,
   Text,
 } from "react-native";
-import LinearGradient from "react-native-linear-gradient";
 import { connect } from "react-redux";
 import { Button } from "../../common";
 import { getLoading } from "../redux/selectors";
@@ -96,28 +95,8 @@ const LoginScreen = ({ navigation, loading, login }) => {
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.childContainer}>
-            <View
-              style={{
-                marginTop: normalized(70),
-                flexDirection: "row",
-                height: hv(100),
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              <Image source={AppImages.appIcon} style={styles.logoStyle} />
+            <Image source={AppImages.Common.appLogo} style={styles.logoStyle} />
 
-              <Text
-                style={{
-                  marginStart: normalized(10),
-                  fontSize: normalized(22),
-                  fontWeight: "600",
-                  color: AppColors.blue.lightNavy,
-                }}
-              >
-                Listah
-              </Text>
-            </View>
             <Text style={styles.topDesTxt}>
               Log in to continue your journey.
             </Text>
@@ -198,9 +177,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   logoStyle: {
-    height: normalized(80),
-    width: normalized(80),
+    marginTop: hv(30),
+    height: normalized(110),
+    width: normalized(120),
+    alignSelf: "center",
   },
+
   topDesTxt: {
     color: "#8391A1",
     fontSize: normalized(13),

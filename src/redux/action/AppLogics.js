@@ -6,6 +6,7 @@ import {
   SET_IS_ADMIN,
   SET_IS_SHOW_NOTI,
   SET_PUSH_NOTI,
+  SET_SHOW_SPLASH,
   SET_UPDATE_FB_TOKEN,
 } from "./types";
 
@@ -41,5 +42,10 @@ export const setAllUserFCMToken = (data) => ({
 
 export const setPushNotifi = (data) => ({
   type: SET_PUSH_NOTI,
+  data: data,
+});
+
+export const setIsShowSplash = (data) => ({
+  type: SET_SHOW_SPLASH,
   data: data,
 });

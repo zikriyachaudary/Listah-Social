@@ -4,4 +4,7 @@ export const Routes = {
     appUserList: "AppUserListScreen",
     userRequestList: "UserRequestListScreen",
   },
+  Search: {
+    searchScreen: "SearchScreen",
+  },
 };
