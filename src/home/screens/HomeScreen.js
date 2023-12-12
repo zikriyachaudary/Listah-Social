@@ -39,8 +39,14 @@ import CheckBox from "@react-native-community/checkbox";
 import { getLoginUserNotificationCount } from "../../notification/redux/actions";
 import { UPDATE_CHALLENGE_FEATURE } from "../../suggestion/redux/constants";
 import FastImage from "react-native-fast-image";
-import { AppColors, AppImages, normalized } from "../../util/AppConstant";
+import {
+  AppColors,
+  AppImages,
+  normalized,
+  topicsDummyData,
+} from "../../util/AppConstant";
 import CustomHeader from "../../common/CommonHeader";
+import TopicsComp from "../components/TopicsComp";
 
 let reportPostItem = null;
 /* =============================================================================
@@ -383,10 +389,23 @@ const HomeScreen = ({ posts, getHomePosts, refreshHomePosts, getProfile }) => {
       ) : null}
 
       <CustomHeader
+        atBackPress={() => {
+          navigation.navigate("PostCreate", {
+            postRefresh: getMyUserHomePosts(),
+            isAnnouncement: true,
+          });
+        }}
+        leftIcon={AppImages.Common.announcement}
         isStatusBar={true}
         logo={AppImages.Common.appLogo}
         mainStyle={{ backgroundColor: AppColors.blue.royalBlue }}
+        atRightBtn={() => {
+          navigation.navigate("Profile");
+        }}
+        isRightAction={true}
+        rightIcon={AppImages.Common.profile}
       />
+      <TopicsComp topicsList={topicsDummyData} />
       <FlatList
         style={{
           backgroundColor: AppColors.white.lightSky,

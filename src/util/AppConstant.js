@@ -128,6 +128,8 @@ export const AppImages = {
     memberIcon: require("../assets/images/Common/memberIcon.png"),
     menuIcon: require("../assets/images/Common/menuIcon.png"),
     backArrow: require("../assets/images/Common/backArrow.png"),
+    announcement: require("../assets/images/announcement-ic.png"),
+    profile: require("../assets/images/Common/profile.png"),
   },
   profile: {
     logout: require("../assets/images/logout.png"),
@@ -141,3 +143,10 @@ export const AppImages = {
     logo: require("../assets/images/Auth/logo.png"),
   },
 };
+
+export const topicsDummyData = [
+  {
+    id: 1,
+    title: "Topics coming soon",
+  },
+];

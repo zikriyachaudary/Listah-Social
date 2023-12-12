@@ -6,7 +6,6 @@ import {
   Text,
   TouchableOpacity,
   View,
-  SafeAreaView,
 } from "react-native";
 import {
   AppColors,
@@ -36,9 +35,10 @@ const CustomHeader = (props) => {
                 props?.atBackPress();
               }}
               style={{
-                width: normalized(60),
+                width: normalized(30),
                 height: hv(40),
                 justifyContent: "center",
+                alignItems: "center",
               }}
             >
               {props?.leftIcon ? (
@@ -65,7 +65,7 @@ const CustomHeader = (props) => {
             <Image source={props?.logo} style={styles.logoImage} />
           ) : null}
 
-          {props?.atRightBtn ? (
+          {props?.atRightBtn && props?.isRightAction ? (
             <TouchableOpacity
               activeOpacity={1}
               onPress={() => {
@@ -74,9 +74,8 @@ const CustomHeader = (props) => {
               style={
                 props?.rightIcon
                   ? {
-                      height: normalized(40),
-                      width: normalized(60),
-                      borderRadius: normalized(8),
+                      width: normalized(30),
+                      height: hv(40),
                       justifyContent: "center",
                       alignItems: "center",
                     }
@@ -94,7 +93,7 @@ const CustomHeader = (props) => {
                 <Text style={styles.rightTxt}>{props?.rightTxt}</Text>
               ) : null}
               {props?.rightIcon ? (
-                <Image source={props?.rightIcon} style={props?.iconStyle} />
+                <Image source={props?.rightIcon} style={styles.leftBtn} />
               ) : null}
             </TouchableOpacity>
           ) : (
@@ -135,8 +134,8 @@ const styles = StyleSheet.create({
   leftBtn: {
     tintColor: AppColors.white.white,
     resizeMode: "contain",
-    height: normalized(20),
-    width: normalized(20),
+    height: normalized(25),
+    width: normalized(25),
   },
   logoImage: {
     marginTop: 10,

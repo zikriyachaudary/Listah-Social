@@ -27,7 +27,7 @@ const HomeListHeader = ({ postRefresh, searchClicked, listSize }) => {
 
   return (
     <View>
-      <StackHeader
+      {/* <StackHeader
         // left={<AddIcon />}
         title={" "}
         left={
@@ -55,26 +55,8 @@ const HomeListHeader = ({ postRefresh, searchClicked, listSize }) => {
             ? false
             : true
         }
-      />
+      /> */}
       <HomeHeaderProfileInfo />
-      {/* <View style={{
-        flex: 1,
-        height: 30,
-        alignItems: "flex-end",
-        marginHorizontal: 10
-      }}>
-        <TouchableOpacity
-          onPress={filterClick}
-        >
-          <Image
-            style={{
-              width: 30,
-              height: 30,
-            }}
-            source={require("../../assets/icons/filter-ic.png")}
-          />
-        </TouchableOpacity>
-      </View> */}
     </View>
   );
 };
