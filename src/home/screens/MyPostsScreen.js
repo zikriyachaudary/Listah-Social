@@ -35,7 +35,7 @@ import {
 } from "../../following/redux/actions";
 import { Notification_Types } from "../../util/Strings";
 import useNotificationManger from "../../hooks/useNotificationManger";
-import { normalized } from "../../util/AppConstant";
+import { AppColors, normalized } from "../../util/AppConstant";
 
 // import View from '../../common/View';
 // import Avatar from '../../common/Avatar';
@@ -177,7 +177,7 @@ const MyPostsScreen = ({ profile, route, unFollowUser, followUser }) => {
                 borderWidth: 1.4,
                 borderRadius: 68 / 2,
                 backgroundColor: Colors.outline,
-                borderColor: "yellow",
+                borderColor: AppColors.blue.royalBlue,
               }}
             />
             {userProfileInfo && userProfileInfo?.verified ? (

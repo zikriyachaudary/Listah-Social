@@ -118,7 +118,7 @@ const PostItemHeader = ({
                 borderWidth: 1.4,
                 borderRadius: 68 / 2,
                 backgroundColor: Colors.outline,
-                borderColor: "yellow",
+                borderColor: AppColors.blue.royalBlue,
               }}
               source={AppLogoImg}
             />
@@ -134,7 +134,7 @@ const PostItemHeader = ({
                   borderWidth: 1.4,
                   borderRadius: 68 / 2,
                   backgroundColor: Colors.outline,
-                  borderColor: "yellow",
+                  borderColor: AppColors.blue.royalBlue,
                 }}
               />
 

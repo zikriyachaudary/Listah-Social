@@ -6,6 +6,7 @@ import View from "./View";
 import * as Colors from "../config/colors";
 
 import UserIcon from "../assets/icons/nav-profile-icon.svg";
+import { AppColors } from "../util/AppConstant";
 
 const Avatar = ({ size, style, url }) => {
   const styles = getStyles(size);
@@ -41,7 +42,7 @@ const getStyles = (size) =>
       height: size,
       marginVertical: 10,
       borderWidth: 1.4,
-      borderColor: "yellow",
+      borderColor: AppColors.blue.royalBlue,
       borderRadius: size / 2,
       backgroundColor: Colors.outline,
     },

@@ -94,7 +94,7 @@ const PostInnerItems = ({ post, userPosts, profile }) => {
                       height: normalized(50),
                       borderRadius: 2,
                       borderWidth: 1.4,
-                      borderColor: "yellow",
+                      borderColor: AppColors.blue.royalBlue,
                     }}
                   />
                 ) : null}

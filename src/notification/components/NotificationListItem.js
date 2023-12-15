@@ -10,6 +10,7 @@ import { Text, Touchable, View } from "../../common";
 import LoadingImage from "../../common/LoadingImage";
 import * as Colors from "../../config/colors";
 import { Notification_Types } from "../../util/Strings";
+import { AppColors } from "../../util/AppConstant";
 
 /* =============================================================================
 <NotificationListItem />
@@ -47,11 +48,10 @@ const NotificationListItem = ({ notification }) => {
             style={{
               width: 50,
               height: 50,
-              borderRadius: 2,
-              borderWidth: 1.4,
+              borderWidth: 2,
               borderRadius: 50 / 2,
-              backgroundColor: Colors.outline,
-              borderColor: "yellow",
+              backgroundColor: AppColors.blue.royalBlue,
+              borderColor: AppColors.blue.royalBlue,
             }}
           />
         </TouchableOpacity>
@@ -88,12 +88,10 @@ const NotificationListItem = ({ notification }) => {
           style={{
             width: 50,
             height: 50,
-            borderRadius: 2,
-            borderWidth: 1.4,
+            borderWidth: 2,
             borderRadius: 50 / 2,
-            backgroundColor: Colors.outline,
-            marginEnd: 5,
-            borderColor: "yellow",
+            backgroundColor: AppColors.blue.royalBlue,
+            borderColor: AppColors.blue.royalBlue,
           }}
         />
 
@@ -101,6 +99,7 @@ const NotificationListItem = ({ notification }) => {
           style={{
             flex: 1,
             flexWrap: "wrap",
+            marginStart: 8,
           }}
           sm
         >

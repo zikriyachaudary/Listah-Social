@@ -8,6 +8,7 @@ import { Avatar, Touchable, View } from "../../common";
 import EditIcon from "../../assets/icons/edit-icon.svg";
 import * as Colors from "../../config/colors";
 import LoadingImage from "../../common/LoadingImage";
+import { AppColors } from "../../util/AppConstant";
 
 /* =============================================================================
 <ProfileHeader />
@@ -41,7 +42,7 @@ const ProfileHeader = ({ photoUrl }) => {
           borderWidth: 1.4,
           borderRadius: 160 / 2,
           backgroundColor: Colors.outline,
-          borderColor: "yellow",
+          borderColor: AppColors.blue.royalBlue,
         }}
       />
     </LinearGradient>

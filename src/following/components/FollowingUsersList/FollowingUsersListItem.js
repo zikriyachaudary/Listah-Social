@@ -58,7 +58,7 @@ const FollowingUsersListItem = ({ user, unFollowUser }) => {
                 borderWidth: 1.4,
                 borderRadius: 68 / 2,
                 backgroundColor: Colors.outline,
-                borderColor: "yellow",
+                borderColor: AppColors.blue.royalBlue,
               }}
             />
             <Text style={styles.userNameTxt}>
