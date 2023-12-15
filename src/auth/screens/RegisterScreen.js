@@ -281,14 +281,12 @@ const RegisterScreen = ({ register, navigation }) => {
           />
           <TextInputComponent
             value={password}
-            showLastIcon={true}
-            showFirstIcon={true}
+            isPassword={true}
             container={styles.inputMainCont}
             setValue={(val) => {
               setPassword(val);
             }}
             placeholder="Password"
-            secureEntry={true}
             error={passErroMsg}
           />
           <View style={styles.termCont}>

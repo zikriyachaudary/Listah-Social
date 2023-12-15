@@ -10,7 +10,7 @@ import {
 import { AppColors, AppImages, normalized } from "../util/AppConstant";
 
 const TextInputComponent = (props) => {
-  const [secureEntry, setSecureEntry] = useState(props?.secureEntry);
+  const [secureEntry, setSecureEntry] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
   return (
     <View style={[{ marginVertical: normalized(5) }, props?.mainContainer]}>
@@ -40,8 +40,9 @@ const TextInputComponent = (props) => {
           keyboardType={
             props?.keyboardType ? props?.keyboardType : "email-address"
           }
-          autoCapitalize="none"
-          secureTextEntry={secureEntry}
+          autoCapitalize={
+            props?.autoCapitalize ? props?.autoCapitalize : "none"
+          }
           style={[styles.txtInput, props.textInputStyle]}
           placeholderTextColor={AppColors.grey.dark}
           maxLength={props?.maxLength ? props?.maxLength : 200}
@@ -54,8 +55,15 @@ const TextInputComponent = (props) => {
           onChangeText={(val) => {
             props?.setValue(val);
           }}
+          multiline={props?.isMultiLine}
+          secureTextEntry={props?.isPassword && !secureEntry ? true : false}
+          onSubmitEditing={props?.atSubmit}
+          returnKeyType={props?.returnType ? props?.returnType : "done"}
+          scrollEnabled={props?.isMultiLine}
+          editable={props.isDisable ? false : true}
         />
-        {props?.showLastIcon ? (
+
+        {props?.isPassword ? (
           <Pressable
             style={{ padding: 5 }}
             onPress={() => {
@@ -64,7 +72,7 @@ const TextInputComponent = (props) => {
           >
             <Image
               source={
-                secureEntry ? AppImages.Auth.closeEye : AppImages.Auth.eye
+                !secureEntry ? AppImages.Auth.closeEye : AppImages.Auth.eye
               }
               style={{
                 width: normalized(20),

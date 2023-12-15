@@ -112,8 +112,7 @@ const LoginScreen = ({ navigation, loading, login }) => {
             />
             <TextInputComponent
               value={password}
-              showLastIcon={true}
-              showFirstIcon={true}
+              isPassword={true}
               container={styles.inputMainCont}
               setValue={(val) => {
                 setPasswordErrorMsg("");
@@ -121,7 +120,6 @@ const LoginScreen = ({ navigation, loading, login }) => {
               }}
               placeholder="Password"
               error={passErroMsg}
-              secureEntry={true}
             />
 
             <View style={styles.secondCont}>
@@ -171,6 +169,7 @@ const styles = StyleSheet.create({
   containerStyle: {
     flex: 1,
     marginHorizontal: AppHorizontalMargin,
+    marginTop: hv(50),
   },
   childContainer: {
     flex: 1,

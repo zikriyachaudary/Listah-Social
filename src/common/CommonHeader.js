@@ -20,7 +20,7 @@ const CustomHeader = (props) => {
       {props?.isStatusBar ? (
         <StatusBar
           animated={true}
-          backgroundColor={AppColors.blue.navy}
+          backgroundColor={AppColors.blue.royalBlue}
           barStyle={"light-content"}
           showHideTransition={"fade"}
         />
