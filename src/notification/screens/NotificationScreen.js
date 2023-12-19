@@ -23,12 +23,14 @@ const NotificationScreen = ({ notifications, getNotifications }) => {
   const styles = getStyles(insets);
   const [notificationList, setNotificationList] = useState([]);
   const [loader, setIsLoader] = useState(false);
-  const { fetchNotificationList } = useNotificationManger();
+  const { fetchNotificationList, setMessageIsRead } = useNotificationManger();
+
   // GET_NOTIFICATIONS
   useEffect(() => {
     if (isFocused) {
       // getNotifications(selector.Home.notificationUnread);
       setIsLoader(true);
+      setMessageIsRead();
       fetchNotificationList((response) => {
         if (response?.length > 0) {
           setNotificationList(response);

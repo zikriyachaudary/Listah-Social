@@ -6,8 +6,7 @@ const TopicsComp = (props) => {
     <ScrollView
       style={{
         backgroundColor: "#4035AE",
-        height: normalized(60),
-        padding: normalized(8),
+        padding: normalized(10),
       }}
       horizontal
       showsHorizontalScrollIndicator={false}
@@ -15,8 +14,10 @@ const TopicsComp = (props) => {
       {props?.topicsList.map((el) => {
         return (
           <TouchableOpacity
+            activeOpacity={1}
             style={{
-              height: normalized(33),
+              alignSelf: "center",
+              height: normalized(30),
               paddingHorizontal: normalized(10),
               backgroundColor: "#322988",
               borderRadius: normalized(15),

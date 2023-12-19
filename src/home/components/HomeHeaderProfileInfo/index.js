@@ -44,11 +44,39 @@ const HomeHeaderProfileInfo = ({ profile }) => {
       </Touchable>
       <Touchable center style={styles.item} onPress={_toggleFollowersModal}>
         <Image source={AppImages.Common.memberIcon} />
-        <Text style={styles.textStyle}>{` ${followers?.length || 0}`}</Text>
+        <Text
+          style={{
+            ...styles.textStyle,
+            right: normalized(-10),
+          }}
+        >{` ${
+          followers?.length > 0
+            ? followers?.length < 10
+              ? `0${followers?.length}`
+              : followers?.length > 99
+              ? "+99"
+              : followers?.length
+            : 0
+        }`}</Text>
       </Touchable>
       <Touchable center style={styles.item} onPress={_handleFollowingPress}>
         <Image source={AppImages.Common.global} />
-        <Text style={styles.textStyle}>{` ${followings?.length || 0}`}</Text>
+        <Text
+          style={{
+            ...styles.textStyle,
+            right: normalized(-5),
+          }}
+        >
+          {` ${
+            followings?.length > 0
+              ? followings?.length < 10
+                ? `0${followings?.length}`
+                : followings?.length > 99
+                ? "+99"
+                : followings?.length
+              : 0
+          }`}
+        </Text>
       </Touchable>
       <ProfileFollowersListModal
         followers={followers}

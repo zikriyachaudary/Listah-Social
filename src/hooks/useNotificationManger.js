@@ -1,4 +1,4 @@
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import firestore from "@react-native-firebase/firestore";
 import {
   Collections,
@@ -6,7 +6,9 @@ import {
   Notification_Types,
 } from "../util/Strings";
 import { sendPushNotification } from "../network/Services/NotificationServices";
+import { setIsUnReadMsg } from "../redux/action/AppLogics";
 const useNotificationManger = (props) => {
+  const dispatch = useDispatch();
   const selector = useSelector((AppState) => AppState);
   const userSubscribed = async (currentUid, onComplete) => {
     await firestore()
@@ -72,9 +74,12 @@ const useNotificationManger = (props) => {
       name: selector?.Profile?.profile?.username,
       image: selector?.Profile?.profile?.profileImage,
     };
-    await getupdatedFCM(obj?.reciverId?.toString(), (res) => {
+    await getupdatedFCM(obj?.reciverId?.toString(), async (res) => {
       if (res?.userId) {
         updatedReciverData = res;
+        if (obj?.actionType == Notification_Types.follow && res?.fcmToken) {
+          await unReadedMessageFun(obj?.reciverId?.toString());
+        }
         completeNotiList = res?.notification_List;
       }
     });
@@ -133,9 +138,12 @@ const useNotificationManger = (props) => {
       name: selector?.Profile?.profile?.username,
       image: selector?.Profile?.profile?.profileImage,
     };
-    await getupdatedFCM(obj?.reciverId?.toString(), (res) => {
+    await getupdatedFCM(obj?.reciverId?.toString(), async (res) => {
       if (res?.userId) {
         updatedReciverData = res;
+        if (obj?.actionType == Notification_Types.like && res?.fcmToken) {
+          await unReadedMessageFun(obj?.reciverId?.toString());
+        }
         completeNotiList = res?.notification_List;
       }
     });
@@ -194,9 +202,12 @@ const useNotificationManger = (props) => {
       name: selector?.Profile?.profile?.username,
       image: selector?.Profile?.profile?.profileImage,
     };
-    await getupdatedFCM(obj?.reciverId?.toString(), (res) => {
+    await getupdatedFCM(obj?.reciverId?.toString(), async (res) => {
       if (res?.userId) {
         updatedReciverData = res;
+        if (res?.fcmToken) {
+          await unReadedMessageFun(obj?.reciverId?.toString());
+        }
         completeNotiList = res?.notification_List;
       }
     });
@@ -235,9 +246,12 @@ const useNotificationManger = (props) => {
       name: selector?.Profile?.profile?.username,
       image: selector?.Profile?.profile?.profileImage,
     };
-    await getupdatedFCM(obj?.reciverId?.toString(), (res) => {
+    await getupdatedFCM(obj?.reciverId?.toString(), async (res) => {
       if (res?.userId) {
         updatedReciverData = res;
+        if (res?.fcmToken) {
+          await unReadedMessageFun(obj?.reciverId?.toString());
+        }
         completeNotiList = res?.notification_List;
       }
     });
@@ -275,9 +289,12 @@ const useNotificationManger = (props) => {
       name: selector?.Profile?.profile?.username,
       image: selector?.Profile?.profile?.profileImage,
     };
-    await getupdatedFCM(obj?.reciverId?.toString(), (res) => {
+    await getupdatedFCM(obj?.reciverId?.toString(), async (res) => {
       if (res?.userId) {
         updatedReciverData = res;
+        if (res?.fcmToken) {
+          await unReadedMessageFun(obj?.reciverId?.toString());
+        }
         completeNotiList = res?.notification_List;
       }
     });
@@ -309,18 +326,7 @@ const useNotificationManger = (props) => {
       });
   };
   const sendPushNoti = async (obj, fcmToken) => {
-    console.log("obj-------->", obj);
-    //////////////////  Obj will look like ////////////////////
-    // let obj = {
-    //   reciverId: "yudfsuy78eqwhjembjheshjriuyuy",
-    //   message: "usama follow you",
-    //   actionType: "Follow",
-    //   extraData: { email: "usamaMalik@gmail.com" },
-    // };
-    ///////////////////////////////////////////////////////////
-
     let title = selector?.Profile?.profile?.username;
-
     if (fcmToken) {
       let notification = {
         title: title,
@@ -376,14 +382,18 @@ const useNotificationManger = (props) => {
       .collection(Collections.NOTIFICATION)
       .doc(userId)
       .get()
-      .then((snapDoc) => {
+      .then(async (snapDoc) => {
         if (snapDoc?._data) {
           if (snapDoc?._data?.notification_List?.length > 0) {
             updatedReciverData = snapDoc?._data;
+            if (snapDoc?._data?.fcmToken) {
+              await unReadedMessageFun(userId?.toString());
+            }
             completeNotiList = snapDoc?._data?.notification_List;
           }
         }
       });
+
     let newObj = {
       reciverId: userId,
       message: msg,
@@ -393,7 +403,6 @@ const useNotificationManger = (props) => {
     };
     let newArr = [];
     newArr = [...completeNotiList, newObj];
-
     await firestore()
       .collection(Collections.NOTIFICATION)
       .doc(userId)
@@ -412,12 +421,51 @@ const useNotificationManger = (props) => {
       .collection(Collections.NOTIFICATION)
       .doc(uId)
       .get()
-      .then((snapDoc) => {
+      .then(async (snapDoc) => {
         if (snapDoc?._data) {
           onComplete(snapDoc?._data);
         } else {
           onComplete(null);
         }
+      });
+  };
+  const unReadedMessageFun = async (userId) => {
+    await firestore()
+      .collection(Collections.NOTIFICATION)
+      .doc(userId)
+      .update({ isUnRead: true })
+      .then(() => {})
+      .catch((error) => {
+        console.error("Error updating array value:", error);
+      });
+  };
+  const setMessageIsRead = async () => {
+    await firestore()
+      .collection(Collections.NOTIFICATION)
+      .doc(selector?.Profile?.profile?.userId?.toString())
+      .get()
+      .then(async (snapDoc) => {
+        if (snapDoc?._data?.notification_List) {
+          await firestore()
+            .collection(Collections.NOTIFICATION)
+            .doc(selector?.Profile?.profile?.userId?.toString())
+            .update({ isUnRead: false })
+            .then(() => {
+              dispatch(setIsUnReadMsg(false));
+            })
+            .catch((error) => {
+              console.error("Error updating array value:", error);
+            });
+        }
+      });
+  };
+  const fetchIsUnReadValue = async (userId) => {
+    await firestore()
+      .collection(Collections.NOTIFICATION)
+      .doc(userId?.toString())
+      .get()
+      .then(async (snapDoc) => {
+        dispatch(setIsUnReadMsg(snapDoc?._data?.isUnRead ? true : false));
       });
   };
   return {
@@ -430,6 +478,8 @@ const useNotificationManger = (props) => {
     commentPostNoti,
     fetchNotificationList,
     generateMultiplePushNotification,
+    setMessageIsRead,
+    fetchIsUnReadValue,
   };
 };
 export default useNotificationManger;

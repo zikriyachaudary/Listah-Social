@@ -52,7 +52,7 @@ const HomeTabBar = ({ state, navigation }) => {
             onPress={onPress}
             onLongPress={onLongPress}
           >
-            {selector.Home.notificationUnread > 0 &&
+            {selector.sliceReducer.isUnReaded &&
               route.name.slice(0, route.name.indexOf("Stack")) ==
                 "Notification" && <View style={styles.badgeView} />}
 

@@ -387,33 +387,46 @@ const HomeScreen = ({ posts, getHomePosts, refreshHomePosts, getProfile }) => {
           />
         </View>
       ) : null}
+      {!selector?.DraftPost?.isAdmin ? (
+        <CustomHeader
+          isStatusBar={true}
+          logo={AppImages.Common.appLogo}
+          mainStyle={{ backgroundColor: AppColors.blue.royalBlue }}
+          atRightBtn={() => {
+            navigation.navigate("Profile");
+          }}
+          isRightAction={true}
+          rightIcon={AppImages.Common.profile}
+        />
+      ) : (
+        <CustomHeader
+          atBackPress={() => {
+            navigation.navigate("PostCreate", {
+              postRefresh: getMyUserHomePosts(),
+              isAnnouncement: true,
+            });
+          }}
+          leftIcon={AppImages.Common.announcement}
+          isStatusBar={true}
+          logo={AppImages.Common.appLogo}
+          mainStyle={{ backgroundColor: AppColors.blue.royalBlue }}
+          atRightBtn={() => {
+            navigation.navigate("Profile");
+          }}
+          isRightAction={true}
+          rightIcon={AppImages.Common.profile}
+        />
+      )}
 
-      <CustomHeader
-        atBackPress={() => {
-          navigation.navigate("PostCreate", {
-            postRefresh: getMyUserHomePosts(),
-            isAnnouncement: true,
-          });
-        }}
-        leftIcon={AppImages.Common.announcement}
-        isStatusBar={true}
-        logo={AppImages.Common.appLogo}
-        mainStyle={{ backgroundColor: AppColors.blue.royalBlue }}
-        atRightBtn={() => {
-          navigation.navigate("Profile");
-        }}
-        isRightAction={true}
-        rightIcon={AppImages.Common.profile}
-      />
       <TopicsComp topicsList={topicsDummyData} />
       <FlatList
         style={{
           backgroundColor: AppColors.white.lightSky,
-          marginBottom: normalized(90),
+          marginBottom: normalized(150),
           paddingHorizontal: 18,
-          paddingVertical: 10,
+          paddingVertical: normalized(10),
           zIndex: 0,
-          height: "88%",
+          // height: "90%",
         }}
         showsVerticalScrollIndicator={false}
         data={!searchPostVisible ? homePosts : filtersPost}

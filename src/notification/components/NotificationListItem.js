@@ -50,7 +50,7 @@ const NotificationListItem = ({ notification }) => {
               height: 50,
               borderWidth: 2,
               borderRadius: 50 / 2,
-              backgroundColor: AppColors.blue.royalBlue,
+              // backgroundColor: AppColors.blue.royalBlue,
               borderColor: AppColors.blue.royalBlue,
             }}
           />
@@ -90,7 +90,7 @@ const NotificationListItem = ({ notification }) => {
             height: 50,
             borderWidth: 2,
             borderRadius: 50 / 2,
-            backgroundColor: AppColors.blue.royalBlue,
+            // backgroundColor: AppColors.blue.royalBlue,
             borderColor: AppColors.blue.royalBlue,
           }}
         />

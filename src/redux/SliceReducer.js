@@ -1,5 +1,6 @@
 import {
   SET_ALL_USER_FCM,
+  SET_IS_UN_READED,
   SET_PUSH_NOTI,
   SET_SHOW_SPLASH,
   SET_UPDATE_FB_TOKEN,
@@ -10,6 +11,7 @@ const initialState = {
   updateToken: true,
   push_Noti: null,
   isShowSplash: true,
+  isUnReaded: false,
 };
 const SliceReducer = (state = initialState, action) => {
   switch (action.type) {
@@ -33,6 +35,11 @@ const SliceReducer = (state = initialState, action) => {
       return {
         ...state,
         isShowSplash: action.data,
+      };
+    case SET_IS_UN_READED:
+      return {
+        ...state,
+        isUnReaded: action.data,
       };
     default:
       return state;

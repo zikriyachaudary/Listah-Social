@@ -5,6 +5,7 @@ import {
   SET_DRAFT_POST,
   SET_IS_ADMIN,
   SET_IS_SHOW_NOTI,
+  SET_IS_UN_READED,
   SET_PUSH_NOTI,
   SET_SHOW_SPLASH,
   SET_UPDATE_FB_TOKEN,
@@ -47,5 +48,10 @@ export const setPushNotifi = (data) => ({
 
 export const setIsShowSplash = (data) => ({
   type: SET_SHOW_SPLASH,
+  data: data,
+});
+
+export const setIsUnReadMsg = (data) => ({
+  type: SET_IS_UN_READED,
   data: data,
 });

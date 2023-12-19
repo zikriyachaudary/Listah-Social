@@ -36,7 +36,8 @@ const Stack = createNativeStackNavigator();
 <AppNavigation />
 ============================================================================= */
 const AppNavigation = ({ changeAuthState, getProfile, authenticated }) => {
-  const { checkNUpdateFCMToken, userSubscribed } = useNotificationManger();
+  const { checkNUpdateFCMToken, userSubscribed, fetchIsUnReadValue } =
+    useNotificationManger();
   const [initializing, setInitializing] = useState(true);
   const userCompleteObj = useRef(null);
   const [showSplash, setShowSplash] = useState(true);
@@ -49,6 +50,7 @@ const AppNavigation = ({ changeAuthState, getProfile, authenticated }) => {
       if (user) {
         userCompleteObj.current = user;
         onAppStart();
+        fetchIsUnReadValue(user?.uid);
         changeAuthState(user.toJSON());
         registerDevice();
         onNotificationListener();
@@ -162,6 +164,14 @@ const AppNavigation = ({ changeAuthState, getProfile, authenticated }) => {
     //this gets triggered when the application is in the background
     notifications.onNotificationOpened((notification) => {
       if (notification?._body) {
+        let userId = userCompleteObj.current?.uid
+          ? userCompleteObj.current?.uid
+          : selector?.Profile?.profile?.userId
+          ? selector?.Profile?.profile?.userId
+          : null;
+        if (userId) {
+          fetchIsUnReadValue(userId);
+        }
         dispatch(setPushNotifi(notification));
         setTimeout(() => {
           openDetail();
@@ -177,6 +187,14 @@ const AppNavigation = ({ changeAuthState, getProfile, authenticated }) => {
 
     notifications.onNotification(async (notification) => {
       if (notification?._body) {
+        let userId = userCompleteObj.current?.uid
+          ? userCompleteObj.current?.uid
+          : selector?.Profile?.profile?.userId
+          ? selector?.Profile?.profile?.userId
+          : null;
+        if (userId) {
+          fetchIsUnReadValue(userId);
+        }
         dispatch(setPushNotifi(notification));
       }
     });

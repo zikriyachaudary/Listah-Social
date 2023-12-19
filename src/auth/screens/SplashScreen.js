@@ -57,7 +57,7 @@ export default function RNSplashScreen(props) {
   return (
     <ImageBackground
       style={styles.container}
-      resizeMode="contain"
+      resizeMode="cover"
       source={AppImages.Common.SplashBg}
     >
       <View

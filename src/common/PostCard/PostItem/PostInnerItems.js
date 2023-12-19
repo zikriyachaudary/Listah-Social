@@ -56,6 +56,7 @@ const PostInnerItems = ({ post, userPosts, profile }) => {
                       color: AppColors.black.black,
                       fontWeight: "500",
                       marginStart: normalized(10),
+                      flex: 0.8,
                     }}
                     adjustsFontSizeToFit={true}
                     numberOfLines={4}
@@ -157,6 +158,7 @@ const styles = StyleSheet.create({
   },
   descriptionTxt: {
     flex: 1.5,
+    marginStart: normalized(5),
   },
   menuBtn: {
     paddingVertical: 20,

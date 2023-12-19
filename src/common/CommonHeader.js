@@ -54,7 +54,7 @@ const CustomHeader = (props) => {
               )}
             </TouchableOpacity>
           ) : (
-            <View style={{ marginHorizontal: normalized(30) }} />
+            <View style={{ marginHorizontal: normalized(20) }} />
           )}
 
           {props?.title ? (
@@ -97,7 +97,7 @@ const CustomHeader = (props) => {
               ) : null}
             </TouchableOpacity>
           ) : (
-            <View style={{ marginHorizontal: hv(38) }} />
+            <View style={{ marginHorizontal: hv(25) }} />
           )}
         </>
       </View>

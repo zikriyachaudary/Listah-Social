@@ -448,7 +448,8 @@ const PostCreateScreen = ({
                             <View
                               style={{
                                 width: "70%",
-                                height: hv(120),
+                                height: normalized(135),
+                                marginVertical: normalized(10),
                               }}
                             >
                               <TextInput
@@ -650,7 +651,7 @@ const styles = StyleSheet.create({
     width: ScreenSize.width - normalized(Platform.OS == "ios" ? 30 : 40),
     borderRadius: normalized(10),
     alignItems: "center",
-    height: normalized(120),
+    height: normalized(140),
     marginTop: normalized(7),
     justifyContent: "space-between",
   },
@@ -672,7 +673,7 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     flex: 1,
-    marginTop: 0,
+    marginVertical: 10,
     marginHorizontal: 5,
   },
   input: {
