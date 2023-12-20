@@ -157,7 +157,7 @@ const PostActions = ({
             <Text
               style={[
                 liked ? styles.btnActiveTxt : styles.btnTxt,
-                { paddingHorizontal: 10 },
+                { paddingEnd: 10 },
               ]}
             >
               {likesCount}

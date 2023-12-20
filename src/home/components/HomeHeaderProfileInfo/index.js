@@ -47,7 +47,6 @@ const HomeHeaderProfileInfo = ({ profile }) => {
         <Text
           style={{
             ...styles.textStyle,
-            right: normalized(-10),
           }}
         >{` ${
           followers?.length > 0
@@ -64,7 +63,6 @@ const HomeHeaderProfileInfo = ({ profile }) => {
         <Text
           style={{
             ...styles.textStyle,
-            right: normalized(-5),
           }}
         >
           {` ${
@@ -93,13 +91,13 @@ const styles = StyleSheet.create({
   },
   item: {
     height: normalized(45),
-    width: normalized(65),
-    padding: 10,
+    width: normalized(70),
+    alignItems: "flex-start",
   },
   textStyle: {
     color: AppColors.blue.royalBlue,
     position: "absolute",
-    right: 0,
+    right: 10,
     bottom: 0,
     fontSize: normalized(16),
     fontWeight: "400",

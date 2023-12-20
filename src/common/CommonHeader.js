@@ -1,6 +1,7 @@
 import React from "react";
 import {
   Image,
+  Platform,
   StatusBar,
   StyleSheet,
   Text,
@@ -20,7 +21,7 @@ const CustomHeader = (props) => {
       {props?.isStatusBar ? (
         <StatusBar
           animated={true}
-          backgroundColor={AppColors.blue.royalBlue}
+          backgroundColor={AppColors.blue.lightNavy}
           barStyle={"light-content"}
           showHideTransition={"fade"}
         />
@@ -112,7 +113,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: AppHorizontalMargin,
     alignItems: "center",
-    paddingTop: hv(20),
+    paddingTop: Platform.OS == "ios" ? hv(10) : hv(5),
   },
   title: {
     marginStart: normalized(10),
