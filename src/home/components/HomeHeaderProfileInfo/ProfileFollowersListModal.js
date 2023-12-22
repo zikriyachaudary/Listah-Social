@@ -29,6 +29,7 @@ const ProfileFollowersListModal = ({ visible, followers, onClose }) => {
       isVisible={visible}
       onBackdropPress={onClose}
       onBackButtonPress={onClose}
+      onRequestClose={onClose}
     >
       <SafeAreaView />
 

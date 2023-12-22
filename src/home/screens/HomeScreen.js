@@ -47,6 +47,8 @@ import {
 } from "../../util/AppConstant";
 import CustomHeader from "../../common/CommonHeader";
 import TopicsComp from "../components/TopicsComp";
+import HomeTopBar from "../components/HomeTopBar";
+import ProfileFollowersListModal from "../components/HomeHeaderProfileInfo/ProfileFollowersListModal";
 
 let reportPostItem = null;
 /* =============================================================================
@@ -56,8 +58,11 @@ let allHomePosts = [];
 let lastSelectedId = "1";
 const HomeScreen = ({ posts, getHomePosts, refreshHomePosts, getProfile }) => {
   const isFocused = useIsFocused();
-  const [loaderVisible, setLoaderVisible] = useState(true);
+  const selector = useSelector((AppState) => AppState);
 
+  const [followerModal, setFollowerModal] = useState(false);
+  const [loaderVisible, setLoaderVisible] = useState(true);
+  const profileData = selector?.Profile?.profile;
   const [searchPostVisible, setSearchPostVisible] = useState(false);
   const dispatch = useDispatch();
   const [refreshing, setRefreshing] = useState(false);
@@ -79,7 +84,6 @@ const HomeScreen = ({ posts, getHomePosts, refreshHomePosts, getProfile }) => {
   ]);
   const [reportPostModal, setReportPostModal] = useState(true);
   const [toggleCheckBox, setToggleCheckBox] = useState(false);
-  const selector = useSelector((AppState) => AppState);
   // GET POSTS
   const [isFilterPopup, setIsFilterPopup] = useState(false);
   const [homePosts, setHomePosts] = useState([]);
@@ -336,6 +340,14 @@ const HomeScreen = ({ posts, getHomePosts, refreshHomePosts, getProfile }) => {
     );
   };
 
+  const _handleMyPostedPress = () => {
+    if (selector?.Profile?.profile?.userId) {
+      navigation.navigate("MyPosts", {
+        userId: selector?.Profile?.profile.userId,
+        username: selector?.Profile?.profile.username,
+      });
+    }
+  };
   return (
     <View>
       {searchPostVisible ? (
@@ -419,6 +431,19 @@ const HomeScreen = ({ posts, getHomePosts, refreshHomePosts, getProfile }) => {
       )}
 
       <TopicsComp topicsList={topicsDummyData} />
+      <HomeTopBar
+        profile={profileData}
+        atMenuPress={() => {
+          _handleMyPostedPress();
+        }}
+        openModal={followerModal}
+        openFollowerModal={(val) => {
+          setFollowerModal(val);
+        }}
+        atFollowingBtn={() => {
+          navigation.navigate("FollowingStack");
+        }}
+      />
       <FlatList
         style={{
           backgroundColor: AppColors.white.lightSky,
@@ -436,26 +461,26 @@ const HomeScreen = ({ posts, getHomePosts, refreshHomePosts, getProfile }) => {
           return item.id;
         }}
         // contentContainerStyle={styles.content}
-        ListHeaderComponent={() => {
-          return !searchPostVisible ? (
-            <HomeListHeader
-              postRefresh={() => {
-                getMyUserHomePosts();
-              }}
-              filterClick={() => {
-                const filterArray = radioButtons.filter(
-                  (item) => item.selected
-                );
-                if (filterArray.length > 0) lastSelectedId = filterArray[0].id;
-                setIsFilterPopup(!isFilterPopup);
-              }}
-              listSize={homePosts.length}
-              searchClicked={() => {
-                navigation.navigate("Profile");
-              }}
-            />
-          ) : null;
-        }}
+        // ListHeaderComponent={() => {
+        //   return !searchPostVisible ? (
+        //     <HomeListHeader
+        //       postRefresh={() => {
+        //         getMyUserHomePosts();
+        //       }}
+        //       filterClick={() => {
+        //         const filterArray = radioButtons.filter(
+        //           (item) => item.selected
+        //         );
+        //         if (filterArray.length > 0) lastSelectedId = filterArray[0].id;
+        //         setIsFilterPopup(!isFilterPopup);
+        //       }}
+        //       listSize={homePosts.length}
+        //       searchClicked={() => {
+        //         navigation.navigate("Profile");
+        //       }}
+        //     />
+        //   ) : null;
+        // }}
         ListEmptyComponent={emptyComponent}
         ListFooterComponent={ListFooter}
         onEndReached={_handlePostsGet}
@@ -464,6 +489,13 @@ const HomeScreen = ({ posts, getHomePosts, refreshHomePosts, getProfile }) => {
       />
 
       <WrapperComponent />
+      <ProfileFollowersListModal
+        followers={profileData?.followers}
+        visible={followerModal}
+        onClose={(val) => {
+          setFollowerModal(!followerModal);
+        }}
+      />
     </View>
   );
 };
