@@ -24,7 +24,7 @@ const HomeTopBar = (props) => {
 
       <TouchableOpacity
         activeOpacity={1}
-        style={styles.item}
+        style={{ ...styles.item, justifyContent: "center" }}
         onPress={() => {
           props?.openFollowerModal(!props?.openModal);
         }}
@@ -33,6 +33,8 @@ const HomeTopBar = (props) => {
         <Text
           style={{
             ...styles.textStyle,
+            marginStart: 4,
+            bottom: -10,
           }}
         >{` ${
           followers?.length > 0
@@ -46,7 +48,7 @@ const HomeTopBar = (props) => {
       </TouchableOpacity>
       <TouchableOpacity
         activeOpacity={1}
-        style={styles.item}
+        style={{ ...styles.item, justifyContent: "flex-end" }}
         onPress={() => {
           props?.atFollowingBtn();
         }}
@@ -55,6 +57,7 @@ const HomeTopBar = (props) => {
         <Text
           style={{
             ...styles.textStyle,
+            bottom: -10,
           }}
         >
           {` ${
@@ -74,23 +77,22 @@ const HomeTopBar = (props) => {
 const styles = StyleSheet.create({
   mainCont: {
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
+    height: normalized(80),
     paddingHorizontal: AppHorizontalMargin,
     backgroundColor: AppColors.white.lightSky,
-    paddingVertical: normalized(10),
   },
   item: {
-    height: normalized(40),
-    width: normalized(65),
+    flex: 1,
+    height: "100%",
     flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-end",
+    alignItems: "center",
   },
   textStyle: {
     color: AppColors.blue.royalBlue,
     fontSize: normalized(16),
     fontWeight: "400",
   },
+  imageStyle: {},
 });
 export default HomeTopBar;
