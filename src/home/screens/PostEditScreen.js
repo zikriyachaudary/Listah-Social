@@ -24,6 +24,7 @@ import { updatePost as updatePostAction } from "../redux/actions";
 import { useEffect } from "react";
 import TextInputComponent from "../../common/TextInputComponent";
 import { useIsFocused } from "@react-navigation/native";
+import { AppHorizontalMargin } from "../../util/AppConstant";
 
 /* =============================================================================
 <PostEditScreen />
@@ -69,7 +70,9 @@ const PostEditScreen = ({ navigation, updatePost, route }) => {
   };
 
   return (
-    <Container style={styles.content}>
+    <Container
+      style={{ ...styles.content, marginHorizontal: AppHorizontalMargin }}
+    >
       <StackHeader />
       <TextInputComponent
         value={title}

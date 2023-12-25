@@ -121,7 +121,7 @@ const PostItem = ({
   };
 
   useEffect(() => {
-    if (post.likeOneUsers) {
+    if (post?.likeOneUsers) {
       const isLiked =
         post.likeOneUsers.filter((id) => id == profile.userId).length > 0
           ? true

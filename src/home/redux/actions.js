@@ -729,11 +729,9 @@ export const updatePost = (changes) => async (dispatch) => {
         })
       );
     }
-    console.log("post Edit------>", post);
-    await PostsCollection.doc(changes?.id).update(post);
-
+    await PostsCollection.doc(changes?.id.toString()).update(post);
     const updatedPost = await (
-      await PostsCollection.doc(changes?.id).get()
+      await PostsCollection.doc(changes?.id.toString()).get()
     ).data();
     const postAuthor = await (
       await ProfilesCollection.doc(updatedPost?.author).get()
@@ -747,11 +745,9 @@ export const updatePost = (changes) => async (dispatch) => {
         verified: postAuthor?.verified ? true : false,
       },
     };
-
     if (populatedPost?.likes >= 2) {
       dispatch(updateDiscoveryPost(populatedPost));
     }
-
     dispatch({ type: constants.UPDATED_POST.SUCCESS, payload: populatedPost });
   } catch (error) {
     Alert.alert(error.message);

@@ -77,10 +77,10 @@ const MyPostsScreen = ({ profile, route, unFollowUser, followUser }) => {
   // GET POSTS
   useEffect(() => {
     if (isFocused && route?.params?.userId) {
+      getPostsByUserId();
       // getHomePosts();
       fetchUsersData();
       setLoaderVisible(true);
-      getPostsByUserId();
     }
   }, [isFocused]);
 
@@ -95,7 +95,6 @@ const MyPostsScreen = ({ profile, route, unFollowUser, followUser }) => {
       // getPostsByUserId()
     }
   };
-
   const renderItem = ({ item, index }) => {
     return (
       <PostItem
@@ -322,7 +321,7 @@ const MyPostsScreen = ({ profile, route, unFollowUser, followUser }) => {
           refreshing={false}
           renderItem={renderItem}
           keyExtractor={(item, index) => {
-            return item.id;
+            return item?.id;
           }}
           contentContainerStyle={styles.content}
           onEndReached={_handlePostsGet}

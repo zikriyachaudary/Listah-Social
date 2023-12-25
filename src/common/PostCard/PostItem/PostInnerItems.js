@@ -29,7 +29,7 @@ const PostInnerItems = ({ post, userPosts, profile }) => {
     } else {
       setPostItems(userPosts.length > 3 ? userPosts.slice(0, 3) : userPosts);
     }
-  }, [showMore]);
+  }, [showMore, userPosts]);
   return (
     <View>
       {postItems?.length >= 0 &&
