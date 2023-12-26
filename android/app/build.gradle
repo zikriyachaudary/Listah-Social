@@ -137,8 +137,8 @@ android {
         applicationId "com.listaapp"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 23
-        versionName "1.2.2"
+        versionCode 24
+        versionName "1.2.3"
         buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString()
         multiDexEnabled true
         if (isNewArchitectureEnabled()) {

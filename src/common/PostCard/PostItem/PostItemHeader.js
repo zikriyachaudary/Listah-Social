@@ -24,7 +24,7 @@ import LoadingImage from "../../LoadingImage";
 
 import AppLogoImg from "../../../assets/images/edit-app-logo.jpeg";
 import FastImage from "react-native-fast-image";
-import { AppColors, normalized } from "../../../util/AppConstant";
+import { AppColors, AppImages, normalized } from "../../../util/AppConstant";
 
 /* =============================================================================
 <PostItemHeader />
@@ -120,7 +120,8 @@ const PostItemHeader = ({
                 backgroundColor: Colors.outline,
                 borderColor: AppColors.blue.royalBlue,
               }}
-              source={AppLogoImg}
+              // source={AppLogoImg}
+              source={AppImages.Common.aPlusIcon}
             />
           ) : (
             <View style={{ width: post.author?.verified ? 76 : 70 }}>
