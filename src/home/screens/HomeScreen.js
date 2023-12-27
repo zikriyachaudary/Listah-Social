@@ -356,10 +356,10 @@ const HomeScreen = ({ posts, getProfile }) => {
       <FlatList
         style={{
           backgroundColor: AppColors.white.lightSky,
-          // marginBottom: normalized(230),
           paddingHorizontal: 18,
           paddingVertical: normalized(10),
           zIndex: 0,
+          flex: 1,
         }}
         showsVerticalScrollIndicator={false}
         data={!searchPostVisible ? homePosts : filtersPost}

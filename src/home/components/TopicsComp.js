@@ -13,7 +13,7 @@ const TopicsComp = (props) => {
       style={{
         backgroundColor: "#4035AE",
         paddingHorizontal: normalized(10),
-        height: 75,
+        maxHeight: 50,
       }}
       horizontal
       showsHorizontalScrollIndicator={false}
@@ -58,13 +58,14 @@ const TopicsComp = (props) => {
 const styles = StyleSheet.create({
   mainCont: {
     alignSelf: "center",
-    height: normalized(30),
+    height: 30,
     paddingHorizontal: normalized(10),
     backgroundColor: "#322988",
     borderRadius: normalized(15),
     alignItems: "center",
     justifyContent: "center",
     marginHorizontal: normalized(5),
+    marginVertical: 15,
   },
 });
 export default TopicsComp;
