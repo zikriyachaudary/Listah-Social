@@ -15,7 +15,8 @@ import LoadingImage from "../../../common/LoadingImage";
 import { useNavigation } from "@react-navigation/native";
 import useNotificationManger from "../../../hooks/useNotificationManger";
 import { Notification_Types } from "../../../util/Strings";
-import { AppColors, normalized } from "../../../util/AppConstant";
+import { AppColors, AppImages, normalized } from "../../../util/AppConstant";
+import FastImage from "react-native-fast-image";
 
 /* =============================================================================
 <AllUsersListItem />
@@ -79,31 +80,41 @@ const AllUsersListItem = ({
           }}
         >
           <View horizontal>
-            {/* <Avatar url={{ uri: `${userProfileImage}` }} /> */}
-            <LoadingImage
-              source={{ uri: `${userProfileImage}` }}
-              style={{
-                width: 68,
-                height: 68,
-                borderRadius: 2,
-                marginVertical: 10,
-                borderWidth: 1.4,
-                borderRadius: 68 / 2,
-                backgroundColor: Colors.outline,
-                borderColor: AppColors.blue.royalBlue,
-              }}
-            />
-
-            <Text style={styles.userNameText} numberOfLines={2}>
-              {userName}
+            <View style={{ marginBottom: normalized(10) }}>
+              <LoadingImage
+                source={{ uri: `${userProfileImage}` }}
+                style={{
+                  width: 68,
+                  height: 68,
+                  borderRadius: 2,
+                  marginVertical: 10,
+                  borderWidth: 1.4,
+                  borderRadius: 68 / 2,
+                  backgroundColor: Colors.outline,
+                  borderColor: AppColors.blue.royalBlue,
+                }}
+              />
               {user?.verified ? (
-                <Text
+                <FastImage
                   style={{
-                    color: Colors.primary,
+                    position: "absolute",
+                    width: normalized(35),
+                    height: normalized(35),
+                    borderRadius: normalized(35 / 2),
+                    bottom: normalized(-8),
+                    right: normalized(-8),
+                    alignSelf: "flex-end",
                   }}
-                >{`\n(A+)`}</Text>
+                  source={AppImages.Common.aPlusIcon}
+                />
               ) : null}
-            </Text>
+            </View>
+
+            <View style={{ width: "55%", marginStart: normalized(10) }}>
+              <Text style={styles.userNameText} numberOfLines={2}>
+                {userName}
+              </Text>
+            </View>
           </View>
         </TouchableWithoutFeedback>
         {isFollowed ? (
@@ -137,8 +148,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   userNameText: {
-    marginLeft: 10,
-    width: "45%",
     flexWrap: "wrap",
   },
   btn: {

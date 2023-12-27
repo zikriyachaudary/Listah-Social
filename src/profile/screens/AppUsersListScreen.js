@@ -13,6 +13,7 @@ import { useIsFocused } from "@react-navigation/native";
 import {
   AppColors,
   AppHorizontalMargin,
+  AppImages,
   hv,
   normalized,
 } from "../../util/AppConstant";
@@ -24,6 +25,7 @@ import {
 } from "../../network/Services/ProfileServices";
 import { paginationLogic } from "../../util/helperFun";
 import * as Colors from "../../config/colors";
+import FastImage from "react-native-fast-image";
 
 const AppUserListScreen = (route) => {
   const isFocused = useIsFocused();
@@ -92,31 +94,32 @@ const AppUserListScreen = (route) => {
                             onPress={() => {}}
                             activeOpacity={1}
                           >
-                            <View style = {{
+                            <View
+                              style={{
                                 width: normalized(70),
-                                height: normalized(70)
-                            }}>
-                            <LoadingImage
-                              source={{ uri: `${item?.image}` }}
-                              style={styles.profile}
-                            />
+                                height: normalized(70),
+                              }}
+                            >
+                              <LoadingImage
+                                source={{ uri: `${item?.image}` }}
+                                style={styles.profile}
+                              />
 
-                            {item?.verified && (
-                                  <Text
-                                    style={{
-                                      position : "absolute",
-                                      bottom: -8,
-                                      end : 0,
-                                      fontFamily: "Poppins-Bold",
-                                      fontSize: normalized(12),
-                                      color: Colors.primary,
-                                    }}
-                                  >
-                                    {`(A+)`}
-                                  </Text>
+                              {item?.verified && (
+                                <FastImage
+                                  style={{
+                                    width: normalized(35),
+                                    height: normalized(35),
+                                    position: "absolute",
+                                    bottom: -8,
+                                    end: 0,
+                                    borderRadius: normalized(35 / 2),
+                                  }}
+                                  source={AppImages.Common.aPlusIcon}
+                                />
                               )}
                             </View>
-                          
+
                             <View style={styles.nameCont}>
                               <Text style={styles.nameTxt}>
                                 {item?.name?.length > 0
@@ -128,8 +131,6 @@ const AppUserListScreen = (route) => {
                                   ? item?.email
                                   : "No email"}
                               </Text>
-
-                           
                             </View>
                           </TouchableOpacity>
                           <View style={styles.bottomLine} />
@@ -142,7 +143,7 @@ const AppUserListScreen = (route) => {
             ) : index == 2 ? (
               userList?.length > 0 ? (
                 <View>
-                  <View style={{...styles.titleCont, marginTop : 10}}>
+                  <View style={{ ...styles.titleCont, marginTop: 10 }}>
                     <Text
                       style={styles.title}
                     >{`Total Users (${totalUser})`}</Text>
@@ -159,28 +160,29 @@ const AppUserListScreen = (route) => {
                             onPress={() => {}}
                             activeOpacity={1}
                           >
-                             <View style = {{
+                            <View
+                              style={{
                                 width: normalized(70),
-                                height: normalized(70)
-                            }}>
-                            <LoadingImage
-                              source={{ uri: `${item?.image}` }}
-                              style={styles.profile}
-                            />
+                                height: normalized(70),
+                              }}
+                            >
+                              <LoadingImage
+                                source={{ uri: `${item?.image}` }}
+                                style={styles.profile}
+                              />
 
-                            {item?.verified && (
-                                  <Text
-                                    style={{
-                                      position : "absolute",
-                                      bottom: -8,
-                                      end : 0,
-                                      fontFamily: "Poppins-Bold",
-                                      fontSize: normalized(12),
-                                      color: Colors.primary,
-                                    }}
-                                  >
-                                    {`(A+)`}
-                                  </Text>
+                              {item?.verified && (
+                                <FastImage
+                                  style={{
+                                    width: normalized(35),
+                                    height: normalized(35),
+                                    position: "absolute",
+                                    bottom: -8,
+                                    end: 0,
+                                    borderRadius: normalized(35 / 2),
+                                  }}
+                                  source={AppImages.Common.aPlusIcon}
+                                />
                               )}
                             </View>
                             <View style={styles.nameCont}>
@@ -188,7 +190,6 @@ const AppUserListScreen = (route) => {
                                 {item?.name?.length > 0
                                   ? item?.name
                                   : "No name"}
-                               
                               </Text>
                               <Text style={styles.emailTxt}>
                                 {item?.email?.length > 0
@@ -276,8 +277,8 @@ const styles = StyleSheet.create({
     fontSize: normalized(14),
     paddingVertical: hv(4),
     color: Colors.primary,
-    textDecorationLine : "underline",
-    fontWeight : "bold",
+    textDecorationLine: "underline",
+    fontWeight: "bold",
     textAlign: "center",
   },
   titleCont: {

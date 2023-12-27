@@ -121,7 +121,7 @@ const PostItemHeader = ({
                 borderColor: AppColors.blue.royalBlue,
               }}
               // source={AppLogoImg}
-              source={AppImages.Common.aPlusIcon}
+              source={AppImages.Common.listahIcon}
             />
           ) : (
             <View style={{ width: post.author?.verified ? 76 : 70 }}>
@@ -140,19 +140,17 @@ const PostItemHeader = ({
               />
 
               {post.author?.verified ? (
-                <Text
+                <FastImage
                   style={{
+                    width: normalized(35),
+                    height: normalized(35),
                     position: "absolute",
-                    bottom: -8,
-                    marginStart: 50,
-                    fontFamily: "Poppins-Bold",
-                    fontSize: normalized(12),
-                    color: Colors.primary,
-                    width: Dimensions.get("screen").width - 200,
+                    bottom: normalized(-5),
+                    marginStart: normalized(45),
+                    borderRadius: normalized(35 / 2),
                   }}
-                >
-                  {`(A+)`}
-                </Text>
+                  source={AppImages.Common.aPlusIcon}
+                />
               ) : null}
             </View>
           )}

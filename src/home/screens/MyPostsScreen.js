@@ -35,7 +35,8 @@ import {
 } from "../../following/redux/actions";
 import { Notification_Types } from "../../util/Strings";
 import useNotificationManger from "../../hooks/useNotificationManger";
-import { AppColors, normalized } from "../../util/AppConstant";
+import { AppColors, AppImages, normalized } from "../../util/AppConstant";
+import FastImage from "react-native-fast-image";
 
 // import View from '../../common/View';
 // import Avatar from '../../common/Avatar';
@@ -180,19 +181,17 @@ const MyPostsScreen = ({ profile, route, unFollowUser, followUser }) => {
               }}
             />
             {userProfileInfo && userProfileInfo?.verified ? (
-              <Text
+              <FastImage
                 style={{
+                  width: normalized(35),
+                  height: normalized(35),
                   position: "absolute",
-                  bottom: 0,
-                  marginStart: 50,
-                  fontFamily: "Poppins-Bold",
-                  fontSize: normalized(12),
-                  color: Colors.primary,
-                  width: Dimensions.get("screen").width - 200,
+                  bottom: normalized(-5),
+                  marginStart: normalized(45),
+                  borderRadius: normalized(35 / 2),
                 }}
-              >
-                {`(A+)`}
-              </Text>
+                source={AppImages.Common.aPlusIcon}
+              />
             ) : null}
           </View>
           <View

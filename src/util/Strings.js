@@ -2,6 +2,7 @@ export const Collections = {
   ACCOUNT_VERIFY_REQUEST: "Account_Verification_Request",
   profile: "profiles",
   NOTIFICATION: "Notifications",
+  CATEGORIES: "Categories",
 };
 
 export const RequestStatus = {

@@ -2,7 +2,6 @@ import React, { useEffect } from "react";
 import { connect, useDispatch, useSelector } from "react-redux";
 import {
   ActivityIndicator,
-  AppState,
   Dimensions,
   Platform,
   StyleSheet,
@@ -10,16 +9,13 @@ import {
   View,
   Image,
   FlatList,
-  SafeAreaView,
   TextInput,
 } from "react-native";
 // import { FlatList } from 'react-native-gesture-handler';
 import { useIsFocused, useNavigation } from "@react-navigation/native";
 import ChevronLeftIcon from "../../assets/icons/edit-chevron-left.svg";
 
-import { PostItem, Container, Text, Button } from "../../common";
-import HomeListHeader from "../components/HomeListHeader";
-import HomeListEmpty from "../components/HomeListEmpty";
+import { PostItem, Text } from "../../common";
 import ListFooter from "../components/ListFooter";
 
 import { getPosts as selectPosts } from "../redux/selectors";
@@ -34,9 +30,6 @@ import {
 import { useState } from "react";
 import * as Colors from "../../config/colors";
 import Modal, { ReactNativeModal } from "react-native-modal";
-import { RadioGroup } from "react-native-radio-buttons-group";
-import CheckBox from "@react-native-community/checkbox";
-import { getLoginUserNotificationCount } from "../../notification/redux/actions";
 import { UPDATE_CHALLENGE_FEATURE } from "../../suggestion/redux/constants";
 import FastImage from "react-native-fast-image";
 import {
@@ -49,39 +42,37 @@ import CustomHeader from "../../common/CommonHeader";
 import TopicsComp from "../components/TopicsComp";
 import HomeTopBar from "../components/HomeTopBar";
 import ProfileFollowersListModal from "../components/HomeHeaderProfileInfo/ProfileFollowersListModal";
+import { fetchCategoriesList } from "../../network/Services/ProfileServices";
 
-let reportPostItem = null;
 /* =============================================================================
 <HomeScreen />
 ============================================================================= */
-let allHomePosts = [];
-let lastSelectedId = "1";
-const HomeScreen = ({ posts, getHomePosts, refreshHomePosts, getProfile }) => {
-  const isFocused = useIsFocused();
-  const selector = useSelector((AppState) => AppState);
 
+const HomeScreen = ({ posts, getProfile }) => {
+  const selector = useSelector((AppState) => AppState);
   const [followerModal, setFollowerModal] = useState(false);
   const [loaderVisible, setLoaderVisible] = useState(true);
   const profileData = selector?.Profile?.profile;
   const [searchPostVisible, setSearchPostVisible] = useState(false);
-  const dispatch = useDispatch();
+  const [categories, setCategories] = useState([]);
+  const [selectedCat, setSelectedCat] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
   const navigation = useNavigation();
-  const [radioButtons, setRadioButtons] = useState([
-    {
-      id: "1", // acts as primary key, should be unique and non-empty string
-      label: "Ascending List",
-      value: "ascendinglist",
-      borderColor: "#6d14c4",
-      selected: true,
-    },
-    {
-      id: "2",
-      label: "Descending List",
-      value: "descendinglist",
-      borderColor: "#6d14c4",
-    },
-  ]);
+  // const [radioButtons, setRadioButtons] = useState([
+  //   {
+  //     id: "1", // acts as primary key, should be unique and non-empty string
+  //     label: "Ascending List",
+  //     value: "ascendinglist",
+  //     borderColor: "#6d14c4",
+  //     selected: true,
+  //   },
+  //   {
+  //     id: "2",
+  //     label: "Descending List",
+  //     value: "descendinglist",
+  //     borderColor: "#6d14c4",
+  //   },
+  // ]);
   const [reportPostModal, setReportPostModal] = useState(true);
   const [toggleCheckBox, setToggleCheckBox] = useState(false);
   // GET POSTS
@@ -91,16 +82,21 @@ const HomeScreen = ({ posts, getHomePosts, refreshHomePosts, getProfile }) => {
   const [searchTxt, setSearchTxt] = useState("");
 
   const [isUpdate, setUpdate] = useState(false);
-  const [reportText, setReportTxt] = useState("");
 
   useEffect(() => {
     // setIsFilterPopup(true);
     setLoaderVisible(true);
     getMyUserHomePosts();
     // getHomePosts();
+    getCatList();
     getProfile();
   }, [selector.Home.updateHomeData]);
 
+  const getCatList = () => {
+    fetchCategoriesList((res) => {
+      setCategories(res?.categoriesList ? res?.categoriesList : []);
+    });
+  };
   useEffect(() => {
     setLoaderVisible(true);
     getMyUserHomePosts();
@@ -148,47 +144,18 @@ const HomeScreen = ({ posts, getHomePosts, refreshHomePosts, getProfile }) => {
       setRefreshing(false);
       setLoaderVisible(false);
     }, 20);
-
-    // applyFilterOnList(allHomePosts)
-    // setTimeout(() => {
-    //   setLoaderVisible(false)
-    // }, 500)
   };
-
-  // const applyFilterOnList = (mHomePosts) => {
-  //   const filterArray = radioButtons.filter((item) => item.selected)
-  //   setHomePosts([])
-  //   setTimeout(() => {
-  //     if (filterArray.length > 0) {
-  //       // console.log("filterId - > ", filterArray[0].id, allHomePosts[0])
-  //       if (filterArray[0].id == "1") {
-  //         setHomePosts(mHomePosts.reverse())
-  //       } else {
-  //         setHomePosts(mHomePosts.reverse())
-  //       }
-  //     } else {
-  //       setHomePosts(mHomePosts)
-  //     }
-  //     setLoaderVisible(false)
-  //     setRefreshing(false)
-
-  //   },400)
-
-  // }
-
   const _handlePostsGet = () => {
     if (posts) {
       // refreshHomePosts(posts[posts.length - 1]);
     }
   };
-
   const _handleRefresh = () => {
     console.log("callinf -- > ");
     setRefreshing(true);
     getMyUserHomePosts();
     // getHomePosts();
   };
-
   const renderItem = ({ item, index }) => (
     <PostItem
       id={item.id}
@@ -218,69 +185,7 @@ const HomeScreen = ({ posts, getHomePosts, refreshHomePosts, getProfile }) => {
       }}
     />
   );
-
-  const ReportPostModal = () => {
-    return (
-      <Modal
-        isVisible={reportPostModal}
-        deviceWidth={Dimensions.get("window").width}
-        deviceHeight={Dimensions.get("window").height}
-        onRequestClose={() => {
-          console.log("called11");
-          setReportTxt("");
-          setReportPostModal(false);
-        }}
-        // onBackdropPress={() =>{
-        //   setReportTxt("")
-        //   setReportPostModal(false)
-        // }}
-        backdropOpacity={0.2}
-      >
-        <View style={styles.modalStyle}>
-          <View
-            style={{
-              margin: 30,
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <Text
-              style={{
-                fontSize: 18,
-                color: "black",
-              }}
-            >
-              Reason for reporting this post?
-            </Text>
-
-            <View
-              style={{
-                borderColor: "gray",
-                borderWidth: 1,
-                width: "100%",
-                marginVertical: 20,
-                borderRadius: 5,
-              }}
-            >
-              <TextInput
-                style={{
-                  padding: 20,
-                  fontSize: 16,
-                }}
-                placeholder={"Please add reason..."}
-                onChangeText={(text) => {
-                  setReportTxt(text);
-                }}
-              />
-            </View>
-          </View>
-        </View>
-      </Modal>
-    );
-  };
-
   useIsFocused();
-
   const emptyComponent = () => {
     return (
       <View style={styles.container}>
@@ -298,7 +203,6 @@ const HomeScreen = ({ posts, getHomePosts, refreshHomePosts, getProfile }) => {
       </View>
     );
   };
-
   const WrapperComponent = () => {
     return (
       <ReactNativeModal
@@ -339,7 +243,6 @@ const HomeScreen = ({ posts, getHomePosts, refreshHomePosts, getProfile }) => {
       </ReactNativeModal>
     );
   };
-
   const _handleMyPostedPress = () => {
     if (selector?.Profile?.profile?.userId) {
       navigation.navigate("MyPosts", {
@@ -349,7 +252,7 @@ const HomeScreen = ({ posts, getHomePosts, refreshHomePosts, getProfile }) => {
     }
   };
   return (
-    <View>
+    <View style={{ backgroundColor: AppColors.white.simpleLight, flex: 1 }}>
       {searchPostVisible ? (
         <View style={styles.searchTopStyle}>
           <TouchableOpacity
@@ -430,7 +333,13 @@ const HomeScreen = ({ posts, getHomePosts, refreshHomePosts, getProfile }) => {
         />
       )}
 
-      <TopicsComp topicsList={topicsDummyData} />
+      <TopicsComp
+        topicsList={topicsDummyData}
+        selectedCat={selectedCat}
+        setSelectedCat={(val) => {
+          setSelectedCat(val);
+        }}
+      />
       <HomeTopBar
         profile={profileData}
         atMenuPress={() => {
@@ -447,11 +356,10 @@ const HomeScreen = ({ posts, getHomePosts, refreshHomePosts, getProfile }) => {
       <FlatList
         style={{
           backgroundColor: AppColors.white.lightSky,
-          marginBottom: normalized(150),
+          // marginBottom: normalized(230),
           paddingHorizontal: 18,
           paddingVertical: normalized(10),
           zIndex: 0,
-          // height: "90%",
         }}
         showsVerticalScrollIndicator={false}
         data={!searchPostVisible ? homePosts : filtersPost}
@@ -460,27 +368,6 @@ const HomeScreen = ({ posts, getHomePosts, refreshHomePosts, getProfile }) => {
         keyExtractor={(item, index) => {
           return item.id;
         }}
-        // contentContainerStyle={styles.content}
-        // ListHeaderComponent={() => {
-        //   return !searchPostVisible ? (
-        //     <HomeListHeader
-        //       postRefresh={() => {
-        //         getMyUserHomePosts();
-        //       }}
-        //       filterClick={() => {
-        //         const filterArray = radioButtons.filter(
-        //           (item) => item.selected
-        //         );
-        //         if (filterArray.length > 0) lastSelectedId = filterArray[0].id;
-        //         setIsFilterPopup(!isFilterPopup);
-        //       }}
-        //       listSize={homePosts.length}
-        //       searchClicked={() => {
-        //         navigation.navigate("Profile");
-        //       }}
-        //     />
-        //   ) : null;
-        // }}
         ListEmptyComponent={emptyComponent}
         ListFooterComponent={ListFooter}
         onEndReached={_handlePostsGet}

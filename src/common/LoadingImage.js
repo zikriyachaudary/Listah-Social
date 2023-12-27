@@ -65,7 +65,6 @@ const LoadingImage = (props) => {
             }
           }}
           source={src}
-          // <UploadIcon />
           style={{
             ...props.style,
           }}

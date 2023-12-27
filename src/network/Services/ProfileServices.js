@@ -94,7 +94,7 @@ export const fetchAdminUserList = async (onComplete) => {
           image: doc?._data?.profileImage,
           userId: doc?._data?.userId,
           name: doc?._data?.username,
-          verified: doc?._data?.verified
+          verified: doc?._data?.verified,
         });
       });
       setTimeout(() => {
@@ -131,6 +131,19 @@ export const fetchUserRequestedList = async (onUpdates) => {
     .catch(() => {
       onUpdates([]);
     });
+};
+export const fetchCategoriesList = async (onComplete) => {
+  await firestore()
+    .collection(Collections.CATEGORIES)
+    .get()
+    .then((snapShot) => {
+      let arr = [];
+      if (snapShot?.docs[0]?._data) {
+        arr = snapShot?.docs[0]?._data;
+      }
+      onComplete(arr);
+    })
+    .catch(() => {});
 };
 
 export const adminActionAtReq = async (obj, onComplete) => {

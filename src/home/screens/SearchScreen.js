@@ -7,8 +7,9 @@ import {
   View,
   Image,
   FlatList,
-  SafeAreaView,
   TextInput,
+  TouchableOpacity,
+  Text,
 } from "react-native";
 import { useIsFocused, useNavigation } from "@react-navigation/native";
 import { useState } from "react";
@@ -25,8 +26,15 @@ import {
   refreshHomePosts as refreshHomePostsAction,
 } from "../redux/actions";
 import { PostItem } from "../../common";
-import { AppColors, AppImages, normalized } from "../../util/AppConstant";
+import {
+  AppColors,
+  AppHorizontalMargin,
+  AppImages,
+  normalized,
+} from "../../util/AppConstant";
 import CustomHeader from "../../common/CommonHeader";
+import { fetchCategoriesList } from "../../network/Services/ProfileServices";
+import LoadingImage from "../../common/LoadingImage";
 
 let allHomePosts = [];
 /* =============================================================================
@@ -34,6 +42,7 @@ let allHomePosts = [];
 ============================================================================= */
 const SearchScreen = ({ posts, getProfile }) => {
   const isFocused = useIsFocused();
+  const [categories, setCategories] = useState([]);
   const [loaderVisible, setLoaderVisible] = useState(true);
   const [searchPostVisible, setSearchPostVisible] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
@@ -47,12 +56,13 @@ const SearchScreen = ({ posts, getProfile }) => {
   const [homePosts, setHomePosts] = useState([]);
   const [filtersPost, setFiltersPost] = useState([]);
   const [searchTxt, setSearchTxt] = useState("");
-
+  const [selectedCat, setSelectedCat] = useState("");
   const [isUpdate, setUpdate] = useState(false);
-  const [reportText, setReportTxt] = useState("");
+  // const [reportText, setReportTxt] = useState("");
   useLayoutEffect(() => {
     if (isFocused) {
       setSearchPostVisible(true);
+      getCatList();
     }
   }, [isFocused]);
 
@@ -60,7 +70,11 @@ const SearchScreen = ({ posts, getProfile }) => {
     setLoaderVisible(true);
     getMyUserHomePosts();
   }, [selector.Home.isPostRefresh]);
-
+  const getCatList = () => {
+    fetchCategoriesList((res) => {
+      setCategories(res?.categoriesList ? res?.categoriesList : []);
+    });
+  };
   const getMyUserHomePosts = async () => {
     const mAnnouncementPosts = await getAnnouncementPosts();
     const mHomePosts = await getMyHomePosts();
@@ -96,7 +110,7 @@ const SearchScreen = ({ posts, getProfile }) => {
       announcementList = [announcementList[0]];
     }
     const mFinalList = [...announcementList, ...compList];
-    // console.log("ggggg - > ", JSON.stringify(mFinalList));
+    console.log("getMyUserHomePosts----- > ", mFinalList?.length);
     setTimeout(() => {
       setHomePosts(mFinalList);
       setUpdate(!isUpdate);
@@ -132,7 +146,6 @@ const SearchScreen = ({ posts, getProfile }) => {
         getMyUserHomePosts();
       }}
       postReport={async (isReportCount) => {
-        console.log("called");
         if (isReportCount == 2) {
           await blockUsers(item.author.userId);
           getMyUserHomePosts();
@@ -197,7 +210,6 @@ const SearchScreen = ({ posts, getProfile }) => {
       </ReactNativeModal>
     );
   };
-
   return (
     <View>
       <CustomHeader
@@ -205,8 +217,22 @@ const SearchScreen = ({ posts, getProfile }) => {
         logo={AppImages.Common.appLogo}
         mainStyle={{ backgroundColor: AppColors.blue.royalBlue }}
       />
-
       <View style={styles.searchTopStyle}>
+        {/* {selectedCat ? (
+          <TouchableOpacity
+            activeOpacity={1}
+            style={styles.selectedCatCont}
+            onPress={() => {
+              setSelectedCat("");
+            }}
+          >
+            <Text style={styles.catName}>{selectedCat}</Text>
+            <Image
+              source={AppImages.Common.cross}
+              style={{ marginHorizontal: normalized(10) }}
+            />
+          </TouchableOpacity>
+        ) : ( */}
         <TextInput
           style={{
             flex: 1,
@@ -217,33 +243,50 @@ const SearchScreen = ({ posts, getProfile }) => {
           placeholder="Search in post..."
           placeholderTextColor={"gray"}
           value={searchTxt}
-          onChange={(txt) => {
+          onChangeText={(txt) => {
             let usersFiltersPost = [];
             homePosts.forEach((obj) => {
               if (
-                obj.searchTxt
-                  .toLowerCase()
-                  .includes(String(txt.nativeEvent.text).toLowerCase())
+                obj.searchTxt.toLowerCase().includes(String(txt).toLowerCase())
               ) {
                 usersFiltersPost.push(obj);
               }
             });
-            console.log("filter -- > ", usersFiltersPost?.length);
-            setFiltersPost(txt.nativeEvent.text == "" ? [] : usersFiltersPost);
+            setFiltersPost(txt == "" ? [] : usersFiltersPost);
             setSearchTxt(txt);
           }}
         />
+        {/* )} */}
       </View>
-
+      {/* {!searchTxt && !selectedCat ? (
+        <>
+          <Text style={styles.topTrendTxt}>Trending Topics</Text>
+          <FlatList
+            data={categories}
+            style={{ ...styles.list, backgroundColor: AppColors.white.white }}
+            keyExtractor={(index) => `${index}`}
+            renderItem={({ item, index }) => {
+              return (
+                <TouchableOpacity
+                  activeOpacity={1}
+                  style={styles.singleCatBtn}
+                  onPress={() => {
+                    setSelectedCat(item?.name);
+                  }}
+                >
+                  <LoadingImage
+                    source={{ uri: `${item?.icon}` }}
+                    style={styles.catIcon}
+                  />
+                  <Text style={styles.catName}>{item?.name}</Text>
+                </TouchableOpacity>
+              );
+            }}
+          />
+        </>
+      ) : ( */}
       <FlatList
-        style={{
-          backgroundColor: AppColors.white.lightSky,
-          marginBottom: normalized(170),
-          paddingHorizontal: 18,
-          paddingVertical: 10,
-          zIndex: 0,
-          height: "74%",
-        }}
+        style={styles.list}
         showsVerticalScrollIndicator={false}
         data={!searchPostVisible ? homePosts : filtersPost}
         refreshing={refreshing}
@@ -257,6 +300,7 @@ const SearchScreen = ({ posts, getProfile }) => {
         onRefresh={_handleRefresh}
         extraData={isUpdate}
       />
+      {/* )} */}
 
       <WrapperComponent />
     </View>
@@ -283,13 +327,68 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     height: 60,
     marginHorizontal: 18,
-    marginTop: Platform.OS == "android" ? 60 : 10,
+    marginTop: Platform.OS == "android" ? 20 : 10,
     marginBottom: 10,
     borderRadius: 5,
     borderWidth: 1,
     borderColor: "gray",
     alignItems: "center",
     paddingHorizontal: 12,
+  },
+  list: {
+    backgroundColor: AppColors.white.lightSky,
+    marginBottom: normalized(170),
+    paddingHorizontal: 18,
+    paddingVertical: 10,
+    zIndex: 0,
+    height: "75%",
+  },
+  singleCatBtn: {
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 6,
+    },
+    shadowOpacity: 0.37,
+    shadowRadius: 7.49,
+    elevation: 12,
+    height: normalized(40),
+    width: normalized(200),
+    backgroundColor: AppColors.white.white,
+    borderRadius: normalized(8),
+    marginVertical: normalized(10),
+    alignSelf: "center",
+  },
+  topTrendTxt: {
+    fontSize: normalized(16),
+    fontWeight: "500",
+    color: AppColors.grey.dark,
+    margin: AppHorizontalMargin,
+  },
+  catIcon: {
+    width: normalized(50),
+    height: normalized(40),
+    borderTopLeftRadius: normalized(8),
+    borderBottomLeftRadius: normalized(8),
+  },
+  catName: {
+    marginStart: normalized(10),
+    textAlign: "center",
+    color: AppColors.black.black,
+    fontSize: normalized(14),
+    fontWeight: "400",
+  },
+  selectedCatCont: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: AppColors.white.simpleLight,
+    height: normalized(40),
+    paddingHorizontal: normalized(5),
+    borderRadius: normalized(5),
   },
 });
 

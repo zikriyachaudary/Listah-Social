@@ -138,6 +138,8 @@ export const AppImages = {
     books: require("../assets/images/Common/books.jpeg"),
     electronic: require("../assets/images/Common/electronic.jpeg"),
     other: require("../assets/images/Common/other.jpeg"),
+    cross: require("../assets/images/Common/cross.png"),
+    listahIcon: require("../assets/images/Common/listahIcon.jpeg"),
   },
   profile: {
     logout: require("../assets/images/logout.png"),
@@ -155,6 +157,44 @@ export const AppImages = {
 export const topicsDummyData = [
   {
     id: 1,
-    title: "Topics coming soon",
+    name: "Topics coming soon",
   },
 ];
+
+// export const categoriesArr = [
+//   {
+//     id: 1,
+//     name: "Shows & Movies",
+//     icon: "https://firebasestorage.googleapis.com/v0/b/listah-ae13c.appspot.com/o/categories%2Fmovie.jpeg?alt=media&token=f7a28ca3-2279-4f89-b2e2-17971b6fd653",
+//   },
+//   {
+//     id: 2,
+//     name: "Sports",
+//     icon: "https://firebasestorage.googleapis.com/v0/b/listah-ae13c.appspot.com/o/categories%2Fsports.jpeg?alt=media&token=ded58b34-c192-4870-a21f-e16bab53a269",
+//   },
+//   {
+//     id: 3,
+//     name: "Electronics & Tech",
+//     icon: "https://firebasestorage.googleapis.com/v0/b/listah-ae13c.appspot.com/o/categories%2Felectronic.jpeg?alt=media&token=18dc48ee-09c8-4eb1-b25a-b2c66d363b20",
+//   },
+//   {
+//     id: 4,
+//     name: "Books & Literature",
+//     icon: "https://firebasestorage.googleapis.com/v0/b/listah-ae13c.appspot.com/o/categories%2Fbooks.jpeg?alt=media&token=cd27b96c-2ad5-4c1c-bb6e-cd25bbffa96a",
+//   },
+//   {
+//     id: 5,
+//     name: "Food & Drinks",
+//     icon: "https://firebasestorage.googleapis.com/v0/b/listah-ae13c.appspot.com/o/categories%2Fbooks.jpeg?alt=media&token=cd27b96c-2ad5-4c1c-bb6e-cd25bbffa96a",
+//   },
+//   {
+//     id: 6,
+//     name: "Fashion & Beauty",
+//     icon: "https://firebasestorage.googleapis.com/v0/b/listah-ae13c.appspot.com/o/categories%2Fbeauty.jpeg?alt=media&token=d7c71a71-8e2b-41dd-8b77-13f1f717939f",
+//   },
+//   {
+//     id: 7,
+//     name: "Other",
+//     icon: "https://firebasestorage.googleapis.com/v0/b/listah-ae13c.appspot.com/o/categories%2Fother.jpeg?alt=media&token=ae5d118c-5cc6-4cf8-9d9a-5f9118ad97c6",
+//   },
+// ];
