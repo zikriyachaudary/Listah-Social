@@ -1,9 +1,11 @@
 import {
   SET_ALL_USER_FCM,
+  SET_CATEGORIES_LIST,
   SET_IS_UN_READED,
   SET_PUSH_NOTI,
   SET_SHOW_SPLASH,
   SET_UPDATE_FB_TOKEN,
+  SET_APP_LOADER,
 } from "./action/types";
 
 const initialState = {
@@ -12,6 +14,8 @@ const initialState = {
   push_Noti: null,
   isShowSplash: true,
   isUnReaded: false,
+  categoriesList: [],
+  isLoaderStart: false,
 };
 const SliceReducer = (state = initialState, action) => {
   switch (action.type) {
@@ -40,6 +44,16 @@ const SliceReducer = (state = initialState, action) => {
       return {
         ...state,
         isUnReaded: action.data,
+      };
+    case SET_CATEGORIES_LIST:
+      return {
+        ...state,
+        categoriesList: action.data,
+      };
+    case SET_APP_LOADER:
+      return {
+        ...state,
+        isLoaderStart: action.data,
       };
     default:
       return state;

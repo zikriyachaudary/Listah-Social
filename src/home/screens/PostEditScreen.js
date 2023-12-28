@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { connect } from "react-redux";
+import { connect, useDispatch, useSelector } from "react-redux";
 import * as yup from "yup";
 import { StyleSheet } from "react-native";
 import FastImage from "react-native-fast-image";
@@ -25,13 +25,19 @@ import { useEffect } from "react";
 import TextInputComponent from "../../common/TextInputComponent";
 import { useIsFocused } from "@react-navigation/native";
 import { AppHorizontalMargin } from "../../util/AppConstant";
+import CustomDropDown from "../../common/CustomDropDown";
+import { fetchPostData } from "../../network/Services/ProfileServices";
 
 /* =============================================================================
 <PostEditScreen />
 ============================================================================= */
 const PostEditScreen = ({ navigation, updatePost, route }) => {
   const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
+  const selector = useSelector((AppState) => AppState);
   const [title, setTitle] = useState("");
+  const [selectedcategory, setSelectedCategory] = useState("");
+  const [categoryError, setCategoryError] = useState("");
   const isFocused = useIsFocused();
   const [titleError, setTitleError] = useState("");
   const [initialValues, setInitialValues] = useState({
@@ -46,23 +52,41 @@ const PostEditScreen = ({ navigation, updatePost, route }) => {
     });
   };
   useEffect(() => {
-    if (isFocused && route.params.post) {
-      setTitle(route.params.post?.title);
+    if (isFocused) {
+      initialFun();
     }
   }, [isFocused]);
-
+  const initialFun = async () => {
+    let data = null;
+    await fetchPostData(route.params.post?.id, (res) => {
+      data = res;
+    });
+    if (data) {
+      setSelectedCategory(data?.category ? data?.category : "");
+      setTitle(data?.title);
+      setInitialValues({
+        items: data?.items,
+      });
+    }
+  };
   const _handleRemove = (arrayHelpers, index) => arrayHelpers.remove(index);
 
   const _handleSubmit = async (values) => {
+    if (selectedcategory == "") {
+      setCategoryError("Please select Category");
+      return;
+    }
     let obj = {
       ...values,
       title: title,
       author: route.params.post?.author,
       id: route?.params?.id,
+      category: selectedcategory,
     };
     setLoading(true);
     await updatePost(obj);
     setLoading(false);
+
     if (route?.params?.postRefresh) {
       route.params.postRefresh();
     }
@@ -83,6 +107,19 @@ const PostEditScreen = ({ navigation, updatePost, route }) => {
         }}
         placeholder="What's your List Title..."
         error={titleError}
+      />
+      <CustomDropDown
+        dropDownStyle={{
+          marginVertical: 10,
+        }}
+        placeHolder={"Select Category"}
+        atSelect={(val) => {
+          setSelectedCategory(val?.name);
+          setCategoryError("");
+        }}
+        selected={selectedcategory?.name || selectedcategory}
+        list={selector?.sliceReducer?.categoriesList}
+        error={categoryError}
       />
       <Formik
         initialValues={initialValues}

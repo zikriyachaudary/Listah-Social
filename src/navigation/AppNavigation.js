@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { connect, useDispatch, useSelector } from "react-redux";
-import { Platform, SafeAreaView, StatusBar } from "react-native";
+import { Platform, SafeAreaView, ActivityIndicator } from "react-native";
 import FirebaseAuth from "@react-native-firebase/auth";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -22,14 +22,16 @@ import {
   setDraftPost,
   setIsAlertShow,
   setPushNotifi,
+  setCategoriesInRed,
 } from "../redux/action/AppLogics";
 import AlertModal from "../common/AlertModal";
 import LocalNotification from "../common/LocalNotification";
 import useNotificationManger from "../hooks/useNotificationManger";
 import { Notification_Types } from "../util/Strings";
 import { navigate, navigationRef } from "./RootNavigation";
+import { fetchCategoriesList } from "../network/Services/ProfileServices";
 import RNSplashScreen from "../auth/screens/SplashScreen";
-import { AppColors } from "../util/AppConstant";
+import { AppLoader } from "../common/AppLoader";
 const Stack = createNativeStackNavigator();
 
 /* =============================================================================
@@ -203,6 +205,11 @@ const AppNavigation = ({ changeAuthState, getProfile, authenticated }) => {
   ////--------------------------------->
 
   const onAppStart = async () => {
+    await fetchCategoriesList((res) => {
+      dispatch(
+        setCategoriesInRed(res?.categoriesList ? res?.categoriesList : [])
+      );
+    });
     let draftPost = await getUserDraftPost();
     if (draftPost?.length > 0) {
       dispatch(setDraftPost(draftPost));
@@ -246,6 +253,35 @@ const AppNavigation = ({ changeAuthState, getProfile, authenticated }) => {
         )}
       </Stack.Navigator>
 
+      {selector?.sliceReducer?.isLoaderStart ? (
+        <View
+          style={{
+            backgroundColor: "rgba(0,0,0, 0.2)",
+            justifyContent: "center",
+            alignItems: "center",
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            elevation: 3,
+            zIndex: 100,
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: "white",
+              width: 80,
+              height: 80,
+              justifyContent: "center",
+              alignItems: "center",
+              borderRadius: 10,
+            }}
+          >
+            <ActivityIndicator size="large" color={"#544be3"} />
+          </View>
+        </View>
+      ) : null}
       {selector?.DraftPost?.isAlertShow?.value ? (
         <AlertModal
           visible={selector?.DraftPost?.isAlertShow?.value}
@@ -255,6 +291,7 @@ const AppNavigation = ({ changeAuthState, getProfile, authenticated }) => {
           message={selector?.DraftPost?.isAlertShow?.message}
         />
       ) : null}
+
       {selector?.sliceReducer?.push_Noti ? (
         <View
           style={{

@@ -409,8 +409,14 @@ export const createAnnouncementPost =
   (postContent, onComplete) => async (dispatch) => {
     try {
       dispatch({ type: constants.CREATE_POST.REQUEST });
-      const { title, description, items, order, isNumberShowInItems } =
-        postContent;
+      const {
+        title,
+        description,
+        items,
+        order,
+        isNumberShowInItems,
+        category,
+      } = postContent;
       const postId = Date.now();
       const authorId = FireAuth().currentUser.uid;
 
@@ -425,6 +431,7 @@ export const createAnnouncementPost =
         comments: [],
         likedUsers: [],
         author: authorId,
+        category,
         announcement: true,
         createdAt: FireStore.FieldValue.serverTimestamp(),
       };
@@ -493,9 +500,9 @@ export const createAnnouncementPost =
 export const createPost = (postContent) => async (dispatch) => {
   try {
     dispatch({ type: constants.CREATE_POST.REQUEST });
-    const { title, description, items, order, isNumberShowInItems } =
+    const { title, description, items, order, isNumberShowInItems, category } =
       postContent;
-    const postId = Date.now();
+    const postId = String(Date.now());
     const authorId = FireAuth().currentUser.uid;
 
     const post = {
@@ -509,6 +516,7 @@ export const createPost = (postContent) => async (dispatch) => {
       comments: [],
       likedUsers: [],
       author: authorId,
+      category,
       createdAt: FireStore.FieldValue.serverTimestamp(),
     };
 
@@ -544,7 +552,6 @@ export const createPost = (postContent) => async (dispatch) => {
     }
 
     await PostsCollection.doc(`${postId}`).set(post);
-
     const createdPost = await (await PostsCollection.doc(postId).get()).data();
     const postAuthor = await (
       await ProfilesCollection.doc(createdPost?.author).get()
@@ -733,6 +740,7 @@ export const updatePost = (changes) => async (dispatch) => {
     const updatedPost = await (
       await PostsCollection.doc(changes?.id.toString()).get()
     ).data();
+
     const postAuthor = await (
       await ProfilesCollection.doc(updatedPost?.author).get()
     ).data();

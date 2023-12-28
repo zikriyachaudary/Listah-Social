@@ -3,6 +3,7 @@ export const Collections = {
   profile: "profiles",
   NOTIFICATION: "Notifications",
   CATEGORIES: "Categories",
+  POST: "posts",
 };
 
 export const RequestStatus = {

@@ -32,17 +32,16 @@ import * as Colors from "../../config/colors";
 import Modal, { ReactNativeModal } from "react-native-modal";
 import { UPDATE_CHALLENGE_FEATURE } from "../../suggestion/redux/constants";
 import FastImage from "react-native-fast-image";
-import {
-  AppColors,
-  AppImages,
-  normalized,
-  topicsDummyData,
-} from "../../util/AppConstant";
+import { AppColors, AppImages, normalized } from "../../util/AppConstant";
 import CustomHeader from "../../common/CommonHeader";
 import TopicsComp from "../components/TopicsComp";
 import HomeTopBar from "../components/HomeTopBar";
 import ProfileFollowersListModal from "../components/HomeHeaderProfileInfo/ProfileFollowersListModal";
-import { fetchCategoriesList } from "../../network/Services/ProfileServices";
+import {
+  filterPostReq,
+  updateCategiesList,
+} from "../../network/Services/ProfileServices";
+import { setIsAppLoader } from "../../redux/action/AppLogics";
 
 /* =============================================================================
 <HomeScreen />
@@ -50,12 +49,13 @@ import { fetchCategoriesList } from "../../network/Services/ProfileServices";
 
 const HomeScreen = ({ posts, getProfile }) => {
   const selector = useSelector((AppState) => AppState);
+  const dispatch = useDispatch();
   const [followerModal, setFollowerModal] = useState(false);
   const [loaderVisible, setLoaderVisible] = useState(true);
   const profileData = selector?.Profile?.profile;
   const [searchPostVisible, setSearchPostVisible] = useState(false);
-  const [categories, setCategories] = useState([]);
   const [selectedCat, setSelectedCat] = useState(null);
+  const [filterByCatList, setFilterByCat] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const navigation = useNavigation();
   // const [radioButtons, setRadioButtons] = useState([
@@ -87,16 +87,9 @@ const HomeScreen = ({ posts, getProfile }) => {
     // setIsFilterPopup(true);
     setLoaderVisible(true);
     getMyUserHomePosts();
-    // getHomePosts();
-    getCatList();
     getProfile();
   }, [selector.Home.updateHomeData]);
 
-  const getCatList = () => {
-    fetchCategoriesList((res) => {
-      setCategories(res?.categoriesList ? res?.categoriesList : []);
-    });
-  };
   useEffect(() => {
     setLoaderVisible(true);
     getMyUserHomePosts();
@@ -137,7 +130,6 @@ const HomeScreen = ({ posts, getProfile }) => {
       announcementList = [announcementList[0]];
     }
     const mFinalList = [...announcementList, ...compList];
-    // console.log("ggggg - > ", JSON.stringify(mFinalList));
     setTimeout(() => {
       setHomePosts(mFinalList);
       setUpdate(!isUpdate);
@@ -150,56 +142,70 @@ const HomeScreen = ({ posts, getProfile }) => {
       // refreshHomePosts(posts[posts.length - 1]);
     }
   };
-  const _handleRefresh = () => {
-    console.log("callinf -- > ");
-    setRefreshing(true);
-    getMyUserHomePosts();
-    // getHomePosts();
+  const _handleRefresh = async () => {
+    if (selectedCat?.name) {
+      setRefreshing(true);
+      await filterPostReq(selectedCat?.name, (res) => {
+        setFilterByCat(res);
+      });
+    } else {
+      setRefreshing(true);
+      getMyUserHomePosts();
+    }
   };
-  const renderItem = ({ item, index }) => (
-    <PostItem
-      id={item.id}
-      post={item}
-      postIndex={index}
-      showIndex={toggleCheckBox}
-      postRefresh={() => {
-        setLoaderVisible(true);
-        getMyUserHomePosts();
-      }}
-      postDel={() => {
-        getMyUserHomePosts();
-      }}
-      postReport={async (isReportCount) => {
-        console.log("called");
-        if (isReportCount == 2) {
-          await blockUsers(item.author.userId);
+  const renderItem = ({ item, index }) => {
+    return (
+      <PostItem
+        id={item.id}
+        post={item}
+        postIndex={index}
+        showIndex={toggleCheckBox}
+        postRefresh={() => {
+          setLoaderVisible(true);
           getMyUserHomePosts();
-        } else {
-          reportPostItem = item;
-          setReportPostModal(true);
-          navigation.navigate("ReportPost", {
-            post: item,
-            isReportCount: isReportCount,
-          });
-        }
-      }}
-    />
-  );
+        }}
+        postDel={() => {
+          getMyUserHomePosts();
+        }}
+        postReport={async (isReportCount) => {
+          console.log("called");
+          if (isReportCount == 2) {
+            await blockUsers(item.author.userId);
+            getMyUserHomePosts();
+          } else {
+            reportPostItem = item;
+            setReportPostModal(true);
+            navigation.navigate("ReportPost", {
+              post: item,
+              isReportCount: isReportCount,
+            });
+          }
+        }}
+      />
+    );
+  };
+
   useIsFocused();
   const emptyComponent = () => {
+    let noPostFound = selectedCat?.name
+      ? filterByCatList?.length == 0
+      : homePosts?.length == 0;
     return (
       <View style={styles.container}>
-        {loaderVisible ? (
-          <ActivityIndicator size="large" color={Colors.primary} />
-        ) : (
-          homePosts.length == 0 && (
-            <Text sm center>
-              Nothing to show yet
-            </Text>
+        {
+          loaderVisible && !selectedCat?.name ? (
+            <ActivityIndicator size="large" color={Colors.primary} />
+          ) : (
+            noPostFound &&
+            !selector?.sliceReducer?.isLoaderStart && (
+              <Text sm center>
+                Nothing to show yet
+              </Text>
+            )
           )
 
           // homePosts.length == 0 && <Text sm center>You don't have any followers. follow people to see there posts</Text>
-        )}
+        }
       </View>
     );
   };
@@ -334,10 +340,21 @@ const HomeScreen = ({ posts, getProfile }) => {
       )}
 
       <TopicsComp
-        topicsList={topicsDummyData}
+        topicsList={selector?.sliceReducer?.categoriesList}
         selectedCat={selectedCat}
-        setSelectedCat={(val) => {
+        setSelectedCat={async (val) => {
           setSelectedCat(val);
+          if (val?.name) {
+            dispatch(setIsAppLoader(true));
+            await filterPostReq(val?.name, (res) => {
+              setFilterByCat(res);
+              setTimeout(() => {
+                dispatch(setIsAppLoader(false));
+              }, 2000);
+            });
+          } else {
+            await getMyUserHomePosts();
+          }
         }}
       />
       <HomeTopBar
@@ -362,7 +379,7 @@ const HomeScreen = ({ posts, getProfile }) => {
           flex: 1,
         }}
         showsVerticalScrollIndicator={false}
-        data={!searchPostVisible ? homePosts : filtersPost}
+        data={selectedCat?.name ? filterByCatList : homePosts}
         refreshing={refreshing}
         renderItem={renderItem}
         keyExtractor={(item, index) => {

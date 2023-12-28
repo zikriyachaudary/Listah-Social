@@ -18,7 +18,7 @@ const TopicsComp = (props) => {
       horizontal
       showsHorizontalScrollIndicator={false}
     >
-      {props?.topicsList.map((el) => {
+      {props?.topicsList.map((el, index) => {
         return (
           <TouchableOpacity
             activeOpacity={1}
@@ -28,13 +28,14 @@ const TopicsComp = (props) => {
                 props?.selectedCat?.id == el?.id
                   ? AppColors.white.white
                   : "#322988",
+              marginEnd: index == props?.topicsList?.length - 1 ? 20 : 0,
             }}
             onPress={() => {
-              // if (props?.selectedCat?.id == el?.id) {
-              //   props?.setSelectedCat(null);
-              // } else {
-              //   props?.setSelectedCat(el);
-              // }
+              if (props?.selectedCat?.id == el?.id) {
+                props?.setSelectedCat(null);
+              } else {
+                props?.setSelectedCat(el);
+              }
             }}
           >
             <Text

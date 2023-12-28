@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { connect, useDispatch, useSelector } from "react-redux";
 import { StyleSheet, TouchableWithoutFeedback } from "react-native";
 
@@ -34,8 +34,11 @@ const AllUsersListItem = ({
   const userProfileImage = user?.profileImage;
   const dispatch = useDispatch();
   const selector = useSelector((AppState) => AppState);
-  const isFollowed = userFollowings?.find((user) => user?.userId === userId);
-
+  // const isFollowed = userFollowings?.find((user) => user?.userId === userId);
+  const [isFollowed, setIsFollowed] = useState(false);
+  useEffect(() => {
+    setIsFollowed(userFollowings?.find((user) => user?.userId === userId));
+  }, [userFollowings]);
   const navigation = useNavigation();
   const _handleFollowPress = async () => {
     setLoading(true);
@@ -43,9 +46,13 @@ const AllUsersListItem = ({
       actionType: Notification_Types.follow,
       reciverId: userId,
     });
-    await followUser(userId);
+    await followUser(userId, (res) => {
+      console.log("res------>", res);
+      if (res?.status) {
+        setIsFollowed(true);
+      }
+    });
     dispatch(updateHomeData(!selector.Home.updateHomeData));
-
     setLoading(false);
   };
   const postRefresh = () => {
@@ -58,7 +65,11 @@ const AllUsersListItem = ({
       actionType: Notification_Types.unFollow,
       reciverId: userId,
     });
-    await unFollowUser(userId);
+    await unFollowUser(userId, (res) => {
+      if (res?.status) {
+        setIsFollowed(false);
+      }
+    });
     dispatch(updateHomeData(!selector.Home.updateHomeData));
     setLoading(false);
     // }

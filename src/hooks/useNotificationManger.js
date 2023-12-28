@@ -80,55 +80,53 @@ const useNotificationManger = (props) => {
         if (obj?.actionType == Notification_Types.follow && res?.fcmToken) {
           await unReadedMessageFun(obj?.reciverId?.toString());
         }
-        completeNotiList = res?.notification_List;
+        completeNotiList =
+          res?.notification_List?.length > 0 ? res?.notification_List : [];
       }
+
+      if (!updatedReciverData?.userId) {
+        return;
+      }
+
+      let newObj = {
+        reciverId: obj?.reciverId,
+        message: `${selector?.Profile?.profile?.username} ${Notification_Messages.followMsg}`,
+        actionType: obj?.actionType,
+        sender: sender,
+        extraData: null,
+      };
+      let newArr = [];
+      if (obj?.actionType == Notification_Types.follow) {
+        newArr = [...completeNotiList, newObj];
+      } else {
+        completeNotiList.map((el) => {
+          if (
+            el?.actionType == Notification_Types.follow &&
+            el?.sender?.id == newObj?.sender?.id
+          ) {
+            console.log("el------>", el);
+          } else {
+            newArr.push(el);
+          }
+        });
+      }
+
+      await firestore()
+        .collection(Collections.NOTIFICATION)
+        .doc(obj?.reciverId)
+        .update({ notification_List: newArr })
+        .then(() => {
+          if (
+            obj?.actionType == Notification_Types.follow &&
+            updatedReciverData?.fcmToken
+          ) {
+            sendPushNoti(newObj, updatedReciverData?.fcmToken);
+          }
+        })
+        .catch((error) => {
+          console.error("Error updating array value:", error);
+        });
     });
-
-    if (!updatedReciverData?.userId) {
-      return;
-    }
-
-    let newObj = {
-      reciverId: obj?.reciverId,
-      message: `${selector?.Profile?.profile?.username} ${Notification_Messages.followMsg}`,
-      actionType: obj?.actionType,
-      sender: sender,
-      extraData: null,
-    };
-    let newArr = [];
-    if (obj?.actionType == Notification_Types.follow) {
-      newArr = [...completeNotiList, newObj];
-    } else {
-      completeNotiList.map((el) => {
-        if (
-          el?.actionType != Notification_Types.follow &&
-          el?.actionType != Notification_Types.unFollow
-        ) {
-          newArr.push(el);
-        } else if (
-          el?.reciverId != obj?.reciverId?.toString() &&
-          el?.actionType != Notification_Types.follow
-        ) {
-          newArr.push(el);
-        }
-      });
-    }
-
-    await firestore()
-      .collection(Collections.NOTIFICATION)
-      .doc(obj?.reciverId)
-      .update({ notification_List: newArr })
-      .then(() => {
-        if (
-          obj?.actionType == Notification_Types.follow &&
-          updatedReciverData?.fcmToken
-        ) {
-          sendPushNoti(newObj, updatedReciverData?.fcmToken);
-        }
-      })
-      .catch((error) => {
-        console.error("Error updating array value:", error);
-      });
   };
   const likeNUnLikePost = async (obj) => {
     let updatedReciverData = null;
@@ -144,55 +142,53 @@ const useNotificationManger = (props) => {
         if (obj?.actionType == Notification_Types.like && res?.fcmToken) {
           await unReadedMessageFun(obj?.reciverId?.toString());
         }
-        completeNotiList = res?.notification_List;
+        completeNotiList = res?.notification_List ? res?.notification_List : [];
       }
+
+      if (!updatedReciverData?.userId) {
+        return;
+      }
+
+      let newObj = {
+        reciverId: obj?.reciverId,
+        message: `${selector?.Profile?.profile?.username} ${Notification_Messages.likeMsg}`,
+        actionType: obj?.actionType,
+        sender: sender,
+        extraData: obj?.extraData,
+      };
+      let newArr = [];
+      if (obj?.actionType == Notification_Types.like) {
+        newArr = [...completeNotiList, newObj];
+      } else {
+        completeNotiList.map((el) => {
+          if (
+            el?.actionType == Notification_Types.like &&
+            el?.sender?.id == newObj?.sender?.id &&
+            el?.extraData?.postId == obj?.extraData?.postId
+          ) {
+            console.log("el------>", el);
+          } else {
+            newArr.push(el);
+          }
+        });
+      }
+
+      await firestore()
+        .collection(Collections.NOTIFICATION)
+        .doc(obj?.reciverId)
+        .update({ notification_List: newArr })
+        .then(() => {
+          if (
+            obj?.actionType == Notification_Types.like &&
+            updatedReciverData?.fcmToken
+          ) {
+            sendPushNoti(newObj, updatedReciverData?.fcmToken);
+          }
+        })
+        .catch((error) => {
+          console.error("Error updating array value:", error);
+        });
     });
-
-    if (!updatedReciverData?.userId) {
-      return;
-    }
-
-    let newObj = {
-      reciverId: obj?.reciverId,
-      message: `${selector?.Profile?.profile?.username} ${Notification_Messages.likeMsg}`,
-      actionType: obj?.actionType,
-      sender: sender,
-      extraData: obj?.extraData,
-    };
-    let newArr = [];
-    if (obj?.actionType == Notification_Types.like) {
-      newArr = [...completeNotiList, newObj];
-    } else {
-      completeNotiList.map((el) => {
-        if (
-          el?.actionType != Notification_Types.like &&
-          el?.actionType != Notification_Types.unlike
-        ) {
-          newArr.push(el);
-        } else if (
-          el?.reciverId != obj?.reciverId &&
-          el?.extraData?.postId != obj?.extraData?.postId
-        ) {
-          newArr.push(el);
-        }
-      });
-    }
-
-    await firestore()
-      .collection(Collections.NOTIFICATION)
-      .doc(obj?.reciverId)
-      .update({ notification_List: newArr })
-      .then(() => {
-        if (
-          obj?.actionType == Notification_Types.like &&
-          updatedReciverData?.fcmToken
-        ) {
-          sendPushNoti(newObj, updatedReciverData?.fcmToken);
-        }
-      })
-      .catch((error) => {
-        console.error("Error updating array value:", error);
-      });
   };
   const suggestionAtPost = async (obj) => {
     let updatedReciverData = null;
@@ -210,33 +206,33 @@ const useNotificationManger = (props) => {
         }
         completeNotiList = res?.notification_List;
       }
+
+      if (!updatedReciverData?.userId) {
+        return;
+      }
+      let newObj = {
+        reciverId: obj?.reciverId,
+        message: `${selector?.Profile?.profile?.username} ${Notification_Messages.suggestion}`,
+        actionType: obj?.actionType,
+        sender: sender,
+        extraData: obj?.extraData,
+      };
+      let newArr = [];
+      newArr = [...completeNotiList, newObj];
+
+      await firestore()
+        .collection(Collections.NOTIFICATION)
+        .doc(obj?.reciverId)
+        .update({ notification_List: newArr })
+        .then(() => {
+          if (updatedReciverData?.fcmToken) {
+            sendPushNoti(newObj, updatedReciverData?.fcmToken);
+          }
+        })
+        .catch((error) => {
+          console.error("Error updating array value:", error);
+        });
     });
-
-    if (!updatedReciverData?.userId) {
-      return;
-    }
-    let newObj = {
-      reciverId: obj?.reciverId,
-      message: `${selector?.Profile?.profile?.username} ${Notification_Messages.suggestion}`,
-      actionType: obj?.actionType,
-      sender: sender,
-      extraData: obj?.extraData,
-    };
-    let newArr = [];
-    newArr = [...completeNotiList, newObj];
-
-    await firestore()
-      .collection(Collections.NOTIFICATION)
-      .doc(obj?.reciverId)
-      .update({ notification_List: newArr })
-      .then(() => {
-        if (updatedReciverData?.fcmToken) {
-          sendPushNoti(newObj, updatedReciverData?.fcmToken);
-        }
-      })
-      .catch((error) => {
-        console.error("Error updating array value:", error);
-      });
   };
   const challengeAtPost = async (obj) => {
     let updatedReciverData = null;
@@ -254,32 +250,32 @@ const useNotificationManger = (props) => {
         }
         completeNotiList = res?.notification_List;
       }
-    });
-    if (!updatedReciverData?.userId) {
-      return;
-    }
-    let newObj = {
-      reciverId: obj?.reciverId,
-      message: `${selector?.Profile?.profile?.username} ${Notification_Messages.challenge}`,
-      actionType: obj?.actionType,
-      sender: sender,
-      extraData: obj?.extraData,
-    };
-    let newArr = [];
-    newArr = [...completeNotiList, newObj];
+      if (!updatedReciverData?.userId) {
+        return;
+      }
+      let newObj = {
+        reciverId: obj?.reciverId,
+        message: `${selector?.Profile?.profile?.username} ${Notification_Messages.challenge}`,
+        actionType: obj?.actionType,
+        sender: sender,
+        extraData: obj?.extraData,
+      };
+      let newArr = [];
+      newArr = [...completeNotiList, newObj];
 
-    await firestore()
-      .collection(Collections.NOTIFICATION)
-      .doc(obj?.reciverId)
-      .update({ notification_List: newArr })
-      .then(() => {
-        if (updatedReciverData?.fcmToken) {
-          sendPushNoti(newObj, updatedReciverData?.fcmToken);
-        }
-      })
-      .catch((error) => {
-        console.error("Error updating array value:", error);
-      });
+      await firestore()
+        .collection(Collections.NOTIFICATION)
+        .doc(obj?.reciverId)
+        .update({ notification_List: newArr })
+        .then(() => {
+          if (updatedReciverData?.fcmToken) {
+            sendPushNoti(newObj, updatedReciverData?.fcmToken);
+          }
+        })
+        .catch((error) => {
+          console.error("Error updating array value:", error);
+        });
+    });
   };
   const commentPostNoti = async (obj) => {
     let updatedReciverData = null;
@@ -297,33 +293,32 @@ const useNotificationManger = (props) => {
         }
         completeNotiList = res?.notification_List;
       }
+      if (!updatedReciverData?.userId) {
+        return;
+      }
+      let newObj = {
+        reciverId: obj?.reciverId,
+        message: `${selector?.Profile?.profile?.username} ${Notification_Messages.comment}`,
+        actionType: obj?.actionType,
+        sender: sender,
+        extraData: obj?.extraData,
+      };
+      let newArr = [];
+      newArr = [...completeNotiList, newObj];
+
+      await firestore()
+        .collection(Collections.NOTIFICATION)
+        .doc(obj?.reciverId)
+        .update({ notification_List: newArr })
+        .then(() => {
+          if (updatedReciverData?.fcmToken) {
+            sendPushNoti(newObj, updatedReciverData?.fcmToken);
+          }
+        })
+        .catch((error) => {
+          console.error("Error updating array value:", error);
+        });
     });
-
-    if (!updatedReciverData?.userId) {
-      return;
-    }
-    let newObj = {
-      reciverId: obj?.reciverId,
-      message: `${selector?.Profile?.profile?.username} ${Notification_Messages.comment}`,
-      actionType: obj?.actionType,
-      sender: sender,
-      extraData: obj?.extraData,
-    };
-    let newArr = [];
-    newArr = [...completeNotiList, newObj];
-
-    await firestore()
-      .collection(Collections.NOTIFICATION)
-      .doc(obj?.reciverId)
-      .update({ notification_List: newArr })
-      .then(() => {
-        if (updatedReciverData?.fcmToken) {
-          sendPushNoti(newObj, updatedReciverData?.fcmToken);
-        }
-      })
-      .catch((error) => {
-        console.error("Error updating array value:", error);
-      });
   };
   const sendPushNoti = async (obj, fcmToken) => {
     let title = selector?.Profile?.profile?.username;

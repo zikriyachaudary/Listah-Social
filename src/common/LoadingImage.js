@@ -30,26 +30,9 @@ const LoadingImage = (props) => {
         alignItems: "center",
       }}
     >
-      {/* <Image
-        onLoadStart={() => setLoading(true)}
-        onLoadEnd={() => setLoading(false)}
-        onError={() => {
-          setLoading(false);
-          if (props.placeHolder) {
-            setSource(props.placeHolder);
-          }
-        }}
-        source={src}
-        style={{
-          ...props.style,
-          borderWidth: 0,
-          borderRadius: 0,
-        }}
-      /> */}
-
       <TouchableWithoutFeedback
         onPress={() => {
-          if (!selector.Home.showFullImage) {
+          if (!selector.Home.showFullImage && !props?.isDisable) {
             dispatch(setFullImageLink(src));
             dispatch(showFullImage(true));
           }

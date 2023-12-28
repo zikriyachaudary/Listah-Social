@@ -17,7 +17,6 @@ import {
   Container,
   TextInput,
   Touchable,
-  StackHeader,
   ImagePickerButton,
   Text,
 } from "../../common";
@@ -25,6 +24,7 @@ import DeleteIcon from "../../assets/icons/edit-trash-icon.svg";
 import AddIcon from "../../assets/icons/edit-plus-square.svg";
 import { useToast } from "react-native-toast-notifications";
 import { createPost as createPostAction } from "../redux/actions";
+import { updatePost as updatePostAction } from "../redux/actions";
 import { createAnnouncementPost as createAnnouncementPostAction } from "../redux/actions";
 import { RadioGroup } from "react-native-radio-buttons-group";
 import CheckBox from "@react-native-community/checkbox";
@@ -41,6 +41,7 @@ import { useIsFocused } from "@react-navigation/native";
 import TextInputComponent from "../../common/TextInputComponent";
 import {
   AppColors,
+  AppHorizontalMargin,
   AppImages,
   ScreenSize,
   hv,
@@ -48,19 +49,24 @@ import {
 } from "../../util/AppConstant";
 import useNotificationManger from "../../hooks/useNotificationManger";
 import CustomHeader from "../../common/CommonHeader";
+import CustomDropDown from "../../common/CustomDropDown";
+import { fetchPostData } from "../../network/Services/ProfileServices";
+import LoadingImage from "../../common/LoadingImage";
 
 /* =============================================================================
 <PostCreateScreen />
 ============================================================================= */
 const PostCreateScreen = ({
   navigation,
-  loading,
   createPost,
   route,
   createAnnouncementPost,
+  updatePost,
 }) => {
   const { generateMultiplePushNotification, userSubscribed } =
     useNotificationManger();
+  const [selectedcategory, setSelectedCategory] = useState("");
+  const [categoryError, setCategoryError] = useState("");
   const dispatch = useDispatch();
   const selector = useSelector((AppState) => AppState);
   const [title, setTitle] = useState("");
@@ -124,8 +130,21 @@ const PostCreateScreen = ({
 
   useEffect(() => {
     formikRef.current?.resetForm();
-    let data = route?.params?.data;
-    if (isFocused && route?.params?.isEdit && data) {
+    if (isFocused && route?.params?.isEdit) {
+      initialFun(route?.params?.data?.id);
+    }
+    return () => {
+      clearStates();
+    };
+  }, [isFocused]);
+
+  const initialFun = async (postId) => {
+    let data = null;
+    await fetchPostData(postId, (res) => {
+      data = res;
+    });
+    if (data) {
+      setSelectedCategory(data?.category ? data?.category : "");
       if (data?.isNumberShowInItems) {
         setToggleCheckBox(true);
       }
@@ -164,10 +183,8 @@ const PostCreateScreen = ({
       };
       setInitialValues(makeObj);
     }
-    return () => {
-      clearStates();
-    };
-  }, [isFocused]);
+  };
+
   const clearStates = () => {
     title2.current = "";
     des2.current = "";
@@ -183,10 +200,16 @@ const PostCreateScreen = ({
     });
     setTitle("");
     setDes("");
+    setSelectedCategory("");
   };
   useEffect(() => {
     const backAction = () => {
-      fetchCurrentStates();
+      if (route?.params?.from !== "EditPost") {
+        fetchCurrentStates();
+      } else {
+        navigation?.goBack();
+      }
+
       return true;
     };
     const backHandler = BackHandler.addEventListener(
@@ -278,26 +301,32 @@ const PostCreateScreen = ({
     }
   };
   const _handleSubmit = async (values, { resetForm }) => {
+    if (selectedcategory == "") {
+      setCategoryError("Please select Category");
+    }
     if (title == "") {
       setTitleError("!Empty Field");
     }
     if (des == "") {
       setDesError("!Empty Field");
     }
-    if (title?.length == 0 || des?.length == 0) {
+    if (
+      title?.length == 0 ||
+      des?.length == 0 ||
+      selectedcategory?.length == 0
+    ) {
       return;
     }
     setIsLoading(true);
-
     values["title"] = title;
     values["description"] = des;
     values["order"] = radioButtons.find((item) => item.selected).id;
     values["isNumberShowInItems"] = toggleCheckBox;
+    values["category"] = selectedcategory;
     if (route.params && route.params.isAnnouncement) {
       await createAnnouncementPost(values, async (response) => {
         if (response?.status) {
           let isUserFetch = false;
-
           await userSubscribed(selector?.Auth?.user?.uid, async (res) => {
             if (res?.length > 0 && !isUserFetch) {
               dispatch(setAllUserFCMToken(res));
@@ -312,6 +341,10 @@ const PostCreateScreen = ({
           });
         }
       });
+    } else if (route.params?.isEdit && route?.params?.data?.author?.userId) {
+      values["author"] = route?.params?.data?.author;
+      values["id"] = route?.params?.id;
+      await updatePost(values);
     } else {
       await createPost(values);
     }
@@ -363,23 +396,22 @@ const PostCreateScreen = ({
   const onPressRadioButton = (radioButtonsArray) => {
     setRadioButtons(radioButtonsArray);
   };
-
   return (
     <Container style={styles.content}>
       <CustomHeader
         atBackPress={() => {
-          fetchCurrentStates();
+          if (route?.params?.from !== "EditPost") {
+            fetchCurrentStates();
+          } else {
+            navigation.goBack();
+          }
         }}
         leftIcon={AppImages.Common.backArrow}
         isStatusBar={true}
         logo={AppImages.Common.appLogo}
         mainStyle={{ backgroundColor: AppColors.blue.royalBlue }}
       />
-      {/* <StackHeader
-        onLeftPress={() => {
-          fetchCurrentStates();
-        }}
-      /> */}
+
       <View style={{ marginVertical: hv(8) }} />
       <TextInputComponent
         mainContainer={{ marginHorizontal: normalized(15) }}
@@ -405,7 +437,20 @@ const PostCreateScreen = ({
         placeholder="Post description..."
         error={desError}
       />
-
+      <CustomDropDown
+        dropDownStyle={{
+          marginHorizontal: AppHorizontalMargin,
+          marginVertical: 10,
+        }}
+        placeHolder={"Select Category"}
+        atSelect={(val) => {
+          setSelectedCategory(val?.name);
+          setCategoryError("");
+        }}
+        selected={selectedcategory?.name || selectedcategory}
+        list={selector?.sliceReducer?.categoriesList}
+        error={categoryError}
+      />
       <Formik
         enableReinitialize={true}
         innerRef={formikRef}
@@ -418,7 +463,6 @@ const PostCreateScreen = ({
             name="items"
             render={(arrayHelpers, i) => {
               let isSelect = false;
-
               initialState.current = values;
               return (
                 <Content contentContainerStyle={styles.content}>
@@ -431,9 +475,19 @@ const PostCreateScreen = ({
                             style={styles.dynamicFieldContainer}
                           >
                             {item?.image && item.image !== "a" ? (
-                              <FastImage
+                              //   <FastImage
+                              //     style={styles.img}
+                              //     source={item?.image}
+                              // />
+
+                              <LoadingImage
+                                isDisable={true}
+                                source={
+                                  item?.image?.base64
+                                    ? item?.image
+                                    : { uri: item?.image }
+                                }
                                 style={styles.img}
-                                source={item?.image}
                               />
                             ) : (
                               <ImagePickerButton
@@ -705,6 +759,7 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = {
   createPost: createPostAction,
   createAnnouncementPost: createAnnouncementPostAction,
+  updatePost: updatePostAction,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(PostCreateScreen);

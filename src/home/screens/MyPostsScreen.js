@@ -128,9 +128,12 @@ const MyPostsScreen = ({ profile, route, unFollowUser, followUser }) => {
       actionType: Notification_Types.follow,
       reciverId: route.params.userId,
     });
-    await followUser(route.params.userId);
+    await followUser(route.params.userId, (res) => {
+      if (res?.status) {
+        setFollowUser(!isFollowUser);
+      }
+    });
     dispatch(updateHomeData(!selector.Home.updateHomeData));
-    setFollowUser(!isFollowUser);
     await fetchUsersData();
     setLoading(false);
   };
@@ -142,9 +145,13 @@ const MyPostsScreen = ({ profile, route, unFollowUser, followUser }) => {
       actionType: Notification_Types.unFollow,
       reciverId: route.params.userId,
     });
-    await unFollowUser(route.params.userId);
+    await unFollowUser(route.params.userId, (res) => {
+      if (res?.status) {
+        setFollowUser(!isFollowUser);
+      }
+    });
     dispatch(updateHomeData(!selector.Home.updateHomeData));
-    setFollowUser(!isFollowUser);
+
     await fetchUsersData();
     setLoading(false);
   };

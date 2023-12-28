@@ -2,9 +2,10 @@ import {
   CREATING_POST_FAIL,
   IS_ALERT_SHOW,
   SET_ALL_USER_FCM,
+  SET_APP_LOADER,
+  SET_CATEGORIES_LIST,
   SET_DRAFT_POST,
   SET_IS_ADMIN,
-  SET_IS_SHOW_NOTI,
   SET_IS_UN_READED,
   SET_PUSH_NOTI,
   SET_SHOW_SPLASH,
@@ -53,5 +54,15 @@ export const setIsShowSplash = (data) => ({
 
 export const setIsUnReadMsg = (data) => ({
   type: SET_IS_UN_READED,
+  data: data,
+});
+
+export const setCategoriesInRed = (data) => ({
+  type: SET_CATEGORIES_LIST,
+  data: data,
+});
+
+export const setIsAppLoader = (data) => ({
+  type: SET_APP_LOADER,
   data: data,
 });

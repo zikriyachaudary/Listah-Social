@@ -2,10 +2,11 @@ import React from "react";
 import { View, ActivityIndicator } from "react-native";
 import { AppColors } from "../util/AppConstant";
 const AppLoader = (props) => {
+  console.log("props.visisble------>", props);
   return (
     <View
       style={{
-        backgroundColor: "rgba(0,0,0, 0.5)",
+        backgroundColor: "rgba(0,0,0, 0.2)",
         justifyContent: "center",
         alignItems: "center",
         position: "absolute",
@@ -27,8 +28,8 @@ const AppLoader = (props) => {
           borderRadius: 10,
         }}
       >
-        {props.visisble ? (
-          <ActivityIndicator size="large" color={AppColors.blue.navy} />
+        {props.visible ? (
+          <ActivityIndicator size="large" color={AppColors.blue.lightNavy} />
         ) : null}
       </View>
     </View>

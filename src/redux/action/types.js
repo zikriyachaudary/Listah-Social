@@ -8,3 +8,5 @@ export const SET_ALL_USER_FCM = "SET_ALL_USER_FCM";
 export const SET_PUSH_NOTI = "SET_PUSH_NOTI";
 export const SET_SHOW_SPLASH = "SET_SHOW_SPLASH";
 export const SET_IS_UN_READED = "SET_IS_UN_READED";
+export const SET_CATEGORIES_LIST = "SET_CATEGORIES_LIST";
+export const SET_APP_LOADER = "SET_APP_LOADER";

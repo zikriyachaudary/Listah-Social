@@ -1,5 +1,6 @@
 import firestore from "@react-native-firebase/firestore";
 import { Collections, RequestStatus } from "../../util/Strings";
+import { categoriesArr } from "../../util/AppConstant";
 
 export const checkUserAccountRequestStatus = async (id, onComplete) => {
   await firestore()
@@ -132,6 +133,18 @@ export const fetchUserRequestedList = async (onUpdates) => {
       onUpdates([]);
     });
 };
+export const updateCategiesList = async () => {
+  await firestore()
+    .collection(Collections.CATEGORIES)
+    .doc()
+    .set({ categoriesList: categoriesArr })
+    .then(() => {
+      console.log("update Categories Successfully");
+    })
+    .catch(() => {
+      console.log("error-------->");
+    });
+};
 export const fetchCategoriesList = async (onComplete) => {
   await firestore()
     .collection(Collections.CATEGORIES)
@@ -173,5 +186,60 @@ export const adminActionAtReq = async (obj, onComplete) => {
         status: false,
         message: "Error!",
       });
+    });
+};
+
+export const fetchPostData = async (postId, onComplete) => {
+  await firestore()
+    .collection(Collections.POST)
+    .where("id", "==", postId)
+    .get()
+    .then((snapDoc) => {
+      if (snapDoc?.docs?.length > 0) {
+        onComplete(snapDoc.docs[0]?._data);
+      } else {
+        onComplete(null);
+      }
+    });
+};
+
+export const filterPostReq = async (key, onComplete) => {
+  await firestore()
+    .collection(Collections.POST)
+    .where("category", "==", key)
+    .get()
+    .then((snapDoc) => {
+      let arr = [];
+      if (snapDoc.docs.length > 0) {
+        snapDoc.docs.forEach(async (doc) => {
+          let result = { ...doc?._data };
+          if (!result?.author?.userId) {
+            let updatedAuth = null;
+            await fetchUserProfile(result?.author, (res) => {
+              updatedAuth = res;
+            });
+            result["author"] = updatedAuth;
+          }
+          arr.push(result);
+        });
+      }
+      onComplete(arr);
+    });
+};
+const fetchUserProfile = async (userId, atComplete) => {
+  await firestore()
+    .collection(Collections.profile)
+    .where("userId", "==", userId)
+    .get()
+    .then((snapDoc) => {
+      let data = snapDoc.docs[0]?._data;
+      if (data?.username) {
+        atComplete({
+          profileImage: data?.profileImage,
+          userIds: data?.userId,
+          username: data?.username,
+          verified: data?.verified ? true : false,
+        });
+      }
     });
 };

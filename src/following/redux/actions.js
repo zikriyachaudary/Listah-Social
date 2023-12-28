@@ -122,6 +122,8 @@ export const followUser = (userId, onComplete) => async (dispatch) => {
     await ProfilesCollection.doc(currentUser).update({
       followings: currentUserFollowingUpdated,
     });
+    onComplete({ status: true, message: "Follow Successflly!" });
+
     // SAVING UPDATED PROFILE DOC TO PROFILE REDUX AS WELL
     const updatedCurrentUserProfile = await (
       await ProfilesCollection.doc(currentUser).get()
@@ -150,6 +152,8 @@ export const followUser = (userId, onComplete) => async (dispatch) => {
       payload: followedUserProfile,
     });
   } catch (error) {
+    onComplete({ status: false, message: "Something went wrong!" });
+
     dispatch({ type: constants.USER_FOLLOW.FAIL, error });
   } finally {
     dispatch({ type: constants.USER_FOLLOW.COMPLETE });
@@ -159,7 +163,7 @@ export const followUser = (userId, onComplete) => async (dispatch) => {
 /**
  * USER_UN_FOLLOW
  */
-export const unFollowUser = (userId) => async (dispatch) => {
+export const unFollowUser = (userId, onComplete) => async (dispatch) => {
   try {
     dispatch({ type: constants.USER_UN_FOLLOW.REQUEST });
     // FILTERING USER_ID TO CURRENT USERS FOLLOWING LIST
@@ -172,6 +176,7 @@ export const unFollowUser = (userId) => async (dispatch) => {
     await ProfilesCollection.doc(currentUser).update({
       followings: userFollowingsUpdated,
     });
+    onComplete({ status: true, message: "unFollow Successflly!" });
     // SAVING UPDATED PROFILE DOC TO PROFILE REDUX AS WELL
     const updatedCurrentUserProfile = await (
       await ProfilesCollection.doc(currentUser).get()
@@ -187,9 +192,9 @@ export const unFollowUser = (userId) => async (dispatch) => {
         (id) => id !== currentUser
       ),
     });
-
     dispatch({ type: constants.USER_UN_FOLLOW.SUCCESS, payload: userId });
   } catch (error) {
+    onComplete({ status: false, message: "Something went wrong!" });
     dispatch({ type: constants.USER_UN_FOLLOW.FAIL, error });
   } finally {
     dispatch({ type: constants.USER_UN_FOLLOW.COMPLETE });

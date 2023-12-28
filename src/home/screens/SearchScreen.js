@@ -1,5 +1,5 @@
 import React, { useEffect, useLayoutEffect } from "react";
-import { connect, useSelector } from "react-redux";
+import { connect, useDispatch, useSelector } from "react-redux";
 import {
   ActivityIndicator,
   Platform,
@@ -33,24 +33,26 @@ import {
   normalized,
 } from "../../util/AppConstant";
 import CustomHeader from "../../common/CommonHeader";
-import { fetchCategoriesList } from "../../network/Services/ProfileServices";
 import LoadingImage from "../../common/LoadingImage";
+import { setIsAppLoader } from "../../redux/action/AppLogics";
+import { filterPostReq } from "../../network/Services/ProfileServices";
 
 let allHomePosts = [];
 /* =============================================================================
 <search screen/>
 ============================================================================= */
 const SearchScreen = ({ posts, getProfile }) => {
+  const selector = useSelector((AppState) => AppState);
+  const dispatch = useDispatch();
   const isFocused = useIsFocused();
-  const [categories, setCategories] = useState([]);
   const [loaderVisible, setLoaderVisible] = useState(true);
+  const [filterdPostByCat, setFilteredPostByCat] = useState([]);
   const [searchPostVisible, setSearchPostVisible] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const navigation = useNavigation();
 
   const [reportPostModal, setReportPostModal] = useState(true);
   const [toggleCheckBox, setToggleCheckBox] = useState(false);
-  const selector = useSelector((AppState) => AppState);
   // GET POSTS
   const [isFilterPopup, setIsFilterPopup] = useState(false);
   const [homePosts, setHomePosts] = useState([]);
@@ -62,7 +64,6 @@ const SearchScreen = ({ posts, getProfile }) => {
   useLayoutEffect(() => {
     if (isFocused) {
       setSearchPostVisible(true);
-      getCatList();
     }
   }, [isFocused]);
 
@@ -70,11 +71,7 @@ const SearchScreen = ({ posts, getProfile }) => {
     setLoaderVisible(true);
     getMyUserHomePosts();
   }, [selector.Home.isPostRefresh]);
-  const getCatList = () => {
-    fetchCategoriesList((res) => {
-      setCategories(res?.categoriesList ? res?.categoriesList : []);
-    });
-  };
+
   const getMyUserHomePosts = async () => {
     const mAnnouncementPosts = await getAnnouncementPosts();
     const mHomePosts = await getMyHomePosts();
@@ -110,7 +107,6 @@ const SearchScreen = ({ posts, getProfile }) => {
       announcementList = [announcementList[0]];
     }
     const mFinalList = [...announcementList, ...compList];
-    console.log("getMyUserHomePosts----- > ", mFinalList?.length);
     setTimeout(() => {
       setHomePosts(mFinalList);
       setUpdate(!isUpdate);
@@ -125,11 +121,17 @@ const SearchScreen = ({ posts, getProfile }) => {
     }
   };
 
-  const _handleRefresh = () => {
-    console.log("callinf -- > ");
-    setRefreshing(true);
-    getMyUserHomePosts();
-    // getHomePosts();
+  const _handleRefresh = async () => {
+    if (selectedCat?.length > 0) {
+      console.log("filterPostReq refresh----> -- > ");
+      setRefreshing(true);
+      await filterPostReq(selectedCat, (res) => {
+        setFilteredPostByCat(res);
+      });
+    } else {
+      setRefreshing(true);
+      getMyUserHomePosts();
+    }
   };
 
   const renderItem = ({ item, index }) => (
@@ -164,13 +166,18 @@ const SearchScreen = ({ posts, getProfile }) => {
   useIsFocused();
 
   const emptyComponent = () => {
+    let noPostFound =
+      selectedCat?.length > 0
+        ? filterdPostByCat?.length == 0
+        : filtersPost?.length == 0;
     return (
       <View style={styles.container}>
-        {loaderVisible ? (
+        {loaderVisible && selectedCat?.length == 0 ? (
           <ActivityIndicator size="large" color={AppColors.blue.navy} />
         ) : (
-          homePosts.length == 0 && (
-            <Text sm center>
+          noPostFound &&
+          !selector?.sliceReducer?.isLoaderStart && (
+            <Text sm center style={{ alignSelf: "center" }}>
               Nothing to show yet
             </Text>
           )
@@ -218,12 +225,13 @@ const SearchScreen = ({ posts, getProfile }) => {
         mainStyle={{ backgroundColor: AppColors.blue.royalBlue }}
       />
       <View style={styles.searchTopStyle}>
-        {/* {selectedCat ? (
+        {selectedCat ? (
           <TouchableOpacity
             activeOpacity={1}
             style={styles.selectedCatCont}
             onPress={() => {
               setSelectedCat("");
+              setFilteredPostByCat([]);
             }}
           >
             <Text style={styles.catName}>{selectedCat}</Text>
@@ -232,51 +240,67 @@ const SearchScreen = ({ posts, getProfile }) => {
               style={{ marginHorizontal: normalized(10) }}
             />
           </TouchableOpacity>
-        ) : ( */}
-        <TextInput
-          style={{
-            flex: 1,
-            height: 40,
-            fontSize: 16,
-            color: "black",
-          }}
-          placeholder="Search in post..."
-          placeholderTextColor={"gray"}
-          value={searchTxt}
-          onChangeText={(txt) => {
-            let usersFiltersPost = [];
-            homePosts.forEach((obj) => {
-              if (
-                obj.searchTxt.toLowerCase().includes(String(txt).toLowerCase())
-              ) {
-                usersFiltersPost.push(obj);
-              }
-            });
-            setFiltersPost(txt == "" ? [] : usersFiltersPost);
-            setSearchTxt(txt);
-          }}
-        />
-        {/* )} */}
+        ) : (
+          <TextInput
+            style={{
+              flex: 1,
+              height: 40,
+              fontSize: 16,
+              color: "black",
+            }}
+            placeholder="Search in post..."
+            placeholderTextColor={"gray"}
+            value={searchTxt}
+            onChangeText={(txt) => {
+              let usersFiltersPost = [];
+              homePosts.forEach((obj) => {
+                if (
+                  obj.searchTxt
+                    .toLowerCase()
+                    .includes(String(txt).toLowerCase())
+                ) {
+                  usersFiltersPost.push(obj);
+                }
+              });
+              setFiltersPost(txt == "" ? [] : usersFiltersPost);
+              setSearchTxt(txt);
+            }}
+          />
+        )}
       </View>
-      {/* {!searchTxt && !selectedCat ? (
+      {!searchTxt && !selectedCat ? (
         <>
           <Text style={styles.topTrendTxt}>Trending Topics</Text>
           <FlatList
-            data={categories}
-            style={{ ...styles.list, backgroundColor: AppColors.white.white }}
+            data={selector?.sliceReducer?.categoriesList}
+            style={{
+              ...styles.list,
+              backgroundColor: AppColors.white.white,
+              height: "70%",
+            }}
             keyExtractor={(index) => `${index}`}
             renderItem={({ item, index }) => {
               return (
                 <TouchableOpacity
                   activeOpacity={1}
                   style={styles.singleCatBtn}
-                  onPress={() => {
+                  onPress={async () => {
                     setSelectedCat(item?.name);
+                    if (item?.name) {
+                      dispatch(setIsAppLoader(true));
+                      await filterPostReq(item?.name, (res) => {
+                        setFilteredPostByCat(res);
+                        setTimeout(() => {
+                          dispatch(setIsAppLoader(false));
+                        }, 2000);
+                      });
+                    }
                   }}
                 >
                   <LoadingImage
                     source={{ uri: `${item?.icon}` }}
                     style={styles.catIcon}
+                    isDisable={true}
                   />
                   <Text style={styles.catName}>{item?.name}</Text>
                 </TouchableOpacity>
@@ -284,23 +308,23 @@ const SearchScreen = ({ posts, getProfile }) => {
             }}
           />
         </>
-      ) : ( */}
-      <FlatList
-        style={styles.list}
-        showsVerticalScrollIndicator={false}
-        data={!searchPostVisible ? homePosts : filtersPost}
-        refreshing={refreshing}
-        renderItem={renderItem}
-        keyExtractor={(item, index) => {
-          return item.id;
-        }}
-        // contentContainerStyle={styles.content}
-        ListEmptyComponent={emptyComponent}
-        onEndReached={_handlePostsGet}
-        onRefresh={_handleRefresh}
-        extraData={isUpdate}
-      />
-      {/* )} */}
+      ) : (
+        <FlatList
+          style={{ ...styles.list, height: "75%" }}
+          showsVerticalScrollIndicator={false}
+          data={selectedCat?.length > 0 ? filterdPostByCat : filtersPost}
+          refreshing={refreshing}
+          renderItem={renderItem}
+          keyExtractor={(item, index) => {
+            return item.id;
+          }}
+          // contentContainerStyle={styles.content}
+          ListEmptyComponent={emptyComponent}
+          onEndReached={_handlePostsGet}
+          onRefresh={_handleRefresh}
+          extraData={isUpdate}
+        />
+      )}
 
       <WrapperComponent />
     </View>
@@ -337,11 +361,9 @@ const styles = StyleSheet.create({
   },
   list: {
     backgroundColor: AppColors.white.lightSky,
-    marginBottom: normalized(170),
+    marginBottom: normalized(100),
     paddingHorizontal: 18,
-    paddingVertical: 10,
     zIndex: 0,
-    height: "75%",
   },
   singleCatBtn: {
     flexDirection: "row",

@@ -23,7 +23,11 @@ const FollowingUsersListItem = ({ user, unFollowUser }) => {
 
   const _handleUnFollowPress = async () => {
     setLoading(true);
-    await unFollowUser(userId);
+
+    await unFollowUser(userId, (res) => {
+      if (res?.status) {
+      }
+    });
     setLoading(false);
   };
 

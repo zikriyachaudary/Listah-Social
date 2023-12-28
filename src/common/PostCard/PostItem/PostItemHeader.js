@@ -58,11 +58,17 @@ const PostItemHeader = ({
   const _toggleMenu = () => setVisible((prev) => !prev);
 
   const _handleEditPress = () => {
-    navigation.navigate("PostEdit", {
-      id,
-      post: post,
-      postRefresh: postRefresh,
+    navigation.navigate("DiscoverStack", {
+      id: id,
+      data: post,
+      isEdit: true,
+      from: "EditPost",
     });
+    // navigation.navigate("PostEdit", {
+    //   id,
+    //   post: post,
+    //   postRefresh: postRefresh,
+    // });
     _toggleMenu();
   };
 

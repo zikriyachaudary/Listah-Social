@@ -9,11 +9,11 @@ export const getAllUsers = (state) => state.Following.allUsers;
 export const getUserFollowings = (state) => state.Following.userFollowings;
 
 /**
-* Get Loading
-*/
+ * Get Loading
+ */
 export const getLoading = (state) => state.Following.loading;
 
 /**
-* Get Loading
-*/
+ * Get Loading
+ */
 export const getError = (state) => state.Following.error;
