@@ -122,9 +122,9 @@ const PostItemCommentModal = ({
 
           // postRefresh()
           isAddComment = true;
-          console.log("refresCall");
+          console.log("refresCall0------->");
           // setComments((prevState) => [...prevState, payload]);
-          const myPostInfo = await getPostInfoById(post.id);
+          const myPostInfo = await getPostInfoById(post?.id);
           if (myPostInfo.comments && myPostInfo.comments.length > 0) {
             setIsEmptyVisible(false);
             setComments(myPostInfo.comments);

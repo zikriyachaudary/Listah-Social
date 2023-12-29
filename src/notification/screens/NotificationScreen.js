@@ -82,7 +82,7 @@ const getStyles = (insets) =>
   });
 
 const mapStateToProps = (state) => ({
-  notifications: selectNotifications(state),
+  // notifications: selectNotifications(state),
 });
 
 const mapDispatchToProps = {

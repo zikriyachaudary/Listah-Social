@@ -37,32 +37,29 @@ const TextInputComponent = (props) => {
         ) : null}
 
         <TextInput
-          keyboardType={
-            props?.keyboardType ? props?.keyboardType : "email-address"
-          }
           autoCapitalize={
-            props?.autoCapitalize ? props?.autoCapitalize : "none"
+            props?.autoCapitalize ? props?.autoCapitalize : "sentences"
           }
-          style={[styles.txtInput, props.textInputStyle]}
           placeholderTextColor={AppColors.grey.dark}
-          maxLength={props?.maxLength ? props?.maxLength : 200}
-          value={props?.value}
+          placeholder={props?.placeholder}
+          style={[styles.txtInput, props.textInputStyle]}
+          multiline={props?.isMultiLine}
+          value={props?.value?.toString()}
+          onChangeText={(val) => {
+            props.setValue(val);
+          }}
           onBlur={() => setIsFocused(false)}
           onFocus={() => {
             setIsFocused(true);
           }}
-          placeholder={props?.placeholder}
-          onChangeText={(val) => {
-            props?.setValue(val);
-          }}
-          multiline={props?.isMultiLine}
           secureTextEntry={props?.isPassword && !secureEntry ? true : false}
           onSubmitEditing={props?.atSubmit}
           returnKeyType={props?.returnType ? props?.returnType : "done"}
+          keyboardType={props?.padType ? props?.padType : "default"}
           scrollEnabled={props?.isMultiLine}
+          maxLength={props?.maxLength ? props?.maxLength : 200}
           editable={props.isDisable ? false : true}
         />
-
         {props?.isPassword ? (
           <Pressable
             style={{ padding: 5 }}
@@ -118,6 +115,14 @@ const styles = StyleSheet.create({
     borderRadius: normalized(12),
     paddingHorizontal: normalized(15),
     color: AppColors.black.black,
+  },
+
+  inputStyle: {
+    textAlignVertical: "top",
+    flex: 1,
+    height: "100%",
+    color: AppColors.black.black,
+    fontSize: normalized(14),
   },
 });
 export default TextInputComponent;

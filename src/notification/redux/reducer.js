@@ -1,4 +1,4 @@
-import * as constants from './constants';
+import * as constants from "./constants";
 
 const INITIAL_STATE = {
   notifications: [],
@@ -41,7 +41,9 @@ export default function reducer(state = INITIAL_STATE, action) {
     case constants.DELETE_NOTIFICATION.SUCCESS:
       return {
         ...state,
-        notifications: state.notifications.filter((notification) => notification.id !== payload),
+        notifications: state.notifications.filter(
+          (notification) => notification.id !== payload
+        ),
       };
     case constants.DELETE_NOTIFICATION.FAIL:
       return {

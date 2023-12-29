@@ -47,7 +47,6 @@ const AllUsersListItem = ({
       reciverId: userId,
     });
     await followUser(userId, (res) => {
-      console.log("res------>", res);
       if (res?.status) {
         setIsFollowed(true);
       }

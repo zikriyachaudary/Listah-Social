@@ -30,6 +30,8 @@ import {
   AppColors,
   AppHorizontalMargin,
   AppImages,
+  ScreenSize,
+  hv,
   normalized,
 } from "../../util/AppConstant";
 import CustomHeader from "../../common/CommonHeader";
@@ -272,11 +274,12 @@ const SearchScreen = ({ posts, getProfile }) => {
         <>
           <Text style={styles.topTrendTxt}>Trending Topics</Text>
           <FlatList
+            showsVerticalScrollIndicator={false}
             data={selector?.sliceReducer?.categoriesList}
             style={{
               ...styles.list,
               backgroundColor: AppColors.white.white,
-              height: "70%",
+              height: ScreenSize.height - normalized(300),
             }}
             keyExtractor={(index) => `${index}`}
             renderItem={({ item, index }) => {

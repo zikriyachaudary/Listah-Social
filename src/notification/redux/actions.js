@@ -12,7 +12,9 @@ export const getLoginUserNotificationCount = async (dispatch) => {
     await ProfilesCollection.doc(currentUser).get()
   ).data();
 
-  const notifications = currentUserProfile.notifications;
+  const notifications = currentUserProfile.notifications
+    ? currentUserProfile.notifications
+    : [];
   const populatedNotification = await Promise.all(
     notifications.map(async (notification) => {
       const sender = await (
@@ -46,7 +48,9 @@ export const getNotifications = (notificationCount) => async (dispatch) => {
       await ProfilesCollection.doc(currentUser).get()
     ).data();
 
-    const notifications = currentUserProfile.notifications;
+    const notifications = currentUserProfile?.notifications
+      ? currentUserProfile.notifications
+      : [];
 
     // POPULATE SENDER
     const populatedNotification = await Promise.all(

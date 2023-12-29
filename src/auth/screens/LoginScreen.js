@@ -120,6 +120,8 @@ const LoginScreen = ({ navigation, loading, login }) => {
               }}
               placeholder="Password"
               error={passErroMsg}
+              returnType={"next"}
+              autoCapitalize={"none"}
             />
 
             <View style={styles.secondCont}>

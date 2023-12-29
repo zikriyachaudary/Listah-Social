@@ -123,30 +123,32 @@ export const followUser = (userId, onComplete) => async (dispatch) => {
       followings: currentUserFollowingUpdated,
     });
     onComplete({ status: true, message: "Follow Successflly!" });
-
+    console.log(
+      "before updatedCurrentUserProfile--->",
+      currentUser,
+      typeof currentUser
+    );
     // SAVING UPDATED PROFILE DOC TO PROFILE REDUX AS WELL
     const updatedCurrentUserProfile = await (
       await ProfilesCollection.doc(currentUser).get()
     ).data();
     dispatch(setProfile(updatedCurrentUserProfile));
+    console.log("after updatedCurrentUserProfile--->");
 
     // ADDING NOTIFICATION TO USER_ID ABOUT FOLLOW
     // & ADDING CURRENT USER TO FOLLOWED USER FOLLOWERS
+
     const followedUserProfile = await (
       await ProfilesCollection.doc(userId).get()
     ).data();
+    console.log("userId  ------>", [
+      ...followedUserProfile.followers,
+      currentUser,
+    ]);
     await ProfilesCollection.doc(userId).update({
       followers: [...followedUserProfile.followers, currentUser],
-      notifications: [
-        {
-          id: Date.now(),
-          type: "follow",
-          sender: currentUser,
-          unread: true,
-        },
-        ...followedUserProfile.notifications,
-      ],
     });
+    console.log("followedUserProfile------>");
     dispatch({
       type: constants.USER_FOLLOW.SUCCESS,
       payload: followedUserProfile,

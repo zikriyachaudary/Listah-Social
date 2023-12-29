@@ -56,7 +56,7 @@ const MyPostsScreen = ({ profile, route, unFollowUser, followUser }) => {
   const [userProfileImage, setUsersProfileImage] = useState();
   const [userProfileInfo, setUsersProfileInfo] = useState();
   const { followNUnFollowUser } = useNotificationManger();
-  const [isFollowUser, setFollowUser] = useState();
+  const [isFollowUser, setFollowUser] = useState(false);
   const [followersModal, setFollowersModal] = useState(false);
   const [followersOrFollowingList, setFollowersOrFollowingList] = useState([]);
   const dispatch = useDispatch();
@@ -64,6 +64,15 @@ const MyPostsScreen = ({ profile, route, unFollowUser, followUser }) => {
 
   const _toggleFollowersModal = () => setFollowersModal((prev) => !prev);
 
+  // GET POSTS
+  useEffect(() => {
+    if (isFocused && route?.params?.userId) {
+      getPostsByUserId();
+      // getHomePosts();
+      fetchUsersData();
+      setLoaderVisible(true);
+    }
+  }, [isFocused]);
   const fetchUsersData = async () => {
     const mUsersData = await getProfileDataByID(route.params.userId);
     if (mUsersData?.profileImage) {
@@ -75,16 +84,6 @@ const MyPostsScreen = ({ profile, route, unFollowUser, followUser }) => {
     );
     setFollowUser(isFollowed);
   };
-  // GET POSTS
-  useEffect(() => {
-    if (isFocused && route?.params?.userId) {
-      getPostsByUserId();
-      // getHomePosts();
-      fetchUsersData();
-      setLoaderVisible(true);
-    }
-  }, [isFocused]);
-
   const getPostsByUserId = async () => {
     const totalPosts = await getPostsByID(route?.params?.userId);
     setUserPosts(totalPosts);
