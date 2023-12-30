@@ -345,6 +345,7 @@ const HomeScreen = ({ posts, getProfile }) => {
         setSelectedCat={async (val) => {
           setSelectedCat(val);
           if (val?.name) {
+            setFilterByCat([]);
             dispatch(setIsAppLoader(true));
             await filterPostReq(val?.name, (res) => {
               setFilterByCat(res);
