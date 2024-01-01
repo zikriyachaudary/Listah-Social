@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import * as yup from "yup";
 import { connect, useDispatch, useSelector } from "react-redux";
 import {
+  ActivityIndicator,
   BackHandler,
   KeyboardAvoidingView,
   Platform,
@@ -87,7 +88,7 @@ const PostCreateScreen = ({
   const toast = useToast();
   const isFocused = useIsFocused();
   const formikRef = useRef();
-
+  const isBtnActive = useRef(false);
   const [radioButtons, setRadioButtons] = useState([
     {
       id: "1", // acts as primary key, should be unique and non-empty string
@@ -283,6 +284,7 @@ const PostCreateScreen = ({
     }
   };
   const _handleSubmit = async () => {
+    isBtnActive.current = false;
     if (selectedcategory == "") {
       setCategoryError("Please select Category");
     }
@@ -298,6 +300,7 @@ const PostCreateScreen = ({
       des?.length == 0 ||
       selectedcategory?.length == 0
     ) {
+      isBtnActive.current = true;
       return;
     }
     let isErrorFound = false;
@@ -309,6 +312,7 @@ const PostCreateScreen = ({
       });
     }
     if (isErrorFound) {
+      isBtnActive.current = true;
       return;
     }
     let values = {};
@@ -318,12 +322,10 @@ const PostCreateScreen = ({
     values["isNumberShowInItems"] = toggleCheckBox;
     values["category"] = selectedcategory;
     values["items"] = itemList?.length > 0 ? fetchItemList() : [];
-
     setIsLoading(true);
     if (route.params?.isEdit && route?.params?.data?.author?.userId) {
       values["author"] = route?.params?.data?.author;
       values["id"] = route?.params?.id;
-      console.log("values------>", values);
       await updatePost(values);
     } else if (route.params && route.params.isAnnouncement) {
       await createAnnouncementPost(values, async (response) => {
@@ -353,6 +355,7 @@ const PostCreateScreen = ({
       navigation.goBack();
     }
     setTimeout(() => {
+      isBtnActive.current = true;
       setIsLoading(false);
     }, 800);
   };
@@ -654,16 +657,24 @@ const PostCreateScreen = ({
               </TouchableOpacity>
             ) : null}
 
-            <Button
-              style={{
-                width: normalized(180),
-                marginVertical: hv(30),
-                alignSelf: "center",
+            <TouchableOpacity
+              activeOpacity={1}
+              onPress={() => {
+                if (isBtnActive.current) {
+                  _handleSubmit();
+                }
               }}
-              title="Upload"
-              loading={isLoading}
-              onPress={_handleSubmit}
-            />
+              style={styles.uploadBtnCont}
+            >
+              {isLoading ? (
+                <ActivityIndicator
+                  style={styles.indicator}
+                  color={AppColors.white.white}
+                />
+              ) : (
+                <Text style={styles.uploadTxt}>Upload</Text>
+              )}
+            </TouchableOpacity>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -746,6 +757,21 @@ const styles = StyleSheet.create({
     flex: 1,
     marginHorizontal: AppHorizontalMargin,
     marginTop: hv(20),
+  },
+  uploadBtnCont: {
+    height: normalized(50),
+    backgroundColor: AppColors.blue.navy,
+    borderRadius: normalized(40),
+    width: normalized(180),
+    marginVertical: hv(30),
+    alignSelf: "center",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  uploadTxt: {
+    fontSize: normalized(16),
+    color: AppColors.white.white,
+    fontWeight: "600",
   },
 });
 
