@@ -22,7 +22,8 @@ const CustomDropDown = (props) => {
         activeOpacity={1}
         style={{
           ...styles.mainContainer,
-          borderColor: isOpen ? AppColors.blue.navy : "darkgrey",
+          borderColor:
+            isOpen || props?.selected ? AppColors.blue.navy : "darkgrey",
         }}
         disabled={props?.isDisable}
         onPress={() => {

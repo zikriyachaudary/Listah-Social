@@ -1,13 +1,13 @@
-import React, { useRef } from 'react';
+import React, { useRef } from "react";
 import {
   View,
   Text,
   Pressable,
   StyleSheet,
   TextInput as RNTextInput,
-} from 'react-native';
+} from "react-native";
 
-import * as Colors from '../config/colors';
+import * as Colors from "../config/colors";
 
 /* =============================================================================
 <TextInput />
@@ -31,14 +31,14 @@ const TextInput = ({
 }) => {
   const _textInput = useRef();
 
-  const _handleChange = inputValue => {
-    if (typeof onChange === 'function') {
+  const _handleChange = (inputValue) => {
+    if (typeof onChange === "function") {
       onChange(inputValue);
     }
   };
 
-  const _handlePress = e => {
-    if (typeof onPress === 'function') {
+  const _handlePress = (e) => {
+    if (typeof onPress === "function") {
       onPress(e);
     } else if (_textInput.current && editable) {
       _textInput.current.focus();
@@ -49,14 +49,16 @@ const TextInput = ({
     <Pressable
       style={[styles.container, containerStyle]}
       disabled={disabled}
-      onPress={_handlePress}>
+      onPress={_handlePress}
+    >
       {!!label && <Text style={[styles.label, labelStyle]}>{label}</Text>}
       <View
         style={[
           styles.content,
           !!errorText && styles.error,
           contentContainerStyle,
-        ]}>
+        ]}
+      >
         {left}
         <RNTextInput
           ref={_textInput}
@@ -76,11 +78,7 @@ const TextInput = ({
         />
         {right}
       </View>
-      {Boolean(errorText) && (
-        <Text style={styles.errorTxt}>
-          {errorText}
-        </Text>
-      )}
+      {Boolean(errorText) && <Text style={styles.errorTxt}>{errorText}</Text>}
     </Pressable>
   );
 };
@@ -91,24 +89,24 @@ TextInput.defaultProps = {
 
 const styles = StyleSheet.create({
   container: {
-    width: '100%',
+    width: "100%",
     marginTop: 25,
-    backgroundColor: 'transparent',
+    backgroundColor: "transparent",
   },
   label: {
     fontSize: 12,
     marginBottom: 8,
-    fontFamily: 'Poppins-Medium',
-    color: '#2A3037',
+    fontFamily: "Poppins-Medium",
+    color: "#2A3037",
   },
   content: {
-    width: '100%',
+    width: "100%",
     borderWidth: 0.5,
-    borderColor: '#999',
+    borderColor: "#999",
     borderRadius: 10,
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    backgroundColor: '#fff',
+    flexDirection: "row",
+    alignItems: "flex-start",
+    backgroundColor: "#fff",
     paddingHorizontal: 14,
   },
   error: {

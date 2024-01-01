@@ -1,25 +1,28 @@
 import React, { useEffect, useRef, useState } from "react";
 import * as yup from "yup";
 import { connect, useDispatch, useSelector } from "react-redux";
-import FastImage from "react-native-fast-image";
 import {
   BackHandler,
+  KeyboardAvoidingView,
   Platform,
+  SafeAreaView,
+  ScrollView,
   StyleSheet,
+  Text,
   TouchableOpacity,
 } from "react-native";
 import { Formik, FieldArray } from "formik";
 
-import {
-  View,
-  Button,
-  Content,
-  Container,
-  TextInput,
-  Touchable,
-  ImagePickerButton,
-  Text,
-} from "../../common";
+// import {
+//   View,
+//   Button,
+//   Content,
+//   Container,
+//   TextInput,
+//   Touchable,
+//   ImagePickerButton,
+//   Text,
+// } from "../../common";
 import DeleteIcon from "../../assets/icons/edit-trash-icon.svg";
 import AddIcon from "../../assets/icons/edit-plus-square.svg";
 import { useToast } from "react-native-toast-notifications";
@@ -52,6 +55,10 @@ import CustomHeader from "../../common/CommonHeader";
 import CustomDropDown from "../../common/CustomDropDown";
 import { fetchPostData } from "../../network/Services/ProfileServices";
 import LoadingImage from "../../common/LoadingImage";
+import { View } from "react-native";
+import { AppStyles } from "../../util/AppStyles";
+import { Button, ImagePickerButton, TextInput } from "../../common";
+import { getLoading } from "../redux/selectors";
 
 /* =============================================================================
 <PostCreateScreen />
@@ -69,6 +76,7 @@ const PostCreateScreen = ({
   const [categoryError, setCategoryError] = useState("");
   const dispatch = useDispatch();
   const selector = useSelector((AppState) => AppState);
+  const [itemList, setItemList] = useState([]);
   const [title, setTitle] = useState("");
   const title2 = useRef("");
   const [titleError, setTitleError] = useState("");
@@ -79,15 +87,6 @@ const PostCreateScreen = ({
   const toast = useToast();
   const isFocused = useIsFocused();
   const formikRef = useRef();
-  const [initialValues, setInitialValues] = useState({
-    items: [
-      {
-        name: "",
-        image: "",
-        description: "",
-      },
-    ],
-  });
 
   const [radioButtons, setRadioButtons] = useState([
     {
@@ -129,7 +128,6 @@ const PostCreateScreen = ({
   const [toggleCheckBox, setToggleCheckBox] = useState(false);
 
   useEffect(() => {
-    formikRef.current?.resetForm();
     if (isFocused && route?.params?.isEdit) {
       initialFun(route?.params?.data?.id);
     }
@@ -169,35 +167,14 @@ const PostCreateScreen = ({
       title2.current = data?.title ? data?.title : "";
       setDes(data?.description ? data?.description : "");
       des2.current = data?.description ? data?.description : "";
-      let makeObj = {
-        items:
-          data?.items?.length > 0
-            ? data?.items
-            : [
-                {
-                  name: "",
-                  image: "",
-                  description: "",
-                },
-              ],
-      };
-      setInitialValues(makeObj);
+      setItemList(data?.items);
     }
   };
 
   const clearStates = () => {
     title2.current = "";
     des2.current = "";
-    formikRef.current?.resetForm();
-    setInitialValues({
-      items: [
-        {
-          name: "",
-          image: "",
-          description: "",
-        },
-      ],
-    });
+    setItemList([]);
     setTitle("");
     setDes("");
     setSelectedCategory("");
@@ -277,30 +254,35 @@ const PostCreateScreen = ({
       }
     }
   };
-  const _handleAdd = (arrayHelpers) => {
-    let arraySize = arrayHelpers.form.values.items.length + 1;
-    arrayHelpers.push({
-      name: "",
-      image: "",
-      description: "",
+  const _handleAdd = () => {
+    let newArr = [...itemList];
+    if (newArr?.length >= 10) {
+      setShowAddBtn(false);
+    } else {
+      newArr.push({
+        name: "",
+        image: "",
+        description: "",
+      });
+      setShowAddBtn(true);
+      setItemList(newArr);
+    }
+  };
+  const _handleRemove = (index) => {
+    let newArr = [];
+    itemList.map((el, i) => {
+      if (i !== index) {
+        newArr.push(el);
+      }
     });
-    if (arraySize == 10 || arraySize > 10) {
-      setShowAddBtn(false);
-    } else {
-      setShowAddBtn(true);
-    }
-  };
-
-  const _handleRemove = (arrayHelpers, index) => {
-    let arraySize = arrayHelpers.form.values.items.length - 1;
-    arrayHelpers.remove(index);
-    if (arraySize < 10) {
+    setItemList(newArr);
+    if (newArr?.length < 10) {
       setShowAddBtn(true);
     } else {
       setShowAddBtn(false);
     }
   };
-  const _handleSubmit = async (values, { resetForm }) => {
+  const _handleSubmit = async () => {
     if (selectedcategory == "") {
       setCategoryError("Please select Category");
     }
@@ -317,13 +299,21 @@ const PostCreateScreen = ({
     ) {
       return;
     }
-    setIsLoading(true);
+    let values = {};
     values["title"] = title;
     values["description"] = des;
     values["order"] = radioButtons.find((item) => item.selected).id;
     values["isNumberShowInItems"] = toggleCheckBox;
     values["category"] = selectedcategory;
-    if (route.params && route.params.isAnnouncement) {
+    values["items"] = itemList?.length > 0 ? fetchItemList() : [];
+
+    setIsLoading(true);
+    if (route.params?.isEdit && route?.params?.data?.author?.userId) {
+      values["author"] = route?.params?.data?.author;
+      values["id"] = route?.params?.id;
+      console.log("values------>", values);
+      await updatePost(values);
+    } else if (route.params && route.params.isAnnouncement) {
       await createAnnouncementPost(values, async (response) => {
         if (response?.status) {
           let isUserFetch = false;
@@ -341,24 +331,30 @@ const PostCreateScreen = ({
           });
         }
       });
-    } else if (route.params?.isEdit && route?.params?.data?.author?.userId) {
-      values["author"] = route?.params?.data?.author;
-      values["id"] = route?.params?.id;
-      await updatePost(values);
     } else {
       await createPost(values);
     }
     if (selector?.DraftPost?.createPostAPIFail !== "") {
       updateDraftFun(values);
     } else {
-      // route.params.postRefresh();
       dispatch(setPostRefresh(!selector.Home.isPostRefresh));
-      resetForm();
       navigation.goBack();
     }
     setTimeout(() => {
       setIsLoading(false);
     }, 800);
+  };
+  const fetchItemList = () => {
+    let newArr = [];
+    itemList.map((el, i) => {
+      newArr.push({
+        id: i,
+        name: el?.name,
+        description: el?.description,
+        image: el?.image,
+      });
+    });
+    return newArr;
   };
   const updateDraftFun = async (obj) => {
     let draftArr;
@@ -396,9 +392,21 @@ const PostCreateScreen = ({
   const onPressRadioButton = (radioButtonsArray) => {
     setRadioButtons(radioButtonsArray);
   };
+  const updateStates = (type, index, value) => {
+    const updatedArray = [...itemList];
+    let previousObj = updatedArray[index];
+    let newObj = {
+      ...previousObj,
+      [`${type}`]: value,
+    };
+    updatedArray[index] = newObj;
+    setItemList(updatedArray);
+  };
   return (
-    <Container style={styles.content}>
+    <View style={AppStyles.MainStyle}>
+      {/* <SafeAreaView /> */}
       <CustomHeader
+        isStatusBar={true}
         atBackPress={() => {
           if (route?.params?.from !== "EditPost") {
             fetchCurrentStates();
@@ -407,264 +415,247 @@ const PostCreateScreen = ({
           }
         }}
         leftIcon={AppImages.Common.backArrow}
-        isStatusBar={true}
         logo={AppImages.Common.appLogo}
         mainStyle={{ backgroundColor: AppColors.blue.royalBlue }}
       />
-
-      <View style={{ marginVertical: hv(8) }} />
-      <TextInputComponent
-        mainContainer={{ marginHorizontal: normalized(15) }}
-        value={title}
-        maxLength={55}
-        setValue={(val) => {
-          setTitleError("");
-          setTitle(val);
-          title2.current = val;
-        }}
-        placeholder="What's your List Title..."
-        error={titleError}
-      />
-
-      <TextInputComponent
-        mainContainer={{ marginHorizontal: normalized(15) }}
-        value={des}
-        setValue={(val) => {
-          setDesError("");
-          setDes(val);
-          des2.current = val;
-        }}
-        placeholder="Post description..."
-        error={desError}
-      />
-      <CustomDropDown
-        dropDownStyle={{
-          marginHorizontal: AppHorizontalMargin,
-          marginVertical: 10,
-        }}
-        placeHolder={"Select Category"}
-        atSelect={(val) => {
-          setSelectedCategory(val?.name);
-          setCategoryError("");
-        }}
-        selected={selectedcategory?.name || selectedcategory}
-        list={selector?.sliceReducer?.categoriesList}
-        error={categoryError}
-      />
-      <Formik
-        enableReinitialize={true}
-        innerRef={formikRef}
-        initialValues={initialValues}
-        validationSchema={schema}
-        onSubmit={_handleSubmit}
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        keyboardVerticalOffset={Platform.OS === "ios" ? hv(35) : hv(30)}
       >
-        {({ handleChange, handleSubmit, setFieldValue, values, errors }) => (
-          <FieldArray
-            name="items"
-            render={(arrayHelpers, i) => {
-              let isSelect = false;
-              initialState.current = values;
-              return (
-                <Content contentContainerStyle={styles.content}>
-                  <View key={i} center>
-                    {values.items && values.items.length > 0
-                      ? values.items.map((item, index) => (
-                          <View
-                            horizontal
-                            key={index}
-                            style={styles.dynamicFieldContainer}
-                          >
-                            {item?.image && item.image !== "a" ? (
-                              //   <FastImage
-                              //     style={styles.img}
-                              //     source={item?.image}
-                              // />
+        <ScrollView
+          style={styles.containerStyle}
+          showsVerticalScrollIndicator={false}
+        >
+          <TextInputComponent
+            mainContainer={{ marginHorizontal: normalized(15) }}
+            value={title}
+            maxLength={55}
+            setValue={(val) => {
+              setTitleError("");
+              setTitle(val);
+              title2.current = val;
+            }}
+            placeholder="What's your List Title..."
+            error={titleError}
+          />
 
-                              <LoadingImage
-                                isDisable={true}
-                                source={
-                                  item?.image?.base64
-                                    ? item?.image
-                                    : { uri: item?.image }
-                                }
-                                style={styles.img}
-                              />
-                            ) : (
-                              <ImagePickerButton
-                                btnSize="small"
-                                style={styles.img}
-                                onImageSelect={(img) => {
-                                  setFieldValue(`items.${index}.image`, img);
-                                }}
-                              />
-                            )}
+          <TextInputComponent
+            mainContainer={{ marginHorizontal: normalized(15) }}
+            value={des}
+            setValue={(val) => {
+              setDesError("");
+              setDes(val);
+              des2.current = val;
+            }}
+            placeholder="Post description..."
+            error={desError}
+          />
+          <CustomDropDown
+            dropDownStyle={{
+              marginHorizontal: AppHorizontalMargin,
+              marginVertical: 10,
+            }}
+            placeHolder={"Select Category"}
+            atSelect={(val) => {
+              setSelectedCategory(val?.name);
+              setCategoryError("");
+            }}
+            selected={selectedcategory?.name || selectedcategory}
+            list={selector?.sliceReducer?.categoriesList}
+            error={categoryError}
+          />
 
-                            <View
-                              style={{
-                                width: "70%",
-                                height: normalized(135),
-                                marginVertical: normalized(10),
-                              }}
-                            >
-                              <TextInput
-                                value={item.name}
-                                inputStyle={styles.input}
-                                placeholder="Enter name..."
-                                containerStyle={styles.inputContainer}
-                                errorText={
-                                  errors?.items && errors?.items[index]
-                                    ? errors?.items[index].name
-                                    : null
-                                }
-                                onChange={handleChange(`items.${index}.name`)}
-                              />
-                              <TextInput
-                                value={item.description}
-                                inputStyle={styles.input}
-                                placeholder="Enter description..."
-                                containerStyle={styles.inputContainer}
-                                errorText={
-                                  errors?.items && errors?.items[index]
-                                    ? errors?.items[index].description
-                                    : null
-                                }
-                                onChange={handleChange(
-                                  `items.${index}.description`
-                                )}
-                              />
-                            </View>
-
-                            <Touchable
-                              center
-                              style={styles.deleteBtn}
-                              onPress={() => _handleRemove(arrayHelpers, index)}
-                            >
-                              <DeleteIcon />
-                            </Touchable>
-                          </View>
-                        ))
-                      : null}
+          <View>
+            {itemList.length > 0
+              ? itemList.map((item, index) => (
+                  <View key={index} style={styles.dynamicFieldContainer}>
+                    {item?.image && item.image !== "a" ? (
+                      <LoadingImage
+                        isDisable={true}
+                        source={
+                          item?.image?.base64
+                            ? item?.image
+                            : { uri: item?.image }
+                        }
+                        style={styles.img}
+                      />
+                    ) : (
+                      <ImagePickerButton
+                        btnSize="small"
+                        style={styles.img}
+                        onImageSelect={(img) => {
+                          updateStates("image", index, img);
+                        }}
+                      />
+                    )}
 
                     <View
                       style={{
-                        alignItems: "flex-start",
-                        marginVertical: 10,
+                        width: "70%",
+                        height: normalized(135),
+                        marginVertical: normalized(10),
                       }}
                     >
-                      <RadioGroup
-                        radioButtons={radioButtons}
-                        onPress={onPressRadioButton}
-                        layout="row"
-                        containerStyle={{
-                          paddingHorizontal: 10,
-                          paddingVertical: 25,
+                      <TextInput
+                        value={item?.name}
+                        inputStyle={styles.input}
+                        placeholder="Enter name..."
+                        containerStyle={styles.inputContainer}
+                        errorText={
+                          item?.name?.length == 0 ? "!Empty Field" : null
+                        }
+                        onChange={(val) => {
+                          updateStates("name", index, val);
                         }}
                       />
-
-                      <View
-                        style={{
-                          flexDirection: "row",
-                          alignItems: "center",
-                          paddingHorizontal: normalized(18),
-                          justifyContent: "center",
-                          alignItems: "center",
+                      <TextInput
+                        value={item?.description}
+                        inputStyle={styles.input}
+                        placeholder="Enter description..."
+                        containerStyle={styles.inputContainer}
+                        errorText={
+                          item?.description?.length == 0 ? "!Empty Field" : null
+                        }
+                        onChange={(des) => {
+                          updateStates("description", index, des);
                         }}
-                      >
-                        {Platform.OS == "android" ? (
-                          <TouchableOpacity
-                            onPress={() => {
-                              console.log("print ---- > ", isSelect);
-                              if (isSelect) {
-                                isSelect = false;
-                                setToggleCheckBox(isSelect);
-                              } else {
-                                isSelect = true;
-                                setToggleCheckBox(isSelect);
-                              }
-                            }}
-                          >
-                            <View
-                              style={{
-                                width: 25,
-                                height: 25,
-                                borderColor: "#6d14c4",
-
-                                borderWidth: 1,
-                                borderRadius: 5,
-                                marginEnd: 10,
-                                justifyContent: "center",
-                                alignItems: "center",
-                              }}
-                            >
-                              {isSelect && (
-                                <View
-                                  style={{
-                                    width: 20,
-                                    height: 20,
-                                    backgroundColor: "#6d14c4",
-                                    borderRadius: 5,
-                                    justifyContent: "center",
-                                    alignItems: "center",
-                                  }}
-                                ></View>
-                              )}
-                            </View>
-                          </TouchableOpacity>
-                        ) : (
-                          <CheckBox
-                            value={toggleCheckBox}
-                            tintColor="#6d14c4"
-                            onCheckColor="#6d14c4"
-                            onTintColor="#6d14c4"
-                            tintColors={{ true: "black", false: "#a9a9a9" }}
-                            lineWidth={2}
-                            onFillColor="#6d14c4"
-                            style={{
-                              transform: [{ scaleX: 0.85 }, { scaleY: 0.85 }],
-                            }}
-                            boxType={"circle"}
-                            onValueChange={(newValue) => {
-                              console.log("newValue------>", newValue);
-                              // setShhowModal(false)
-                              setToggleCheckBox(newValue);
-                            }}
-                          />
-                        )}
-
-                        <Text
-                          style={{
-                            fontSize: 14,
-                            marginStart: 5,
-                            color: AppColors.black.black,
-                          }}
-                        >
-                          Numbered List
-                        </Text>
-                      </View>
+                      />
                     </View>
 
-                    {isShowAddBtn ? (
-                      <Touchable
-                        style={styles.addBtn}
-                        onPress={() => _handleAdd(arrayHelpers)}
-                      >
-                        <AddIcon />
-                      </Touchable>
-                    ) : null}
+                    <TouchableOpacity
+                      center
+                      style={styles.deleteBtn}
+                      onPress={() => {
+                        _handleRemove(index);
+                      }}
+                    >
+                      <DeleteIcon />
+                    </TouchableOpacity>
                   </View>
-                  <View center>
-                    <Button
-                      title="Upload"
-                      loading={isLoading}
-                      onPress={handleSubmit}
-                    />
-                  </View>
-                </Content>
-              );
-            }}
-          />
-        )}
-      </Formik>
+                ))
+              : null}
+
+            <View
+              style={{
+                alignItems: "flex-start",
+                marginVertical: 10,
+              }}
+            >
+              <RadioGroup
+                radioButtons={radioButtons}
+                onPress={onPressRadioButton}
+                layout="row"
+                containerStyle={{
+                  paddingHorizontal: 10,
+                  paddingVertical: 25,
+                }}
+              />
+
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  paddingHorizontal: normalized(18),
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                {Platform.OS == "android" ? (
+                  <TouchableOpacity
+                    onPress={() => {
+                      if (isSelect) {
+                        isSelect = false;
+                        setToggleCheckBox(isSelect);
+                      } else {
+                        isSelect = true;
+                        setToggleCheckBox(isSelect);
+                      }
+                    }}
+                  >
+                    <View
+                      style={{
+                        width: 25,
+                        height: 25,
+                        borderColor: "#6d14c4",
+
+                        borderWidth: 1,
+                        borderRadius: 5,
+                        marginEnd: 10,
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      {isSelect && (
+                        <View
+                          style={{
+                            width: 20,
+                            height: 20,
+                            backgroundColor: "#6d14c4",
+                            borderRadius: 5,
+                            justifyContent: "center",
+                            alignItems: "center",
+                          }}
+                        ></View>
+                      )}
+                    </View>
+                  </TouchableOpacity>
+                ) : (
+                  <CheckBox
+                    value={toggleCheckBox}
+                    tintColor="#6d14c4"
+                    onCheckColor="#6d14c4"
+                    onTintColor="#6d14c4"
+                    tintColors={{ true: "black", false: "#a9a9a9" }}
+                    lineWidth={2}
+                    onFillColor="#6d14c4"
+                    style={{
+                      transform: [{ scaleX: 0.85 }, { scaleY: 0.85 }],
+                    }}
+                    boxType={"circle"}
+                    onValueChange={(newValue) => {
+                      setToggleCheckBox(newValue);
+                    }}
+                  />
+                )}
+
+                <Text
+                  style={{
+                    fontSize: 14,
+                    marginStart: 5,
+                    color: AppColors.black.black,
+                  }}
+                >
+                  Numbered List
+                </Text>
+              </View>
+            </View>
+
+            {isShowAddBtn ? (
+              <TouchableOpacity
+                style={styles.addBtn}
+                onPress={() => {
+                  _handleAdd();
+                }}
+              >
+                <AddIcon />
+              </TouchableOpacity>
+            ) : null}
+
+            <Button
+              style={{
+                width: normalized(180),
+                marginVertical: hv(30),
+                alignSelf: "center",
+              }}
+              title="Upload"
+              loading={isLoading}
+              onPress={_handleSubmit}
+            />
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+
       {alertModal?.value ? (
         <AlertModal
           visible={alertModal?.value}
@@ -683,22 +674,9 @@ const PostCreateScreen = ({
           message={alertModal?.message}
         />
       ) : null}
-    </Container>
+    </View>
   );
 };
-
-const schema = yup.object().shape({
-  // title: yup.string().required("!Empty Field"),
-  // description: yup.string().required("!Empty Field"),
-  items: yup.array().of(
-    yup.object().shape({
-      name: yup.string().required("!Empty Field"),
-      // image: yup.object()
-      //   .required('!Empty Field'),
-      description: yup.string().required("!Empty Field"),
-    })
-  ),
-});
 
 const styles = StyleSheet.create({
   dynamicFieldContainer: {
@@ -708,6 +686,7 @@ const styles = StyleSheet.create({
     height: normalized(140),
     marginTop: normalized(7),
     justifyContent: "space-between",
+    flexDirection: "row",
   },
   content: {
     justifyContent: "space-between",
@@ -735,8 +714,8 @@ const styles = StyleSheet.create({
     height: 40,
   },
   addBtn: {
-    padding: 20,
     marginTop: 20,
+    alignSelf: "center",
   },
   img: {
     width: normalized(40),
@@ -749,6 +728,12 @@ const styles = StyleSheet.create({
   },
   deleteBtn: {
     padding: normalized(5),
+  },
+
+  containerStyle: {
+    flex: 1,
+    marginHorizontal: AppHorizontalMargin,
+    marginTop: hv(20),
   },
 });
 
