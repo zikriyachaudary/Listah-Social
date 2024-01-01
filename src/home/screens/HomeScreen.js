@@ -86,15 +86,22 @@ const HomeScreen = ({ posts, getProfile }) => {
   useEffect(() => {
     // setIsFilterPopup(true);
     setLoaderVisible(true);
-    getMyUserHomePosts();
     getProfile();
+    getMyUserHomePosts();
   }, [selector.Home.updateHomeData]);
 
   useEffect(() => {
     setLoaderVisible(true);
     getMyUserHomePosts();
   }, [selector.Home.isPostRefresh]);
-
+  useEffect(() => {
+    console.log(
+      "filterByCatList----->",
+      filterByCatList?.length,
+      "-------",
+      homePosts?.length
+    );
+  }, [filterByCatList, homePosts]);
   const getMyUserHomePosts = async () => {
     const mAnnouncementPosts = await getAnnouncementPosts();
     const mHomePosts = await getMyHomePosts();
@@ -344,18 +351,19 @@ const HomeScreen = ({ posts, getProfile }) => {
         selectedCat={selectedCat}
         setSelectedCat={async (val) => {
           setSelectedCat(val);
+          dispatch(setIsAppLoader(true));
           if (val?.name) {
+            setHomePosts([]);
             setFilterByCat([]);
-            dispatch(setIsAppLoader(true));
             await filterPostReq(val?.name, (res) => {
               setFilterByCat(res);
-              setTimeout(() => {
-                dispatch(setIsAppLoader(false));
-              }, 2000);
             });
           } else {
             await getMyUserHomePosts();
           }
+          setTimeout(() => {
+            dispatch(setIsAppLoader(false));
+          }, 2000);
         }}
       />
       <HomeTopBar

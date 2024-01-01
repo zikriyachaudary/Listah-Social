@@ -292,11 +292,23 @@ const PostCreateScreen = ({
     if (des == "") {
       setDesError("!Empty Field");
     }
+
     if (
       title?.length == 0 ||
       des?.length == 0 ||
       selectedcategory?.length == 0
     ) {
+      return;
+    }
+    let isErrorFound = false;
+    if (itemList?.length > 0) {
+      itemList.map((el) => {
+        if (!el?.name || !el?.description) {
+          isErrorFound = true;
+        }
+      });
+    }
+    if (isErrorFound) {
       return;
     }
     let values = {};

@@ -147,6 +147,15 @@ export const followUser = (userId, onComplete) => async (dispatch) => {
     ]);
     await ProfilesCollection.doc(userId).update({
       followers: [...followedUserProfile.followers, currentUser],
+      notifications: [
+        {
+          id: Date.now(),
+          type: "follow",
+          sender: currentUser,
+          unread: true,
+        },
+        ...followedUserProfile.notifications,
+      ],
     });
     console.log("followedUserProfile------>");
     dispatch({
