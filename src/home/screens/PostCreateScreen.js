@@ -284,14 +284,16 @@ const PostCreateScreen = ({
     }
   };
   const _handleSubmit = async () => {
-    isBtnActive.current = false;
+    isBtnActive.current = true;
     if (selectedcategory == "") {
       setCategoryError("Please select Category");
     }
     if (title == "") {
+      isBtnActive.current = false;
       setTitleError("!Empty Field");
     }
     if (des == "") {
+      isBtnActive.current = false;
       setDesError("!Empty Field");
     }
 
@@ -300,7 +302,7 @@ const PostCreateScreen = ({
       des?.length == 0 ||
       selectedcategory?.length == 0
     ) {
-      isBtnActive.current = true;
+      isBtnActive.current = false;
       return;
     }
     let isErrorFound = false;
@@ -312,7 +314,7 @@ const PostCreateScreen = ({
       });
     }
     if (isErrorFound) {
-      isBtnActive.current = true;
+      isBtnActive.current = false;
       return;
     }
     let values = {};
@@ -355,7 +357,7 @@ const PostCreateScreen = ({
       navigation.goBack();
     }
     setTimeout(() => {
-      isBtnActive.current = true;
+      isBtnActive.current = false;
       setIsLoading(false);
     }, 800);
   };
@@ -661,7 +663,10 @@ const PostCreateScreen = ({
               activeOpacity={1}
               disabled={!isBtnActive.current}
               onPress={() => {
-                _handleSubmit();
+                console.log("printBtnActive -- > ", isBtnActive.current);
+                if (!isBtnActive.current) {
+                  _handleSubmit();
+                }
               }}
               style={styles.uploadBtnCont}
             >
