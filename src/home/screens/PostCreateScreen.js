@@ -659,10 +659,9 @@ const PostCreateScreen = ({
 
             <TouchableOpacity
               activeOpacity={1}
+              disabled={!isBtnActive.current}
               onPress={() => {
-                if (isBtnActive.current) {
-                  _handleSubmit();
-                }
+                _handleSubmit();
               }}
               style={styles.uploadBtnCont}
             >
