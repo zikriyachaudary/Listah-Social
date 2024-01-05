@@ -1,29 +1,15 @@
 import React, { useEffect, useRef, useState } from "react";
-import * as yup from "yup";
 import { connect, useDispatch, useSelector } from "react-redux";
 import {
   ActivityIndicator,
   BackHandler,
   KeyboardAvoidingView,
   Platform,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
 } from "react-native";
-import { Formik, FieldArray } from "formik";
-
-// import {
-//   View,
-//   Button,
-//   Content,
-//   Container,
-//   TextInput,
-//   Touchable,
-//   ImagePickerButton,
-//   Text,
-// } from "../../common";
 import DeleteIcon from "../../assets/icons/edit-trash-icon.svg";
 import AddIcon from "../../assets/icons/edit-plus-square.svg";
 import { useToast } from "react-native-toast-notifications";

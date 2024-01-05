@@ -588,7 +588,7 @@ export const challengePost =
       ).data();
 
       const challengePost = {
-        id: postId,
+        id: postId?.toString(),
         order,
         isNumberShowInItems,
         likes: 0,
@@ -607,7 +607,7 @@ export const challengePost =
         challengePost.items = await Promise.all(
           items.map(async (item, index) => {
             let uploadImgUrl = "";
-            console.log("printItem - > ", item);
+
             if (item.image && item.image.uri != "") {
               const compressedImage = await ImageResizer.createResizedImage(
                 item.image.uri,
@@ -647,19 +647,20 @@ export const challengePost =
         challenge: challengePost,
         challengeRequest: CHALLENGE_REQUEST.REQUEST,
       };
-      console.log("postCreateRequest - ? ", uploadedChallengePost);
-      await PostsCollection.doc(previousPost.id).update(uploadedChallengePost);
-      console.log("updated --- > ");
+
+      await PostsCollection.doc(previousPost?.id?.toString()).update(
+        uploadedChallengePost
+      );
 
       const updatedPost = await (
-        await PostsCollection.doc(previousPost.id).get()
+        await PostsCollection.doc(previousPost?.id?.toString()).get()
       ).data();
-
+      const postAuthorId =
+        updatedPost?.author?.userId || updatedPost?.author?.userIds;
       const postAuthor = await (
-        await ProfilesCollection.doc(updatedPost?.author).get()
+        await ProfilesCollection.doc(postAuthorId?.toString()).get()
       ).data();
       //start from there
-
       const populatedPost = {
         ...updatedPost,
         author: {
@@ -1002,7 +1003,9 @@ export const likeUnlikeUserPosts = async (postId, onComplete) => {
 export const challengePostLikeUnlike = async (postId, isChallengePost) => {
   const currentUserUid = FireAuth().currentUser.uid;
   try {
-    const filterPost = await (await PostsCollection.doc(postId).get()).data();
+    const filterPost = await (
+      await PostsCollection.doc(postId.toString()).get()
+    ).data();
 
     console.log("shoePost - > ", postId);
     if (isChallengePost) {
@@ -1017,7 +1020,7 @@ export const challengePostLikeUnlike = async (postId, isChallengePost) => {
         const challengeObj = filterPost.challenge;
         challengeObj["likedUsers"] = [...likeUserList];
         challengeObj["likes"] = likeCount;
-        await PostsCollection.doc(postId).update({
+        await PostsCollection.doc(postId.toString()).update({
           challenge: challengeObj,
         });
       } else {
@@ -1028,7 +1031,7 @@ export const challengePostLikeUnlike = async (postId, isChallengePost) => {
         const challengeObj = filterPost.challenge;
         challengeObj["likedUsers"] = [...likeUserList];
         challengeObj["likes"] = likeCount;
-        await PostsCollection.doc(postId).update({
+        await PostsCollection.doc(postId.toString()).update({
           challenge: challengeObj,
         });
         console.log("DONE > ");
@@ -1039,7 +1042,7 @@ export const challengePostLikeUnlike = async (postId, isChallengePost) => {
           (item) => item !== currentUserUid
         );
         const likeCount = filterPost.likeOne - 1;
-        await PostsCollection.doc(postId).update({
+        await PostsCollection.doc(postId.toString()).update({
           likeOneUsers: [...likeUserList],
           likeOne: likeCount,
         });
@@ -1048,7 +1051,7 @@ export const challengePostLikeUnlike = async (postId, isChallengePost) => {
         const likeUserList = filterPost.likeOneUsers;
         likeUserList.push(currentUserUid);
         const likeCount = filterPost.likeOne + 1;
-        await PostsCollection.doc(postId).update({
+        await PostsCollection.doc(postId.toString()).update({
           likeOneUsers: [...likeUserList],
           likeOne: likeCount,
         });
@@ -1082,9 +1085,13 @@ export const likePost = (postId) => async (dispatch) => {
     ).data();
 
     // CHECKING IF USER ALREADY LIKED THE POST AND UPDATING USER PROFILE DOCUMENT
-    if (!userProfile.likedPosts.find((id) => id === postId)) {
+    if (
+      !userProfile.likedPosts.find(
+        (id) => id?.toString() === postId?.toString()
+      )
+    ) {
       await ProfilesCollection.doc(currentUserUid).update({
-        likedPosts: [...userProfile.likedPosts, postId],
+        likedPosts: [...userProfile.likedPosts, postId?.toString()],
       });
     }
 
@@ -1093,17 +1100,21 @@ export const likePost = (postId) => async (dispatch) => {
     ).data();
 
     // IF USER PROFILE LIKED POSTS ARRAY UPDATED THEN UPDATED POSTS LIKE COUNT
-    if (updatedUserProfile.likedPosts.find((id) => id === postId)) {
+    if (
+      updatedUserProfile.likedPosts.find(
+        (id) => id?.toString() === postId?.toString()
+      )
+    ) {
       const likedPostDoc = await (
-        await PostsCollection.doc(postId).get()
+        await PostsCollection.doc(postId?.toString()).get()
       ).data();
-      await PostsCollection.doc(postId).update({
+      await PostsCollection.doc(postId?.toString()).update({
         likes: likedPostDoc.likes + 1,
       });
     }
     // Populate Author
     const updatedPostDoc = await (
-      await PostsCollection.doc(postId).get()
+      await PostsCollection.doc(postId?.toString()).get()
     ).data();
     const postAuthor = await (
       await ProfilesCollection.doc(updatedPostDoc?.author).get()

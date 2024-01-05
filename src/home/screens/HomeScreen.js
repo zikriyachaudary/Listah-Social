@@ -163,7 +163,7 @@ const HomeScreen = ({ posts, getProfile }) => {
   const renderItem = ({ item, index }) => {
     return (
       <PostItem
-        id={item.id}
+        id={item?.id}
         post={item}
         postIndex={index}
         showIndex={toggleCheckBox}

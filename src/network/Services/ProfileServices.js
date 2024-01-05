@@ -236,7 +236,7 @@ const fetchUserProfile = async (userId, atComplete) => {
       if (data?.username) {
         atComplete({
           profileImage: data?.profileImage,
-          userIds: data?.userId,
+          userId: data?.userId,
           username: data?.username,
           verified: data?.verified ? true : false,
         });

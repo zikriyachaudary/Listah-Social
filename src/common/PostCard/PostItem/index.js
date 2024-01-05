@@ -5,17 +5,13 @@ import {
   ActivityIndicator,
   Image,
   StyleSheet,
-  TouchableOpacity,
   TouchableWithoutFeedback,
 } from "react-native";
 
 import Text from "../../Text";
 import View from "../../View";
-import Avatar from "../../Avatar";
 import PostActions from "./PostActions";
 import PostItemHeader from "./PostItemHeader";
-
-import { getPostsById } from "../../../home/redux/selectors";
 import Card from "../../Card";
 import LikeUserModal from "./LikeUserModal";
 import * as Colors from "../../../config/colors";
@@ -61,7 +57,6 @@ const PostItem = ({
         : post.challenge.items
       : []
   );
-  const [showMore, setShowMore] = useState(false);
   const [loading, setLoading] = useState(false);
   const [challengeLikeLoading, setChallengeLoading] = useState(false);
 
@@ -79,14 +74,7 @@ const PostItem = ({
   const _handlePostReact = async (isCallenge) => {
     if (isCallenge) {
       setChallengeLoading(true);
-      console.log("post?.id - > ", post?.id);
-
       await challengePostLikeUnlike(post?.id, isCallenge);
-      // if (!liked) {
-      //   await likePost(post?.id);
-      // } else {
-      //   await dislikePost(post?.id);
-      // }
       postRefresh();
       if (challengeLiked) {
         setChallengeLikesCount(challengeLikesCount - 1);
@@ -99,14 +87,7 @@ const PostItem = ({
       setChallengeLoading(false);
     } else {
       setLoading(true);
-      console.log("post?.id - > ", post?.id);
-
       await challengePostLikeUnlike(post?.id, isCallenge);
-      // if (!liked) {
-      //   await likePost(post?.id);
-      // } else {
-      //   await dislikePost(post?.id);
-      // }
       postRefresh();
       if (liked) {
         setLikesCount(likesCount - 1);
@@ -123,14 +104,14 @@ const PostItem = ({
   useEffect(() => {
     if (post?.likeOneUsers) {
       const isLiked =
-        post.likeOneUsers.filter((id) => id == profile.userId).length > 0
+        post.likeOneUsers.filter((id) => id == profile?.userId).length > 0
           ? true
           : false;
       setLiked(isLiked);
     }
     if (post.challenge && post.challenge.likedUsers) {
       const isChallengeLiked =
-        post.challenge.likedUsers.filter((id) => id == profile.userId).length >
+        post.challenge.likedUsers.filter((id) => id == profile?.userId).length >
         0
           ? true
           : false;
@@ -173,129 +154,112 @@ const PostItem = ({
       />
       <PostInnerItems post={post} userPosts={postItems} />
 
-      {post.challenge && post.challengeRequest == CHALLENGE_REQUEST.ACCEPT && (
-        <View>
-          <Touchable
-            horizontal
-            style={{ ...styles.btn }}
-            onPress={() => {
-              _handlePostReact(false);
-            }}
-          >
-            {loading ? (
-              <ActivityIndicator color={Colors.primary} />
-            ) : liked ? (
-              <LikeActiveIcon />
-            ) : (
-              <LikeInActiveIcon />
-            )}
-            <TouchableWithoutFeedback
+      {post?.challenge &&
+        post?.challengeRequest == CHALLENGE_REQUEST.ACCEPT && (
+          <View>
+            <Touchable
+              horizontal
+              style={{ ...styles.btn }}
               onPress={() => {
-                // likeUserOpenClicked()
+                _handlePostReact(false);
               }}
             >
-              <Text
-                style={[
-                  liked ? styles.btnActiveTxt : styles.btnTxt,
-                  { paddingHorizontal: 10 },
-                ]}
+              {loading ? (
+                <ActivityIndicator color={Colors.primary} />
+              ) : liked ? (
+                <LikeActiveIcon />
+              ) : (
+                <LikeInActiveIcon />
+              )}
+              <TouchableWithoutFeedback
+                onPress={() => {
+                  // likeUserOpenClicked()
+                }}
               >
-                {likesCount}
-              </Text>
-            </TouchableWithoutFeedback>
-          </Touchable>
-          <Image
-            style={{
-              width: 60,
-              height: 60,
-              justifyContent: "center",
-              alignSelf: "center",
-              marginBottom: 10,
-              aspectRatio: 1,
-              // transform: [{ rotate: '13deg'}]
-            }}
-            source={AppImages.Common.versus_icon}
-          />
-          <PostItemHeader
-            id={id}
-            post={post}
-            postIndex={postIndex}
-            showIndex={showIndex}
-            postDeleted={() => {
-              if (postDel) {
-                postDel();
-              }
-            }}
-            postRefresh={() => {
-              if (postRefresh) {
-                postRefresh();
-              }
-            }}
-            postReport={(isReportCount) => {
-              postReport(isReportCount);
-            }}
-            isChallenge={true}
-          />
-          <PostInnerItems post={post} userPosts={challengePostItems} />
+                <Text
+                  style={[
+                    liked ? styles.btnActiveTxt : styles.btnTxt,
+                    { paddingHorizontal: 10 },
+                  ]}
+                >
+                  {likesCount}
+                </Text>
+              </TouchableWithoutFeedback>
+            </Touchable>
+            <Image
+              style={{
+                width: 60,
+                height: 60,
+                justifyContent: "center",
+                alignSelf: "center",
+                marginBottom: 10,
+                aspectRatio: 1,
+              }}
+              source={AppImages.Common.versus_icon}
+            />
+            <PostItemHeader
+              id={id}
+              post={post}
+              postIndex={postIndex}
+              showIndex={showIndex}
+              postDeleted={() => {
+                if (postDel) {
+                  postDel();
+                }
+              }}
+              postRefresh={() => {
+                if (postRefresh) {
+                  postRefresh();
+                }
+              }}
+              postReport={(isReportCount) => {
+                postReport(isReportCount);
+              }}
+              isChallenge={true}
+            />
+            <PostInnerItems post={post} userPosts={challengePostItems} />
 
-          <Touchable
-            horizontal
-            style={{ ...styles.btn }}
-            onPress={() => {
-              _handlePostReact(true);
-            }}
-          >
-            {challengeLikeLoading ? (
-              <ActivityIndicator color={Colors.primary} />
-            ) : challengeLiked ? (
-              <LikeActiveIcon />
-            ) : (
-              <LikeInActiveIcon />
-            )}
-            <TouchableWithoutFeedback
+            <Touchable
+              horizontal
+              style={{ ...styles.btn }}
               onPress={() => {
-                // likeUserOpenClicked()
+                _handlePostReact(true);
               }}
             >
-              <Text
-                style={[
-                  challengeLiked ? styles.btnActiveTxt : styles.btnTxt,
-                  { paddingHorizontal: 10 },
-                ]}
+              {challengeLikeLoading ? (
+                <ActivityIndicator color={Colors.primary} />
+              ) : challengeLiked ? (
+                <LikeActiveIcon />
+              ) : (
+                <LikeInActiveIcon />
+              )}
+              <TouchableWithoutFeedback
+                onPress={() => {
+                  // likeUserOpenClicked()
+                }}
               >
-                {challengeLikesCount}
-              </Text>
-            </TouchableWithoutFeedback>
-          </Touchable>
-        </View>
-      )}
-
-      {/* {postItems?.length >= 0 && postItems?.map((item, index) => (
-        <View horizontal style={styles.item} key={index}>
-          {
-            post.isNumberShowInItems && (
-              <View style={styles.indexCounter}>
-                <Text sm bold>{post.order && post.order == "1" ? index === 0 ? 1 : index + 1 : postItems?.length - index}</Text>
-              </View>
-            )
-          }
-
-          {
-            item.image && (
-              <View style={styles.imgContainer}>
-                <Avatar style={{ borderRadius: 2 }} size={66} url={{ uri: `${item.image}` }} />
-              </View>
-            )
-          }
-
-          <Text flex center sm medium>{item.name || '--'}</Text>
-          <Text center xs light style={styles.descriptionTxt} >{item.description || '--'}</Text>
-        </View>
-      ))} */}
+                <Text
+                  style={[
+                    challengeLiked ? styles.btnActiveTxt : styles.btnTxt,
+                    { paddingHorizontal: 10 },
+                  ]}
+                >
+                  {challengeLikesCount}
+                </Text>
+              </TouchableWithoutFeedback>
+            </Touchable>
+          </View>
+        )}
 
       {post.description && (
         <Text style={{ marginTop: 10, fontSize: 16, color: "black" }}>
-          <B>{post?.announcement ? "A-Listah" : post.author.username}</B>{" "}
+          <B>
+            {post?.announcement
+              ? "A-Listah"
+              : post?.author?.username
+              ? post?.author?.username
+              : ""}
+          </B>{" "}
           {post.description}.
         </Text>
       )}
