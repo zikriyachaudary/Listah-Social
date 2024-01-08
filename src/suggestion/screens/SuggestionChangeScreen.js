@@ -1,4 +1,4 @@
-import { connect } from 'react-redux';
+import { connect, useSelector } from 'react-redux';
 import React, { useState } from 'react';
 import FastImage from 'react-native-fast-image'
 import FireAuth from '@react-native-firebase/auth';
@@ -19,6 +19,8 @@ import CheckIcon from '../../assets/icons/edit-check-icon.svg';
 import * as Colors from '../../config/colors';
 
 import { suggestPost as suggestPostAction } from '../redux/actions';
+import useNotificationManger from '../../hooks/useNotificationManger';
+import { Notification_Messages, Notification_Types } from '../../util/Strings';
 
 /* =============================================================================
 <SuggestionChangeScreen />
@@ -30,14 +32,23 @@ const SuggestionChangeScreen = ({ route, navigation, suggestPost }) => {
   const [description, setDescription] = useState('');
   const [loading, setLoading] = useState(false);
   const disabled = name || description || image;
+  const { suggestionAtPost } = useNotificationManger();
+  const selector = useSelector((AppState) => AppState);
 
   const _handleSubmit = async () => {
     if (disabled) {
       setLoading(true);
+      console.log("enter -- > " )
 
-      const storageRef = FireStorage().ref('post_media').child(image.fileName);
-      await storageRef.putFile(image.uri)
-      const uploadImgUrl = await storageRef.getDownloadURL();
+      let uploadImgUrl = "";
+      if (image?.fileName?.length > 0) {
+        const storageRef = FireStorage()
+          .ref("post_media")
+          .child(image.fileName);
+        await storageRef.putFile(image.uri);
+        uploadImgUrl = await storageRef.getDownloadURL();
+      }
+      console.log("enter2 -- > " )
 
       const payload = {
         type: 'suggestion',
@@ -48,11 +59,23 @@ const SuggestionChangeScreen = ({ route, navigation, suggestPost }) => {
         },
         postId,
         postTitle,
-        sender: FireAuth().currentUser.uid,
+        sender: {
+          userId: FireAuth().currentUser.uid,
+          username: FireAuth().currentUser.displayName
+        },
         authorId,
       };
 
-      await suggestPost(payload, () => {
+      await suggestPost(payload, async() => {
+        if (authorId != selector?.Auth?.user?.uid) {
+          console.log("call sent -- > ")
+          await suggestionAtPost({
+            actionType: Notification_Types.suggestion,
+            reciverId: authorId,
+            extraData: { postId: postId },
+            payload: payload
+          }, Notification_Messages.changeSuggestion);
+        }
         Alert.alert(
           'Suggestion Successful',
           'Your suggestion has been send',

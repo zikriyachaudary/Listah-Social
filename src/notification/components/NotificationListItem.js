@@ -20,10 +20,14 @@ const NotificationListItem = ({ notification }) => {
   const type = notification?.type;
 
   const _handleSuggestionPress = () => {
-    navigation.navigate("SuggestionStack", {
-      screen: "SuggestionApprove",
-      params: { suggestion: notification },
-    });
+    if (notification.payload) {
+      console.log("print -- > " , notification )
+      navigation.navigate("SuggestionStack", {
+        screen: "SuggestionApprove",
+        params: { suggestion: notification.payload },
+      });
+    }
+  
   };
 
   if (type === "suggestion") {
@@ -66,19 +70,21 @@ const NotificationListItem = ({ notification }) => {
   return (
     <TouchableWithoutFeedback
       onPress={() => {
+        console.log("print --- > " , notification)
         if (
           notification?.actionType == Notification_Types.announced ||
           notification?.actionType == Notification_Types.challenge ||
           notification?.actionType == Notification_Types.comment ||
           notification?.actionType == Notification_Types.follow ||
-          notification?.actionType == Notification_Types.like ||
-          notification?.actionType == Notification_Types.suggestion
+          notification?.actionType == Notification_Types.like 
         ) {
           navigation.navigate("MyPosts", {
             userId: notification.sender.id,
             username: notification.sender.name,
             refreshCall: postRefresh,
           });
+        }else if (notification?.actionType == Notification_Types.suggestion) {
+          _handleSuggestionPress()
         }
       }}
     >

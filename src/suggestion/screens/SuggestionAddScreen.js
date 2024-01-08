@@ -18,7 +18,7 @@ import CheckIcon from "../../assets/icons/edit-check-icon.svg";
 import * as Colors from "../../config/colors";
 
 import { suggestPost as suggestPostAction } from "../redux/actions";
-import { Notification_Types } from "../../util/Strings";
+import { Notification_Messages, Notification_Types } from "../../util/Strings";
 import useNotificationManger from "../../hooks/useNotificationManger";
 
 /* =============================================================================
@@ -59,16 +59,21 @@ const SuggestionAddScreen = ({ route, navigation, suggestPost }) => {
         },
         postId,
         postTitle,
-        sender: FireAuth().currentUser.uid,
+        sender: {
+          userId: FireAuth().currentUser.uid,
+          username: FireAuth().currentUser.displayName
+        },
         authorId,
       };
       await suggestPost(payload, async () => {
         if (authorId != selector?.Auth?.user?.uid) {
+          console.log("call sent -- > ")
           await suggestionAtPost({
             actionType: Notification_Types.suggestion,
             reciverId: authorId,
             extraData: { postId: postId },
-          });
+            payload: payload
+          }, Notification_Messages.suggestion);
         }
 
         Alert.alert("Suggestion Successful", "Your suggestion has been send", [

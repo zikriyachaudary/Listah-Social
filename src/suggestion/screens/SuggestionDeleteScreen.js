@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { connect } from 'react-redux';
+import { connect, useSelector } from 'react-redux';
 import FastImage from 'react-native-fast-image'
 import FireAuth from '@react-native-firebase/auth';
 import { ActivityIndicator, Alert, Image, StyleSheet } from 'react-native';
@@ -16,6 +16,8 @@ import CheckIcon from '../../assets/icons/edit-check-icon.svg';
 import * as Colors from '../../config/colors';
 
 import { suggestPost as suggestPostAction } from '../redux/actions';
+import useNotificationManger from '../../hooks/useNotificationManger';
+import { Notification_Messages, Notification_Types } from '../../util/Strings';
 
 /* =============================================================================
 <SuggestionDeleteScreen />
@@ -23,6 +25,8 @@ import { suggestPost as suggestPostAction } from '../redux/actions';
 const SuggestionDeleteScreen = ({ route, navigation, suggestPost }) => {
   const { item, postTitle, postId, authorId } = route?.params;
   const [loading, setLoading] = useState(false);
+  const { suggestionAtPost } = useNotificationManger();
+  const selector = useSelector((AppState) => AppState);
 
   const _handleSubmit = async () => {
     if (item) {
@@ -35,11 +39,23 @@ const SuggestionDeleteScreen = ({ route, navigation, suggestPost }) => {
         },
         postId,
         postTitle,
-        sender: FireAuth().currentUser.uid,
+        sender: {
+          userId: FireAuth().currentUser.uid,
+          username: FireAuth().currentUser.displayName
+        },
         authorId,
       };
 
-      await suggestPost(payload, () => {
+      await suggestPost(payload, async () => {
+        if (authorId != selector?.Auth?.user?.uid) {
+          console.log("call sent -- > ")
+          await suggestionAtPost({
+            actionType: Notification_Types.suggestion,
+            reciverId: authorId,
+            extraData: { postId: postId },
+            payload: payload
+          }, Notification_Messages.delSuggestion);
+        }
         Alert.alert(
           'Suggestion Successful',
           'Your suggestion has been send',
