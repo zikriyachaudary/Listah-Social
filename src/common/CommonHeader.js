@@ -116,6 +116,7 @@ const styles = StyleSheet.create({
     paddingTop: Platform.OS == "ios" ? hv(18) : hv(5),
   },
   title: {
+    marginTop: 10,
     marginStart: normalized(10),
     color: AppColors.white.white,
     fontSize: normalized(18),

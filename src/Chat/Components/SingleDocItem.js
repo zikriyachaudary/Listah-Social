@@ -24,9 +24,8 @@ const SingleDocItem = ({ item, onOpen }) => {
             height: normalized(50),
             width: normalized(50),
             alignSelf: "center",
-            tintColor: AppColors.blue.navy,
           }}
-          source={AppImages.Chat.Document}
+          source={AppImages.Chat.documentIcon}
         />
       </View>
     </TouchableWithoutFeedback>

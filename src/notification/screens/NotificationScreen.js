@@ -6,13 +6,13 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Container } from "../../common";
 import NotificationListItem from "../components/NotificationListItem";
-import NotificationsListHeader from "../components/NotificationsListHeader";
 import NotificationsListEmpty from "../components/NotificationsListEmpty";
 
 import { getNotifications as selectNotifications } from "../redux/selectors";
 import { getNotifications as getNotificationsAction } from "../redux/actions";
 import useNotificationManger from "../../hooks/useNotificationManger";
-import { AppColors } from "../../util/AppConstant";
+import { AppColors, normalized } from "../../util/AppConstant";
+import CustomHeader from "../../common/CommonHeader";
 
 /* =============================================================================
 <NotificationScreen />
@@ -46,6 +46,14 @@ const NotificationScreen = ({ notifications, getNotifications }) => {
 
   return (
     <Container>
+      <CustomHeader
+        isStatusBar={true}
+        title={"Notifications"}
+        mainStyle={{
+          backgroundColor: AppColors.blue.royalBlue,
+          height: normalized(insets.top + 40),
+        }}
+      />
       {loader ? (
         <View
           style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
@@ -54,12 +62,11 @@ const NotificationScreen = ({ notifications, getNotifications }) => {
         </View>
       ) : (
         <FlatList
+          showsVerticalScrollIndicator={false}
           data={notificationList?.reverse()}
-          refreshing={false}
           renderItem={renderItem}
           keyExtractor={renderKeyExtractor}
           contentContainerStyle={styles.content}
-          ListHeaderComponent={NotificationsListHeader}
           ListEmptyComponent={NotificationsListEmpty}
         />
       )}
@@ -76,7 +83,6 @@ const getStyles = (insets) =>
   StyleSheet.create({
     content: {
       flexGrow: 1,
-      paddingTop: insets.top + 20,
       paddingHorizontal: 18,
     },
   });

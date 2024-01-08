@@ -93,14 +93,19 @@ const PostItemHeader = ({
       <TouchableOpacity
         disabled={post?.announcement}
         onPress={() => {
-          if (username == post.author.username && route.name == "MyPosts") {
+          let userId = isChallenge
+            ? post?.challenge?.author?.userId
+            : post?.author?.userId;
+          if (
+            username == post.author.username &&
+            route.name == "MyPosts" &&
+            !userId
+          ) {
             return;
           }
 
           navigation.push("MyPosts", {
-            userId: isChallenge
-              ? post?.challenge.author.userId
-              : post.author.userId,
+            userId: userId,
             username: username,
             refreshCall: postRefresh,
           });

@@ -18,7 +18,6 @@ import { createThumbnail } from "react-native-create-thumbnail";
 import DocumentPicker, { types } from "react-native-document-picker";
 import RNFS from "react-native-fs";
 import { setIsAppLoader, setIsHideTabBar } from "../../redux/action/AppLogics";
-
 import ThreadManager from "../../ChatModule/ThreadManger";
 import moment from "moment";
 import ChatHeader from "../Components/ChatHeader";
@@ -46,6 +45,7 @@ const ChatScreen = (props) => {
   const [openSelectionMediaModal, setOpenSelectionMediaModal] = useState(false);
   const dispatch = useDispatch();
   const scrollToBottomRef = useRef(null);
+  const [receiverFcmToken, setReceiverFcmToken] = useState(null);
   const [message, setMessage] = useState("");
   const currentlyVisibleMessages = useRef([]);
   const [isKeyboardVisible, setKeyboardVisible] = useState(false);
@@ -64,21 +64,32 @@ const ChatScreen = (props) => {
   var initialMessageRef = useRef();
   var threadRef = useRef();
   var initialCall = useRef();
-  // useEffect(() => {
-  //   if (props?.route?.params?.thread) {
-  //     getOtherUpdatedData();
-  //   }
-  // }, [props?.route?.params?.thread]);
+  useEffect(() => {
+    if (props?.route?.params?.thread) {
+      fetchFcmToken();
+    }
+  }, [props?.route?.params?.thread]);
+  const fetchFcmToken = () => {
+    let participants = props?.route?.params?.thread
+      ? typeof props?.route?.params?.thread?.participants == "string"
+        ? JSON.parse(props?.route?.params?.thread?.participants)
+        : props?.route?.params?.thread?.participants
+      : typeof thread.participants == "string"
+      ? JSON.parse(thread.participants)
+      : thread.participants;
 
-  // const getOtherUpdatedData = async () => {
-  //   let participants = props?.route?.params?.thread
-  //     ? typeof props?.route?.params?.thread?.participants == "string"
-  //       ? JSON.parse(props?.route?.params?.thread?.participants)
-  //       : props?.route?.params?.thread?.participants
-  //     : typeof thread.participants == "string"
-  //     ? JSON.parse(thread.participants)
-  //     : thread.participants;
-  // };
+    let otherIndex = participants.findIndex((value) => value.user != userId);
+    if (otherIndex != -1) {
+      ThreadManager.instance.getupdatedUserData(
+        participants[otherIndex]?.user,
+        (response) => {
+          setReceiverFcmToken(response?.fcmToken);
+          console.log("response----->", response?.fcmToken);
+        }
+      );
+    }
+  };
+
   useFocusEffect(() => {
     if (isFocused) {
       dispatch(setIsHideTabBar(true));
@@ -277,7 +288,6 @@ const ChatScreen = (props) => {
         otherUserRef.current = participants[otherUserIndex];
         name = participants[otherUserIndex]?.userName;
       }
-
       return name;
     }
   };
@@ -286,7 +296,6 @@ const ChatScreen = (props) => {
     let currentDate = moment
       .utc(new Date())
       .format(ThreadManager.instance.dateFormater.fullDate);
-    console.log("currentUserData----->", currentUserData);
 
     let data = {
       created: currentDate,
@@ -312,9 +321,6 @@ const ChatScreen = (props) => {
     if (data["url"]) {
       lastMessage = "Photo";
     }
-    if (data["videoUrl"]) {
-      lastMessage = "Video";
-    }
     if (data["documentUrl"]) {
       lastMessage = "Document";
     }
@@ -328,7 +334,7 @@ const ChatScreen = (props) => {
     createSectionData();
     ThreadManager.instance
       .sendMessage(threadRef.current.channelID, data)
-      .then(() => {
+      .then(async () => {
         let payload = {
           reply: params?.reply ? params.reply : null,
           marked: params?.marked ? params.marked : null,
@@ -340,30 +346,52 @@ const ChatScreen = (props) => {
           currentDate,
           payload
         );
-        setTimeout(() => {
-          ThreadManager.instance.fetchMessageData(
-            threadRef.current.channelID,
-            data?.messageId,
-            (response) => {
-              if (response?.length == 0) {
-                let fullName = currentUserData?.username
-                  ? currentUserData.username
-                  : "";
-                ThreadManager.instance.generatePushNotification(
-                  threadRef.current,
-                  {
-                    id: currentUserData?.userId,
-                    userName: capitalizeFirstLetter(fullName),
-                    image: currentUserData?.profileImage,
-                  },
-                  otherUserRef.current,
-                  lastMessage,
-                  Notification_Types.chat_messages
-                );
-              }
-            }
+        let fullName = capitalizeFirstLetter(
+          currentUserData?.username ? currentUserData.username : ""
+        );
+        setTimeout(async () => {
+          await ThreadManager.instance.updateNotificationList(
+            threadRef.current,
+            {
+              id: currentUserData?.userId,
+              userName: fullName,
+              image: currentUserData?.profileImage,
+            },
+            otherUserRef.current,
+            lastMessage,
+            Notification_Types.chat_messages
           );
         }, 1000);
+        if (receiverFcmToken) {
+          setTimeout(() => {
+            ThreadManager.instance.fetchMessageData(
+              threadRef.current.channelID,
+              data?.messageId,
+              (response) => {
+                if (response?.length == 0) {
+                  let notification = {
+                    title: fullName,
+                    body: lastMessage,
+                  };
+                  let params = {
+                    to: receiverFcmToken,
+                    notification: notification,
+                    data: {
+                      thread: threadRef?.current,
+                      actionType: Notification_Types.chat_messages,
+                    },
+                  };
+                  sendPushNotification(params, (type) => {
+                    if (type) {
+                      console.log("notification send", type);
+                    }
+                  });
+                  ////////
+                }
+              }
+            );
+          }, 1000);
+        }
       })
       .catch((error) => {
         console.log("error==---=>", error);

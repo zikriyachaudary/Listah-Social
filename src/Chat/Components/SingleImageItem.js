@@ -2,10 +2,10 @@ import React, { useState } from "react";
 import {
   View,
   StyleSheet,
-  Image,
   ActivityIndicator,
   TouchableWithoutFeedback,
 } from "react-native";
+import FastImage from "react-native-fast-image";
 const SingleImageItem = ({ item, onPress }) => {
   const [loading, setLoading] = useState(true);
   return (
@@ -15,7 +15,7 @@ const SingleImageItem = ({ item, onPress }) => {
           ...style.mainView,
         }}
       >
-        <Image
+        <FastImage
           style={{
             ...style.innerView,
           }}

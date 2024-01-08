@@ -171,6 +171,7 @@ export const AppImages = {
     emptyChat: require("../assets/images/Chat/emptyChat.png"),
     Microphone: require("../assets/images/Chat/Microphone.png"),
     chat: require("../assets/images/Chat/chat.png"),
+    documentIcon: require("../assets/images/Chat/documentIcon.png"),
   },
 };
 

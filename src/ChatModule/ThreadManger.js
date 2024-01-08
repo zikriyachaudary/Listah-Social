@@ -373,14 +373,7 @@ class ThreadManager {
       .set(data);
   };
   // SEND PUSH NOTIFICATION
-  generatePushNotification = async (
-    thread,
-    sender,
-    receiver,
-    message,
-    type
-  ) => {
-    ////////
+  updateNotificationList = async (thread, sender, receiver, message, type) => {
     let updatedReciverData = null;
     let completeNotiList = [];
     await this.getupdatedUserData(receiver?.user?.toString(), async (res) => {
@@ -400,33 +393,11 @@ class ThreadManager {
       };
       let newArr = [];
       newArr = [...completeNotiList, newObj];
-
       await firestore()
         .collection(Collections.NOTIFICATION)
         .doc(receiver?.user)
         .update({ notification_List: newArr })
-        .then(() => {
-          if (updatedReciverData?.fcmToken && updatedReciverData?.userId) {
-            let notification = {
-              title: sender?.userName,
-              body: message,
-            };
-            let params = {
-              to: updatedReciverData?.fcmToken,
-              notification: notification,
-              data: {
-                thread: thread,
-                actionType: type,
-              },
-            };
-            console.log("params----->", params);
-            sendPushNotification(params, (type) => {
-              if (type) {
-                console.log("notification send", type);
-              }
-            });
-          }
-        })
+        .then(() => {})
         .catch((error) => {
           console.error("Error updating array value:", error);
         });
