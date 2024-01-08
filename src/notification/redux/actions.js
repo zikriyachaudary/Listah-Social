@@ -2,8 +2,12 @@ import FireStore from "@react-native-firebase/firestore";
 import FireAuth from "@react-native-firebase/auth";
 import * as constants from "./constants";
 import { setNotificationData } from "../../home/redux/appLogics";
+import { Collections } from "../../util/Strings";
 
 const ProfilesCollection = FireStore().collection("profiles");
+const NotificationsCollection = FireStore().collection(
+  Collections.NOTIFICATION
+);
 
 export const getLoginUserNotificationCount = async (dispatch) => {
   console.log("enter");
@@ -108,20 +112,38 @@ const updateUnread = async (currentUser, filterNot) => {
 /**
  * DELETE_NOTIFICATION
  */
-export const deleteNotification = (id) => async (dispatch) => {
+export const deleteNotification = (item) => async (dispatch) => {
   try {
     dispatch({ type: constants.DELETE_NOTIFICATION.REQUEST });
     const currentUser = FireAuth().currentUser.uid;
 
+    console.log("printNotificationItem - ?", item);
     const currentUserProfile = await (
-      await ProfilesCollection.doc(currentUser).get()
+      await NotificationsCollection.doc(currentUser).get()
     ).data();
-    const filteredNotifications = currentUserProfile.notifications?.filter(
-      (notification) => notification.id !== id
+    console.log(
+      "currentUserProfile.notification_List - ?",
+      currentUserProfile.notification_List,
+      item
     );
 
-    await ProfilesCollection.doc(currentUser).update({
-      notifications: filteredNotifications,
+    const filteredNotifications = [];
+    currentUserProfile.notification_List?.map((notification) => {
+      if (
+        notification &&
+        notification.payload &&
+        notification.payload.type == "suggestion" &&
+        notification.payload.postId == item.postId
+      ) {
+        console.log("delete -- > ", notification);
+      } else {
+        filteredNotifications.push(notification);
+      }
+    });
+    console.log("filteredNotifications - ?", filteredNotifications);
+
+    await NotificationsCollection.doc(currentUser).update({
+      notification_List: filteredNotifications,
     });
 
     dispatch({

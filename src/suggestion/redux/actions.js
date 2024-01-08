@@ -115,7 +115,7 @@ export const suggestApprove = (suggestion, cb) => async (dispatch) => {
       );
     }
 
-    dispatch(deleteNotification(suggestion?.id));
+    dispatch(deleteNotification(suggestion));
 
     dispatch({ type: constants.APPROVE_SUGGESTION.SUCCESS });
 

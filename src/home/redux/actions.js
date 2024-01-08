@@ -193,8 +193,9 @@ export const getMyHomePosts = async () => {
           }
         } else {
           const obj = allPosts[i];
-          obj["author"] = allPosts[i].author.userId;
-          if (followingUsers[j] === allPosts[i].author.userId) {
+          console.log("print --- > " , allPosts[i])
+          obj["author"] = allPosts[i].author.userIds ? allPosts[i].author.userIds : allPosts[i].author.userId;
+          if (followingUsers[j] === allPosts[i].author.userIds ? allPosts[i].author.userIds : allPosts[i].author.userId) {
             followedUserPost.push(obj);
           }
         }
@@ -205,8 +206,8 @@ export const getMyHomePosts = async () => {
         }
       } else {
         const obj = allPosts[i];
-        obj["author"] = allPosts[i].author.userId;
-        if (allPosts[i].author.userId === currentUserUid) {
+        obj["author"] = allPosts[i].author.userIds ? allPosts[i].author.userIds : allPosts[i].author.userId;
+        if (allPosts[i].author.userIds ? allPosts[i].author.userIds : allPosts[i].author.userId === currentUserUid) {
           followedUserPost.push(obj);
         }
       }
@@ -256,12 +257,14 @@ export const getMyHomePosts = async () => {
       finalPopularPosts = populatedPosts;
     }
 
-    // console.log("alreadyBlockUsersIdsHome - > ", alreadyBlockUsersId)
+    console.log("alreadyBlockUsersIdsHome - > ", finalPopularPosts.length)
     // // populatedPosts.filter((item) => item.author)
 
     return finalPopularPosts;
     // dispatch({ type: constants.GET_HOME_POSTS.SUCCESS, payload: populatedPosts });
   } catch (error) {
+    console.log("error - > ", error)
+
     return [];
     // dispatch({ type: constants.GET_HOME_POSTS.FAIL, error });
   }

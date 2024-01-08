@@ -7,6 +7,8 @@ import {
 } from "../util/Strings";
 import { sendPushNotification } from "../network/Services/NotificationServices";
 import { setIsUnReadMsg } from "../redux/action/AppLogics";
+import auth from "@react-native-firebase/auth";
+
 const useNotificationManger = (props) => {
   const dispatch = useDispatch();
   const selector = useSelector((AppState) => AppState);
@@ -95,6 +97,10 @@ const useNotificationManger = (props) => {
         sender: sender,
         extraData: null,
       };
+        if (obj.payload) {
+        newObj["payload"] = obj.payload
+      }
+      console.log("printNewObj - > " , newObj)
       let newArr = [];
       if (obj?.actionType == Notification_Types.follow) {
         newArr = [...completeNotiList, newObj];
@@ -156,6 +162,10 @@ const useNotificationManger = (props) => {
         sender: sender,
         extraData: obj?.extraData,
       };
+        if (obj.payload) {
+        newObj["payload"] = obj.payload
+      }
+      console.log("printNewObj - > " , newObj)
       let newArr = [];
       if (obj?.actionType == Notification_Types.like) {
         newArr = [...completeNotiList, newObj];
@@ -190,7 +200,7 @@ const useNotificationManger = (props) => {
         });
     });
   };
-  const suggestionAtPost = async (obj) => {
+  const suggestionAtPost = async (obj, suggestionMessage) => {
     let updatedReciverData = null;
     let completeNotiList = [];
     let sender = {
@@ -212,14 +222,20 @@ const useNotificationManger = (props) => {
       }
       let newObj = {
         reciverId: obj?.reciverId,
-        message: `${selector?.Profile?.profile?.username} ${Notification_Messages.suggestion}`,
+        message: `${selector?.Profile?.profile?.username} ${suggestionMessage}`,
         actionType: obj?.actionType,
         sender: sender,
         extraData: obj?.extraData,
       };
+
+      if (obj.payload) {
+        newObj["payload"] = obj.payload
+      }
+      console.log("printNewObj - > " , newObj)
       let newArr = [];
       newArr = [...completeNotiList, newObj];
 
+    
       await firestore()
         .collection(Collections.NOTIFICATION)
         .doc(obj?.reciverId)
@@ -260,6 +276,10 @@ const useNotificationManger = (props) => {
         sender: sender,
         extraData: obj?.extraData,
       };
+        if (obj.payload) {
+        newObj["payload"] = obj.payload
+      }
+      console.log("printNewObj - > " , newObj)
       let newArr = [];
       newArr = [...completeNotiList, newObj];
 
@@ -303,6 +323,11 @@ const useNotificationManger = (props) => {
         sender: sender,
         extraData: obj?.extraData,
       };
+
+        if (obj.payload) {
+        newObj["payload"] = obj.payload
+      }
+      console.log("printNewObj - > " , newObj)
       let newArr = [];
       newArr = [...completeNotiList, newObj];
 
@@ -345,9 +370,13 @@ const useNotificationManger = (props) => {
     }
   };
   const fetchNotificationList = async (onComplete) => {
+
+    const userId = auth().currentUser.uid
+    console.log("printUserId - > " , userId, selector?.Profile?.profile?.userId)
     await firestore()
       .collection(Collections.NOTIFICATION)
-      .doc(selector?.Profile?.profile?.userId)
+      .doc(userId)
+      // .doc(selector?.Profile?.profile?.userId)
       .get()
       .then((snapDoc) => {
         if (snapDoc?._data && snapDoc?._data?.notification_List?.length > 0) {

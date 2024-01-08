@@ -29,6 +29,8 @@ export const Notification_Messages = {
   followMsg: "is now following you",
   likeMsg: "liked your post",
   suggestion: "gave a suggestion to your post",
+  delSuggestion: "gave a suggestion to delete the item of post",
+  changeSuggestion: "gave a suggestion to change the item of post",
   challenge: "challenged your post",
   comment: "commented on your post",
   announcment: "announced a post",

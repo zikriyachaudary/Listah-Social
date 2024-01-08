@@ -8,7 +8,6 @@ import {
 
 import { Text, Touchable, View } from "../../common";
 import LoadingImage from "../../common/LoadingImage";
-import * as Colors from "../../config/colors";
 import { Notification_Types } from "../../util/Strings";
 import { AppColors, normalized } from "../../util/AppConstant";
 import { Routes } from "../../util/Route";
@@ -21,10 +20,13 @@ const NotificationListItem = ({ notification }) => {
   const type = notification?.type;
 
   const _handleSuggestionPress = () => {
-    navigation.navigate("SuggestionStack", {
-      screen: "SuggestionApprove",
-      params: { suggestion: notification },
-    });
+    if (notification.payload) {
+      console.log("print -- > ", notification);
+      navigation.navigate("SuggestionStack", {
+        screen: "SuggestionApprove",
+        params: { suggestion: notification.payload },
+      });
+    }
   };
 
   if (type === "suggestion") {
@@ -67,15 +69,12 @@ const NotificationListItem = ({ notification }) => {
   return (
     <TouchableWithoutFeedback
       onPress={() => {
-        console.log("notification----->", notification);
-
         if (
           notification?.actionType == Notification_Types.announced ||
           notification?.actionType == Notification_Types.challenge ||
           notification?.actionType == Notification_Types.comment ||
           notification?.actionType == Notification_Types.follow ||
-          notification?.actionType == Notification_Types.like ||
-          notification?.actionType == Notification_Types.suggestion
+          notification?.actionType == Notification_Types.like
         ) {
           navigation.navigate("MyPosts", {
             userId: notification.sender.id,
@@ -88,6 +87,8 @@ const NotificationListItem = ({ notification }) => {
           navigation.navigate(Routes.Chat.chatScreen, {
             thread: notification?.thread,
           });
+        } else if (notification?.actionType == Notification_Types.suggestion) {
+          _handleSuggestionPress();
         }
       }}
     >

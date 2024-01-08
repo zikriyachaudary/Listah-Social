@@ -98,7 +98,7 @@ const HomeScreen = ({ posts, getProfile }) => {
   const getMyUserHomePosts = async () => {
     const mAnnouncementPosts = await getAnnouncementPosts();
     const mHomePosts = await getMyHomePosts();
-    allHomePosts = mHomePosts;
+    // allHomePosts = mHomePosts;
     if (UPDATE_CHALLENGE_FEATURE.isUpdate) {
       setHomePosts([]);
       UPDATE_CHALLENGE_FEATURE.isUpdate = false;
