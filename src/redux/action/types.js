@@ -10,3 +10,5 @@ export const SET_SHOW_SPLASH = "SET_SHOW_SPLASH";
 export const SET_IS_UN_READED = "SET_IS_UN_READED";
 export const SET_CATEGORIES_LIST = "SET_CATEGORIES_LIST";
 export const SET_APP_LOADER = "SET_APP_LOADER";
+export const SET_THREAD_LIST = "SET_THREAD_LIST";
+export const SET_HIDE_TAB = "SET_HIDE_TAB";

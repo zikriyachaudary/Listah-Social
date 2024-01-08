@@ -94,14 +94,7 @@ const HomeScreen = ({ posts, getProfile }) => {
     setLoaderVisible(true);
     getMyUserHomePosts();
   }, [selector.Home.isPostRefresh]);
-  useEffect(() => {
-    console.log(
-      "filterByCatList----->",
-      filterByCatList?.length,
-      "-------",
-      homePosts?.length
-    );
-  }, [filterByCatList, homePosts]);
+  useEffect(() => {}, [filterByCatList, homePosts]);
   const getMyUserHomePosts = async () => {
     const mAnnouncementPosts = await getAnnouncementPosts();
     const mHomePosts = await getMyHomePosts();

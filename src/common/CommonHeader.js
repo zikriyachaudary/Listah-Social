@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: AppHorizontalMargin,
     alignItems: "center",
-    paddingTop: Platform.OS == "ios" ? hv(10) : hv(5),
+    paddingTop: Platform.OS == "ios" ? hv(18) : hv(5),
   },
   title: {
     marginStart: normalized(10),

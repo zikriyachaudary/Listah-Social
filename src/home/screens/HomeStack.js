@@ -17,6 +17,8 @@ import { Routes } from "../../util/Route";
 import UserRequestListScreen from "../../profile/screens/UserRequestList";
 import AppUserListScreen from "../../profile/screens/AppUsersListScreen";
 import RequestForVerifyAccountScreen from "../../profile/screens/RequestForVerifyAccountScreen";
+import ChatScreen from "../../Chat/Screens/ChatScreen";
+import ChatListingScreen from "../../Chat/Screens/ChatListingScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -68,6 +70,8 @@ const HomeStack = () => {
         name={Routes.Profile.requestForVerify}
         component={RequestForVerifyAccountScreen}
       />
+      <Stack.Screen name={Routes.Chat.chatList} component={ChatListingScreen} />
+      <Stack.Screen name={Routes.Chat.chatScreen} component={ChatScreen} />
     </Stack.Navigator>
   );
 };

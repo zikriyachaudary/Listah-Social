@@ -16,7 +16,7 @@ import { getProfile as getProfileAction } from "../profile/redux/actions";
 import { changeAuthState as changeAuthStateAction } from "../auth/redux/actions";
 import FullImageModal from "../common/PostCard/PostItem/FullImageModal";
 import { showFullImage } from "../home/redux/appLogics";
-import { getUserDraftPost } from "../util/helperFun";
+import { getUserDraftPost, setUpChat } from "../util/helperFun";
 import {
   setAllUserFCMToken,
   setDraftPost,
@@ -32,6 +32,8 @@ import { navigate, navigationRef } from "./RootNavigation";
 import { fetchCategoriesList } from "../network/Services/ProfileServices";
 import RNSplashScreen from "../auth/screens/SplashScreen";
 import { AppLoader } from "../common/AppLoader";
+import ThreadManager from "../ChatModule/ThreadManger";
+import { Routes } from "../util/Route";
 const Stack = createNativeStackNavigator();
 
 /* =============================================================================
@@ -64,8 +66,24 @@ const AppNavigation = ({ changeAuthState, getProfile, authenticated }) => {
       setTimeout(() => {
         setShowSplash(false);
       }, 3000);
+      ThreadManager.instance.setupRedux(selector?.sliceReducer, dispatch);
+      user?.uid ? setChat(user?.uid) : null;
+      return () => {
+        ThreadManager.instance.removeThreadObserver();
+      };
     });
   }, []);
+  const setChat = async (userId) => {
+    setTimeout(async () => {
+      if (userId) {
+        await setUpChat(userId, async (result) => {
+          setTimeout(async () => {
+            ThreadManager.instance.setAppLoaded();
+          }, 3000);
+        });
+      }
+    }, 1000);
+  };
 
   // Get Profile
   useEffect(() => {
@@ -116,17 +134,6 @@ const AppNavigation = ({ changeAuthState, getProfile, authenticated }) => {
   const hasPermission = async () => {
     return await notifications.hasPermission();
   };
-
-  const setBadge = async (number) => {
-    //only works on iOS and some Android Devices
-    return await notifications.setBadge(number);
-  };
-
-  const getBadge = async () => {
-    //only works on iOS and some Android Devices
-    return await notifications.getBadge();
-  };
-
   const getInitialNotification = async () => {
     const notification = await notifications
       .getInitialNotification()
@@ -159,6 +166,10 @@ const AppNavigation = ({ changeAuthState, getProfile, authenticated }) => {
         userId: obj?.senderId,
         username: obj?.senderName,
         refreshCall: postRefresh,
+      });
+    } else if (obj?.actionType == Notification_Types.chat_messages) {
+      navigate(Routes.Chat.chatScreen, {
+        thread: obj?.thread,
       });
     }
   };
@@ -327,12 +338,6 @@ const AppNavigation = ({ changeAuthState, getProfile, authenticated }) => {
     </NavigationContainer>
   );
 };
-
-const EMPTY_SCREEN = () => (
-  <View center flex>
-    <Text>You Are Logged In</Text>
-  </View>
-);
 
 const THEME = {
   dark: false,

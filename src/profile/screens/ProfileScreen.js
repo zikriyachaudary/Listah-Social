@@ -105,6 +105,25 @@ const ProfileScreen = ({ profile, getProfile, logout, deleteUserAccount }) => {
           style={{ ...styles.item, paddingVertical: normalized(5) }}
           activeOpacity={1}
           onPress={() => {
+            navigation.navigate(Routes.Chat.chatList);
+          }}
+        >
+          <Image
+            source={AppImages.Chat.chat}
+            style={{
+              height: normalized(20),
+              width: normalized(20),
+              tintColor: AppColors.blue.navy,
+            }}
+          />
+          <View style={styles.itemInfoContainer}>
+            <Text normal>{"Chat"}</Text>
+          </View>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={{ ...styles.item, paddingVertical: normalized(5) }}
+          activeOpacity={1}
+          onPress={() => {
             navigation.navigate("DraftPostListing");
           }}
         >

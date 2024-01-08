@@ -5,10 +5,12 @@ import {
   SET_APP_LOADER,
   SET_CATEGORIES_LIST,
   SET_DRAFT_POST,
+  SET_HIDE_TAB,
   SET_IS_ADMIN,
   SET_IS_UN_READED,
   SET_PUSH_NOTI,
   SET_SHOW_SPLASH,
+  SET_THREAD_LIST,
   SET_UPDATE_FB_TOKEN,
 } from "./types";
 
@@ -64,5 +66,15 @@ export const setCategoriesInRed = (data) => ({
 
 export const setIsAppLoader = (data) => ({
   type: SET_APP_LOADER,
+  data: data,
+});
+
+export const setThreadList = (data) => ({
+  type: SET_THREAD_LIST,
+  data: data,
+});
+
+export const setIsHideTabBar = (data) => ({
+  type: SET_HIDE_TAB,
   data: data,
 });

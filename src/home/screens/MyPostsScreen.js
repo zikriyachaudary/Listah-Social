@@ -2,26 +2,15 @@ import React, { useEffect, useState } from "react";
 import { connect, useDispatch, useSelector } from "react-redux";
 import {
   ActivityIndicator,
-  Dimensions,
   FlatList,
   StyleSheet,
-  TouchableOpacity,
   TouchableWithoutFeedback,
   View,
 } from "react-native";
 import { useIsFocused, useNavigation } from "@react-navigation/native";
-
 import { PostItem, Container, StackHeader, Button } from "../../common";
-import MyPostsListEmpty from "../components/MyPostsListEmpty";
-
 import { getMyPosts } from "../redux/selectors";
-import {
-  blockUsers,
-  getHomePosts,
-  getPostsByID,
-  getProfileDataByID,
-  refreshHomePosts,
-} from "../redux/actions";
+import { blockUsers, getPostsByID, getProfileDataByID } from "../redux/actions";
 import { getProfile } from "../../profile/redux/selectors";
 import * as Colors from "../../config/colors";
 import Text from "../../common/Text";
@@ -37,6 +26,10 @@ import { Notification_Types } from "../../util/Strings";
 import useNotificationManger from "../../hooks/useNotificationManger";
 import { AppColors, AppImages, normalized } from "../../util/AppConstant";
 import FastImage from "react-native-fast-image";
+import { Routes } from "../../util/Route";
+import ThreadManager from "../../ChatModule/ThreadManger";
+import { makeObjForInitialChat } from "../../util/helperFun";
+import { setIsAppLoader } from "../../redux/action/AppLogics";
 
 // import View from '../../common/View';
 // import Avatar from '../../common/Avatar';
@@ -48,7 +41,6 @@ import FastImage from "react-native-fast-image";
 ============================================================================= */
 const MyPostsScreen = ({ profile, route, unFollowUser, followUser }) => {
   const [loading, setLoading] = useState(false);
-
   const isFocused = useIsFocused();
   const [userPosts, setUserPosts] = useState([]);
   const [loaderVisible, setLoaderVisible] = useState(true);
@@ -154,7 +146,46 @@ const MyPostsScreen = ({ profile, route, unFollowUser, followUser }) => {
     await fetchUsersData();
     setLoading(false);
   };
-
+  const goToChat = async () => {
+    let threadObj = null;
+    ThreadManager.instance.checkIsConnectionExist(
+      profile?.userId,
+      userProfileInfo?.userId,
+      (threadData) => {
+        threadObj = threadData;
+      }
+    );
+    if (threadObj) {
+      navigation.navigate(Routes.Chat.chatScreen, {
+        thread: threadObj,
+      });
+    } else {
+      let senderObj = {};
+      let reciverObj = {};
+      senderObj = makeObjForInitialChat(profile);
+      reciverObj = makeObjForInitialChat(userProfileInfo);
+      ThreadManager.instance.setupRedux(selector?.sliceReducer, dispatch);
+      dispatch(setIsAppLoader(true));
+      let msg = "";
+      let docId = ThreadManager.instance.makeid(7);
+      await ThreadManager.instance.onSendCall(
+        senderObj,
+        reciverObj,
+        docId,
+        msg,
+        async (data) => {
+          dispatch(setIsAppLoader(false));
+          if (data != "error") {
+            navigation.navigate(Routes.Chat.chatScreen, {
+              thread: data,
+            });
+          } else {
+            alert(JSON.stringify(data));
+          }
+        }
+      );
+    }
+  };
   return (
     <Container>
       <StackHeader
@@ -269,32 +300,32 @@ const MyPostsScreen = ({ profile, route, unFollowUser, followUser }) => {
               </>
             </View>
 
-            {profile.userId !== route.params.userId && (
-              // <View
-              //   style={{
-              //     height: 40,
-              //     flex: 1,
-              //     marginHorizontal: 20,
-              //     backgroundColor: Colors.primary,
-              //     marginTop: 5,
-              //     borderRadius: 20,
-              //     justifyContent: "center",
-              //     alignItems: "center",
-              //   }}
-              // >
-              //   <Text style={{ color: "white", fontSize: 14 }} bold>
-              //     {isFollowed ? "Unfollow" : "Follow"}
-              //   </Text>
-              // </View>
-              <Button
-                title={isFollowUser ? "Unfollow" : "Follow"}
-                style={styles.btn}
-                loading={loading}
-                btnTxtStyles={styles.btnTxtStyles}
-                onPress={
-                  isFollowUser ? _handleUnFollowPress : _handleFollowPress
-                }
-              />
+            {profile?.userId !== route.params.userId && (
+              <View
+                style={{
+                  height: normalized(50),
+                  flexDirection: "row",
+                }}
+              >
+                <Button
+                  title={"Chat"}
+                  style={styles.btn}
+                  loading={loading}
+                  btnTxtStyles={styles.btnTxtStyles}
+                  onPress={() => {
+                    goToChat();
+                  }}
+                />
+                <Button
+                  title={isFollowUser ? "Unfollow" : "Follow"}
+                  style={styles.btn}
+                  loading={loading}
+                  btnTxtStyles={styles.btnTxtStyles}
+                  onPress={
+                    isFollowUser ? _handleUnFollowPress : _handleFollowPress
+                  }
+                />
+              </View>
             )}
           </View>
         </View>
@@ -362,9 +393,10 @@ const styles = StyleSheet.create({
   btn: {
     // width: 120,
     flex: 1,
-    marginHorizontal: 20,
+    marginHorizontal: 5,
     backgroundColor: Colors.primary,
     marginTop: 5,
+    height: normalized(40),
   },
   btnTxtStyles: {
     fontSize: 12,

@@ -10,8 +10,6 @@ import FollowingIcon from "../../assets/icons/nav-following-icon.svg";
 import AddIcon from "../../assets/icons/plus-btn.svg";
 
 import NavSearch from "../../assets/images/Common/Search.svg";
-
-import ProfileIcon from "../../assets/icons/nav-profile-icon.svg";
 import * as Colors from "../../config/colors";
 import { useSelector } from "react-redux";
 
@@ -105,7 +103,7 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.34,
     shadowRadius: 6.27,
-
+    display: "flex",
     elevation: 10,
   },
   badgeView: {

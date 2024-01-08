@@ -114,6 +114,11 @@ export const AppColors = {
     dark: "#D4A33C",
     light: "#D3A23B",
   },
+  green: {
+    lightGreen: "#EFF3F2",
+    primaryLight: "#76E2C6",
+    primaryLightButton: "#57dbba",
+  },
 };
 export const colorsList = [AppColors.gradient.dark, AppColors.gradient.light];
 
@@ -141,7 +146,6 @@ export const AppImages = {
     other: require("../assets/images/Common/other.jpeg"),
     cross: require("../assets/images/Common/cross.png"),
     arrowDown: require("../assets/images/Common/arrowDown.png"),
-
     listahIcon: require("../assets/images/Common/listahIcon.jpeg"),
   },
   profile: {
@@ -154,6 +158,19 @@ export const AppImages = {
     closeEye: require("../assets/images/Auth/closeEye.png"),
     eye: require("../assets/images/Auth/eye.png"),
     logo: require("../assets/images/Auth/logo.png"),
+  },
+  Chat: {
+    SendIcon: require("../assets/images/Chat/SendIcon.png"),
+    Voice: require("../assets/images/Chat/Voice.png"),
+    Attachment: require("../assets/images/Chat/Attachment.png"),
+    Camera: require("../assets/images/Chat/Camera.png"),
+    Gallery: require("../assets/images/Chat/Gallery.png"),
+    Video: require("../assets/images/Chat/Video.png"),
+    Document: require("../assets/images/Chat/Document.png"),
+    msgSeen: require("../assets/images/Chat/msgSeen.png"),
+    emptyChat: require("../assets/images/Chat/emptyChat.png"),
+    Microphone: require("../assets/images/Chat/Microphone.png"),
+    chat: require("../assets/images/Chat/chat.png"),
   },
 };
 
@@ -204,5 +221,17 @@ export const categoriesArr = [
     id: 8,
     name: "Other",
     icon: "https://firebasestorage.googleapis.com/v0/b/listah-ae13c.appspot.com/o/categories%2Fother.jpeg?alt=media&token=ae5d118c-5cc6-4cf8-9d9a-5f9118ad97c6",
+  },
+];
+export const mediaSelectionConstants = [
+  {
+    id: 1,
+    image: AppImages.Chat.Gallery,
+    text: "upload image",
+  },
+  {
+    id: 2,
+    image: AppImages.Chat.Document,
+    text: "Upload document",
   },
 ];

@@ -22,6 +22,7 @@ export const Notification_Types = {
   challenge: "Challenge",
   comment: "Comment",
   announced: "Announced_Post",
+  chat_messages: "Chat_messages",
 };
 
 export const Notification_Messages = {

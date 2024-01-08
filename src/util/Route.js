@@ -7,4 +7,8 @@ export const Routes = {
   Search: {
     searchScreen: "SearchScreen",
   },
+  Chat: {
+    chatScreen: "ChatScreen",
+    chatList: "ChatListingScreen",
+  },
 };

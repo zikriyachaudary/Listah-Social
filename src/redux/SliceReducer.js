@@ -6,6 +6,8 @@ import {
   SET_SHOW_SPLASH,
   SET_UPDATE_FB_TOKEN,
   SET_APP_LOADER,
+  SET_THREAD_LIST,
+  SET_HIDE_TAB,
 } from "./action/types";
 
 const initialState = {
@@ -15,7 +17,9 @@ const initialState = {
   isShowSplash: true,
   isUnReaded: false,
   categoriesList: [],
+  threadList: [],
   isLoaderStart: false,
+  isHideTabBar: false,
 };
 const SliceReducer = (state = initialState, action) => {
   switch (action.type) {
@@ -49,6 +53,16 @@ const SliceReducer = (state = initialState, action) => {
       return {
         ...state,
         categoriesList: action.data,
+      };
+    case SET_THREAD_LIST:
+      return {
+        ...state,
+        threadList: action.data,
+      };
+    case SET_HIDE_TAB:
+      return {
+        ...state,
+        isHideTabBar: action.data,
       };
     case SET_APP_LOADER:
       return {
