@@ -517,7 +517,11 @@ const ChatScreen = (props) => {
           title={setName()}
           profile={otherUserRef?.current?.userProfileImageUrl}
           atBackPress={() => {
-            props?.navigation?.goBack();
+            if (props?.navigation?.canGoBack()) {
+              props?.navigation?.goBack();
+            } else {
+              props?.navigation?.navigate("Home");
+            }
           }}
           showBorder={true}
         />

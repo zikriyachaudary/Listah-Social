@@ -88,6 +88,7 @@ const ChatListingScreen = ({ navigation, route }) => {
                     atPress={() => {
                       navigation.navigate(Routes.Chat.chatScreen, {
                         thread: item,
+                        from: Routes.Chat.chatList,
                       });
                     }}
                   />

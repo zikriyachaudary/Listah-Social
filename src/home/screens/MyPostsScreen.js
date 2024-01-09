@@ -3,6 +3,7 @@ import { connect, useDispatch, useSelector } from "react-redux";
 import {
   ActivityIndicator,
   FlatList,
+  Image,
   StyleSheet,
   TouchableWithoutFeedback,
   View,
@@ -158,6 +159,7 @@ const MyPostsScreen = ({ profile, route, unFollowUser, followUser }) => {
     if (threadObj) {
       navigation.navigate(Routes.Chat.chatScreen, {
         thread: threadObj,
+        from: "MyPosts",
       });
     } else {
       let senderObj = {};
@@ -166,7 +168,7 @@ const MyPostsScreen = ({ profile, route, unFollowUser, followUser }) => {
       reciverObj = makeObjForInitialChat(userProfileInfo);
       ThreadManager.instance.setupRedux(selector?.sliceReducer, dispatch);
       dispatch(setIsAppLoader(true));
-      let msg = "";
+      let msg = "Hi";
       let docId = ThreadManager.instance.makeid(7);
       await ThreadManager.instance.onSendCall(
         senderObj,
@@ -178,6 +180,7 @@ const MyPostsScreen = ({ profile, route, unFollowUser, followUser }) => {
           if (data != "error") {
             navigation.navigate(Routes.Chat.chatScreen, {
               thread: data,
+              from: "MyPosts",
             });
           } else {
             alert(JSON.stringify(data));
@@ -194,6 +197,20 @@ const MyPostsScreen = ({ profile, route, unFollowUser, followUser }) => {
             ? "My Posts"
             : route.params.username + " Posts"
         }
+        right={
+          <Image
+            source={AppImages.Chat.chatStartIcon}
+            style={{
+              height: normalized(35),
+              width: normalized(35),
+              marginTop: normalized(-15),
+              resizeMode: "center",
+            }}
+          />
+        }
+        onRightPress={() => {
+          goToChat();
+        }}
       />
 
       {!loaderVisible && userProfileImage && (
@@ -301,31 +318,15 @@ const MyPostsScreen = ({ profile, route, unFollowUser, followUser }) => {
             </View>
 
             {profile?.userId !== route.params.userId && (
-              <View
-                style={{
-                  height: normalized(50),
-                  flexDirection: "row",
-                }}
-              >
-                <Button
-                  title={"Chat"}
-                  style={styles.btn}
-                  loading={loading}
-                  btnTxtStyles={styles.btnTxtStyles}
-                  onPress={() => {
-                    goToChat();
-                  }}
-                />
-                <Button
-                  title={isFollowUser ? "Unfollow" : "Follow"}
-                  style={styles.btn}
-                  loading={loading}
-                  btnTxtStyles={styles.btnTxtStyles}
-                  onPress={
-                    isFollowUser ? _handleUnFollowPress : _handleFollowPress
-                  }
-                />
-              </View>
+              <Button
+                title={isFollowUser ? "Unfollow" : "Follow"}
+                style={styles.btn}
+                loading={loading}
+                btnTxtStyles={styles.btnTxtStyles}
+                onPress={
+                  isFollowUser ? _handleUnFollowPress : _handleFollowPress
+                }
+              />
             )}
           </View>
         </View>

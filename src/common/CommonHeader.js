@@ -67,36 +67,82 @@ const CustomHeader = (props) => {
           ) : null}
 
           {props?.atRightBtn && props?.isRightAction ? (
-            <TouchableOpacity
-              activeOpacity={1}
-              onPress={() => {
-                props?.atRightBtn();
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "center",
+                alignItems: "center",
               }}
-              style={
-                props?.rightIcon
-                  ? {
-                      width: normalized(30),
-                      height: hv(40),
-                      justifyContent: "center",
-                      alignItems: "center",
-                    }
-                  : {
-                      backgroundColor: AppColors.blue.light,
-                      height: normalized(40),
-                      width: normalized(80),
-                      borderRadius: normalized(8),
-                      justifyContent: "center",
-                      alignItems: "center",
-                    }
-              }
             >
-              {props?.rightTxt ? (
-                <Text style={styles.rightTxt}>{props?.rightTxt}</Text>
+              {props?.atRightFirstBtn ? (
+                <TouchableOpacity
+                  activeOpacity={1}
+                  onPress={() => {
+                    props?.atRightFirstBtn();
+                  }}
+                  style={
+                    props?.rightIcon
+                      ? {
+                          width: normalized(30),
+                          height: hv(40),
+                          justifyContent: "center",
+                          alignItems: "center",
+                          marginHorizontal: normalized(5),
+                        }
+                      : {
+                          backgroundColor: AppColors.blue.light,
+                          height: normalized(40),
+                          width: normalized(80),
+                          borderRadius: normalized(8),
+                          justifyContent: "center",
+                          alignItems: "center",
+                          marginHorizontal: normalized(5),
+                        }
+                  }
+                >
+                  {props?.righFirstTxt ? (
+                    <Text style={styles.rightTxt}>{props?.righFirstTxt}</Text>
+                  ) : null}
+                  {props?.rightFirstIcon ? (
+                    <Image
+                      source={props?.rightFirstIcon}
+                      style={styles.leftBtn}
+                    />
+                  ) : null}
+                </TouchableOpacity>
               ) : null}
-              {props?.rightIcon ? (
-                <Image source={props?.rightIcon} style={styles.leftBtn} />
-              ) : null}
-            </TouchableOpacity>
+
+              <TouchableOpacity
+                activeOpacity={1}
+                onPress={() => {
+                  props?.atRightBtn();
+                }}
+                style={
+                  props?.rightIcon
+                    ? {
+                        width: normalized(30),
+                        height: hv(40),
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }
+                    : {
+                        backgroundColor: AppColors.blue.light,
+                        height: normalized(40),
+                        width: normalized(80),
+                        borderRadius: normalized(8),
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }
+                }
+              >
+                {props?.rightTxt ? (
+                  <Text style={styles.rightTxt}>{props?.rightTxt}</Text>
+                ) : null}
+                {props?.rightIcon ? (
+                  <Image source={props?.rightIcon} style={styles.leftBtn} />
+                ) : null}
+              </TouchableOpacity>
+            </View>
           ) : (
             <View style={{ marginHorizontal: hv(25) }} />
           )}
@@ -113,7 +159,8 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: AppHorizontalMargin,
     alignItems: "center",
-    paddingTop: Platform.OS == "ios" ? hv(18) : hv(5),
+    paddingTop: Platform.OS == "ios" ? hv(25) : hv(10),
+    marginBottom: normalized(-5),
   },
   title: {
     marginTop: 10,

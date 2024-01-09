@@ -42,6 +42,7 @@ import {
   updateCategiesList,
 } from "../../network/Services/ProfileServices";
 import { setIsAppLoader } from "../../redux/action/AppLogics";
+import { Routes } from "../../util/Route";
 
 /* =============================================================================
 <HomeScreen />
@@ -318,6 +319,10 @@ const HomeScreen = ({ posts, getProfile }) => {
           }}
           isRightAction={true}
           rightIcon={AppImages.Common.profile}
+          rightFirstIcon={AppImages.Chat.chat}
+          atRightFirstBtn={() => {
+            navigation.navigate(Routes.Chat.chatList);
+          }}
         />
       ) : (
         <CustomHeader
@@ -336,6 +341,10 @@ const HomeScreen = ({ posts, getProfile }) => {
           }}
           isRightAction={true}
           rightIcon={AppImages.Common.profile}
+          rightFirstIcon={AppImages.Chat.chat}
+          atRightFirstBtn={() => {
+            navigation.navigate(Routes.Chat.chatList);
+          }}
         />
       )}
 

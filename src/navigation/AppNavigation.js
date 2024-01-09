@@ -170,6 +170,7 @@ const AppNavigation = ({ changeAuthState, getProfile, authenticated }) => {
     } else if (obj?.actionType == Notification_Types.chat_messages) {
       navigate(Routes.Chat.chatScreen, {
         thread: obj?.thread,
+        from: "Home",
       });
     }
   };

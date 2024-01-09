@@ -86,6 +86,7 @@ const NotificationListItem = ({ notification }) => {
         ) {
           navigation.navigate(Routes.Chat.chatScreen, {
             thread: notification?.thread,
+            from: "NotificationStack",
           });
         } else if (notification?.actionType == Notification_Types.suggestion) {
           _handleSuggestionPress();
