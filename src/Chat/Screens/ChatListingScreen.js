@@ -1,4 +1,4 @@
-import { useIsFocused } from "@react-navigation/native";
+import { useFocusEffect, useIsFocused } from "@react-navigation/native";
 import React, { useEffect, useLayoutEffect, useState } from "react";
 import { FlatList, Image, Text, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
@@ -17,22 +17,13 @@ import CustomHeader from "../../common/CommonHeader";
 import { Routes } from "../../util/Route";
 
 const ChatListingScreen = ({ navigation, route }) => {
-  const isFouced = useIsFocused();
   const threadList = useSelector(
     (AppState) => AppState.sliceReducer.threadList
   );
-  const dispatch = useDispatch();
   const selector = useSelector((AppState) => AppState.Profile);
   const userData = selector?.profile;
   const [chatList, setChatList] = useState([]);
-  useLayoutEffect(() => {
-    if (isFouced) {
-      dispatch(setIsHideTabBar(true));
-    }
-    return () => {
-      dispatch(setIsHideTabBar(false));
-    };
-  }, [isFouced]);
+
   useEffect(() => {
     let mList = filterListAndSorted(threadList);
     if (mList.length > 0) {

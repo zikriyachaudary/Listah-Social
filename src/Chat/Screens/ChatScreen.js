@@ -34,7 +34,6 @@ import {
   normalized,
 } from "../../util/AppConstant";
 import { capitalizeFirstLetter, removeEmptyLines } from "../../util/helperFun";
-import { useIsFocused } from "@react-navigation/native";
 import { Notification_Types } from "../../util/Strings";
 const ChatScreen = (props) => {
   const selector = useSelector((AppState) => AppState?.Profile);
@@ -55,7 +54,6 @@ const ChatScreen = (props) => {
     (AppState) => AppState?.sliceReducer.threadList
   );
   const [isBlocked, setIsBlocked] = useState(false);
-  const isFocused = useIsFocused();
   const [currentUserData] = useState(selector?.profile);
   const [visibleMessages, setVisibleMessage] = useState([]);
   const [showPdf, setShowPdf] = useState(false);
@@ -65,14 +63,7 @@ const ChatScreen = (props) => {
   var initialMessageRef = useRef();
   var threadRef = useRef();
   var initialCall = useRef();
-  useLayoutEffect(() => {
-    if (isFocused) {
-      dispatch(setIsHideTabBar(true));
-    }
-    return () => {
-      dispatch(setIsHideTabBar(false));
-    };
-  }, [isFocused]);
+
   useEffect(() => {
     if (props?.route?.params?.thread) {
       fetchFcmToken();

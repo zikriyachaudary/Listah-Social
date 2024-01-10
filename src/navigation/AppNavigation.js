@@ -17,6 +17,9 @@ import { changeAuthState as changeAuthStateAction } from "../auth/redux/actions"
 import FullImageModal from "../common/PostCard/PostItem/FullImageModal";
 import { showFullImage } from "../home/redux/appLogics";
 import { getUserDraftPost, setUpChat } from "../util/helperFun";
+import ChatListingScreen from "../Chat/Screens/ChatListingScreen";
+import ChatScreen from "../Chat/Screens/ChatScreen";
+
 import {
   setAllUserFCMToken,
   setDraftPost,
@@ -256,6 +259,14 @@ const AppNavigation = ({ changeAuthState, getProfile, authenticated }) => {
                 <Stack.Screen
                   name="SuggestionStack"
                   component={SuggestionStack}
+                />
+                <Stack.Screen
+                  name={Routes.Chat.chatList}
+                  component={ChatListingScreen}
+                />
+                <Stack.Screen
+                  name={Routes.Chat.chatScreen}
+                  component={ChatScreen}
                 />
               </>
             ) : (

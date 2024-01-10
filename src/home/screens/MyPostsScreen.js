@@ -178,7 +178,7 @@ const MyPostsScreen = ({ profile, route, unFollowUser, followUser }) => {
       }
       ThreadManager.instance.setupRedux(selector?.sliceReducer, dispatch);
       dispatch(setIsAppLoader(true));
-      let msg = "Hi";
+      let msg = "";
       let docId = ThreadManager.instance.makeid(7);
       await ThreadManager.instance.onSendCall(
         senderObj,
