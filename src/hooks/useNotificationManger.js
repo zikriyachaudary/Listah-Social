@@ -44,9 +44,7 @@ const useNotificationManger = (props) => {
         .collection(Collections.NOTIFICATION)
         .doc(data?.userId)
         .update({ fcmToken: data?.fcmToken })
-        .then(() => {
-          console.log(" Token update -------->");
-        })
+        .then(() => {})
         .catch((error) => {
           console.error("Error updating array value:", error);
         });
@@ -97,10 +95,10 @@ const useNotificationManger = (props) => {
         sender: sender,
         extraData: null,
       };
-        if (obj.payload) {
-        newObj["payload"] = obj.payload
+      if (obj.payload) {
+        newObj["payload"] = obj.payload;
       }
-      console.log("printNewObj - > " , newObj)
+
       let newArr = [];
       if (obj?.actionType == Notification_Types.follow) {
         newArr = [...completeNotiList, newObj];
@@ -162,10 +160,10 @@ const useNotificationManger = (props) => {
         sender: sender,
         extraData: obj?.extraData,
       };
-        if (obj.payload) {
-        newObj["payload"] = obj.payload
+      if (obj.payload) {
+        newObj["payload"] = obj.payload;
       }
-      console.log("printNewObj - > " , newObj)
+
       let newArr = [];
       if (obj?.actionType == Notification_Types.like) {
         newArr = [...completeNotiList, newObj];
@@ -229,13 +227,12 @@ const useNotificationManger = (props) => {
       };
 
       if (obj.payload) {
-        newObj["payload"] = obj.payload
+        newObj["payload"] = obj.payload;
       }
-      console.log("printNewObj - > " , newObj)
+
       let newArr = [];
       newArr = [...completeNotiList, newObj];
 
-    
       await firestore()
         .collection(Collections.NOTIFICATION)
         .doc(obj?.reciverId)
@@ -276,10 +273,10 @@ const useNotificationManger = (props) => {
         sender: sender,
         extraData: obj?.extraData,
       };
-        if (obj.payload) {
-        newObj["payload"] = obj.payload
+      if (obj.payload) {
+        newObj["payload"] = obj.payload;
       }
-      console.log("printNewObj - > " , newObj)
+
       let newArr = [];
       newArr = [...completeNotiList, newObj];
 
@@ -324,10 +321,9 @@ const useNotificationManger = (props) => {
         extraData: obj?.extraData,
       };
 
-        if (obj.payload) {
-        newObj["payload"] = obj.payload
+      if (obj.payload) {
+        newObj["payload"] = obj.payload;
       }
-      console.log("printNewObj - > " , newObj)
       let newArr = [];
       newArr = [...completeNotiList, newObj];
 
@@ -370,9 +366,8 @@ const useNotificationManger = (props) => {
     }
   };
   const fetchNotificationList = async (onComplete) => {
-
-    const userId = auth().currentUser.uid
-    console.log("printUserId - > " , userId, selector?.Profile?.profile?.userId)
+    const userId = auth().currentUser.uid;
+    console.log("printUserId - > ", userId, selector?.Profile?.profile?.userId);
     await firestore()
       .collection(Collections.NOTIFICATION)
       .doc(userId)

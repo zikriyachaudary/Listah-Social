@@ -268,9 +268,6 @@ export const getMyHomePosts = async () => {
       finalPopularPosts = populatedPosts;
     }
 
-    console.log("alreadyBlockUsersIdsHome - > ", finalPopularPosts.length);
-    // // populatedPosts.filter((item) => item.author)
-
     return finalPopularPosts;
     // dispatch({ type: constants.GET_HOME_POSTS.SUCCESS, payload: populatedPosts });
   } catch (error) {
@@ -454,7 +451,7 @@ export const createAnnouncementPost =
         post.items = await Promise.all(
           items.map(async (item, index) => {
             let uploadImgUrl = "";
-            console.log("printItem - > ", item);
+
             if (item.image && item.image.uri != "") {
               const compressedImage = await ImageResizer.createResizedImage(
                 item.image.uri,
@@ -538,7 +535,7 @@ export const createPost = (postContent) => async (dispatch) => {
       post.items = await Promise.all(
         items.map(async (item, index) => {
           let uploadImgUrl = "";
-          console.log("printItem - > ", item);
+
           if (item.image && item.image.uri != "") {
             const compressedImage = await ImageResizer.createResizedImage(
               item.image.uri,

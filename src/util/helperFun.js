@@ -31,7 +31,6 @@ export const paginationLogic = (totalCount, limit) => {
 
 export const setUpChat = async (userId, onComplete) => {
   let newId = userId?.toString();
-  console.log("newId----->", newId);
   await ThreadManager.instance.getUserThread(newId, async (list) => {
     await ThreadManager.instance.setupParticipantListener(newId);
     await ThreadManager.instance.setupThreadListener(newId);

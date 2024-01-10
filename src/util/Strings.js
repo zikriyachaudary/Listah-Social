@@ -36,3 +36,8 @@ export const Notification_Messages = {
   comment: "commented on your post",
   announcment: "announced a post",
 };
+export const AppStrings = {
+  Network: {
+    somethingWrong: "Something went wrong",
+  },
+};

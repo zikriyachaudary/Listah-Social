@@ -23,14 +23,14 @@ import {
   unFollowUser as unFollowUserAction,
   followUser as followUserAction,
 } from "../../following/redux/actions";
-import { Notification_Types } from "../../util/Strings";
+import { AppStrings, Notification_Types } from "../../util/Strings";
 import useNotificationManger from "../../hooks/useNotificationManger";
 import { AppColors, AppImages, normalized } from "../../util/AppConstant";
 import FastImage from "react-native-fast-image";
 import { Routes } from "../../util/Route";
 import ThreadManager from "../../ChatModule/ThreadManger";
 import { makeObjForInitialChat } from "../../util/helperFun";
-import { setIsAppLoader } from "../../redux/action/AppLogics";
+import { setIsAlertShow, setIsAppLoader } from "../../redux/action/AppLogics";
 
 // import View from '../../common/View';
 // import Avatar from '../../common/Avatar';
@@ -166,6 +166,16 @@ const MyPostsScreen = ({ profile, route, unFollowUser, followUser }) => {
       let reciverObj = {};
       senderObj = makeObjForInitialChat(profile);
       reciverObj = makeObjForInitialChat(userProfileInfo);
+
+      if (!reciverObj?.id) {
+        dispatch(
+          setIsAlertShow({
+            value: true,
+            message: AppStrings.Network.somethingWrong,
+          })
+        );
+        return;
+      }
       ThreadManager.instance.setupRedux(selector?.sliceReducer, dispatch);
       dispatch(setIsAppLoader(true));
       let msg = "Hi";
@@ -191,27 +201,37 @@ const MyPostsScreen = ({ profile, route, unFollowUser, followUser }) => {
   };
   return (
     <Container>
-      <StackHeader
-        title={
-          route.params.userId == profile.userId
-            ? "My Posts"
-            : route.params.username + " Posts"
-        }
-        right={
-          <Image
-            source={AppImages.Chat.chatStartIcon}
-            style={{
-              height: normalized(35),
-              width: normalized(35),
-              marginTop: normalized(-15),
-              resizeMode: "center",
-            }}
-          />
-        }
-        onRightPress={() => {
-          goToChat();
-        }}
-      />
+      {profile?.userId !== route?.params?.userId && userProfileInfo?.userId ? (
+        <StackHeader
+          title={
+            route.params.userId == profile.userId
+              ? "My Posts"
+              : route.params.username + " Posts"
+          }
+          right={
+            <Image
+              source={AppImages.Chat.chatStartIcon}
+              style={{
+                height: normalized(35),
+                width: normalized(35),
+                marginTop: normalized(-15),
+                resizeMode: "center",
+              }}
+            />
+          }
+          onRightPress={() => {
+            goToChat();
+          }}
+        />
+      ) : (
+        <StackHeader
+          title={
+            route.params.userId == profile.userId
+              ? "My Posts"
+              : route.params.username + " Posts"
+          }
+        />
+      )}
 
       {!loaderVisible && userProfileImage && (
         <View

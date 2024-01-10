@@ -2,7 +2,6 @@ import React from "react";
 import { View, ActivityIndicator } from "react-native";
 import { AppColors } from "../util/AppConstant";
 const AppLoader = (props) => {
-  console.log("props.visisble------>", props);
   return (
     <View
       style={{

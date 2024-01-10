@@ -24,15 +24,7 @@ const HomeTab = () => {
         headerShown: false,
       })}
       tabBar={(props) => {
-        return (
-          <View
-            style={{
-              display: tabBarHidden ? "none" : "flex",
-            }}
-          >
-            <HomeTabBar {...props} />
-          </View>
-        );
+        return <>{tabBarHidden ? null : <HomeTabBar {...props} />}</>;
       }}
     >
       <Tab.Screen name="HomeStack" component={HomeStack} />

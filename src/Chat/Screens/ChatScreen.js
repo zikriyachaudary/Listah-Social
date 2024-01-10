@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useLayoutEffect } from "react";
 import {
   View,
   SafeAreaView,
@@ -34,7 +34,7 @@ import {
   normalized,
 } from "../../util/AppConstant";
 import { capitalizeFirstLetter, removeEmptyLines } from "../../util/helperFun";
-import { useFocusEffect, useIsFocused } from "@react-navigation/native";
+import { useIsFocused } from "@react-navigation/native";
 import { Notification_Types } from "../../util/Strings";
 const ChatScreen = (props) => {
   const selector = useSelector((AppState) => AppState?.Profile);
@@ -65,6 +65,14 @@ const ChatScreen = (props) => {
   var initialMessageRef = useRef();
   var threadRef = useRef();
   var initialCall = useRef();
+  useLayoutEffect(() => {
+    if (isFocused) {
+      dispatch(setIsHideTabBar(true));
+    }
+    return () => {
+      dispatch(setIsHideTabBar(false));
+    };
+  }, [isFocused]);
   useEffect(() => {
     if (props?.route?.params?.thread) {
       fetchFcmToken();
@@ -97,14 +105,6 @@ const ChatScreen = (props) => {
     }
   };
 
-  useFocusEffect(() => {
-    if (isFocused) {
-      dispatch(setIsHideTabBar(true));
-    }
-    return () => {
-      dispatch(setIsHideTabBar(false));
-    };
-  }, [isFocused]);
   useEffect(() => {
     threadRef.current = thread;
     initialMessageRef.current = 50;
@@ -532,137 +532,136 @@ const ChatScreen = (props) => {
           }}
           showBorder={true}
         />
-        <>
-          <View
-            style={{
-              flex: 1,
-              paddingHorizontal: normalized(5),
+
+        <View
+          style={{
+            flex: 1,
+            paddingHorizontal: normalized(5),
+          }}
+        >
+          <SectionList
+            inverted
+            onEndReachedThreshold={0.5}
+            onEndReached={() => {
+              onTopReached();
             }}
-          >
-            <SectionList
-              inverted
-              onEndReachedThreshold={0.5}
-              onEndReached={() => {
-                onTopReached();
-              }}
-              ref={scrollToBottomRef}
-              showsVerticalScrollIndicator={false}
-              stickySectionHeadersEnabled={false}
-              sections={visibleMessages}
-              keyExtractor={(item, index) => `${index}`}
-              renderItem={({ item, index, section }) => {
-                return (
-                  <View style={styles.sectionListCon}>
-                    {item.type == "Owner" ? (
-                      <MyMessage
-                        item={item}
-                        onPdf={() => {
-                          selectedUrl.current = item.documentUrl;
-                          setShowPdf(true);
-                        }}
-                        onImage={() => {
-                          selectedUrl.current = item.url;
-                          setShowImageView(true);
-                        }}
-                        atProfilePress={() => {}}
-                        navigation={props.navigation}
-                        playVideo={(obj) => {}}
-                      />
-                    ) : (
-                      <OtherUserMessage
-                        otherUserData={otherUserRef.current}
-                        item={item}
-                        onPdf={() => {
-                          selectedUrl.current = item.documentUrl;
-                          setShowPdf(true);
-                        }}
-                        onImage={() => {
-                          selectedUrl.current = item.url;
-                          setShowImageView(true);
-                        }}
-                        navigation={props.navigation}
-                        playVideo={(obj) => {}}
-                      />
-                    )}
-                  </View>
-                );
-              }}
-              renderSectionFooter={({ section }) => {
-                return (
-                  <View
-                    style={{
-                      flex: 1,
-                      paddingTop: 10,
-                      flexDirection: "row",
-                      justifyContent: "center",
-                      alignItems: "center",
-                    }}
-                  >
-                    <View style={styles.simpleLine} />
-                    <Text
-                      style={{
-                        marginHorizontal: normalized(15),
-                        fontSize: normalized(14),
-                        paddingVertical: hv(4),
-                        color: AppColors.black.lightBlack,
-                        textAlign: "center",
+            ref={scrollToBottomRef}
+            showsVerticalScrollIndicator={false}
+            stickySectionHeadersEnabled={false}
+            sections={visibleMessages}
+            keyExtractor={(item, index) => `${index}`}
+            renderItem={({ item, index, section }) => {
+              return (
+                <View style={styles.sectionListCon}>
+                  {item.type == "Owner" ? (
+                    <MyMessage
+                      item={item}
+                      onPdf={() => {
+                        selectedUrl.current = item.documentUrl;
+                        setShowPdf(true);
                       }}
-                    >{`${section.title} (${moment(
-                      section.title,
-                      "YYYY-MM-DD"
-                    ).format("ddd")})`}</Text>
-                    <View style={styles.simpleLine} />
-                  </View>
-                );
-              }}
-              renderSectionHeader={({ section }) => {
-                return null;
-              }}
-            />
-          </View>
-          <KeyboardAvoidingView
-            keyboardVerticalOffset={
-              Platform.OS === "ios"
-                ? isSmallDevice
-                  ? normalized(30)
-                  : normalized(50)
-                : -5
-            }
-            behavior={Platform.OS === "ios" ? "padding" : undefined}
-          >
-            {!isBlocked && (
-              <View style={styles.chatBarStyle}>
-                <ChatBar
-                  onAttachmentPress={() => {
-                    setOpenSelectionMediaModal(true);
+                      onImage={() => {
+                        selectedUrl.current = item.url;
+                        setShowImageView(true);
+                      }}
+                      atProfilePress={() => {}}
+                      navigation={props.navigation}
+                      playVideo={(obj) => {}}
+                    />
+                  ) : (
+                    <OtherUserMessage
+                      otherUserData={otherUserRef.current}
+                      item={item}
+                      onPdf={() => {
+                        selectedUrl.current = item.documentUrl;
+                        setShowPdf(true);
+                      }}
+                      onImage={() => {
+                        selectedUrl.current = item.url;
+                        setShowImageView(true);
+                      }}
+                      navigation={props.navigation}
+                      playVideo={(obj) => {}}
+                    />
+                  )}
+                </View>
+              );
+            }}
+            renderSectionFooter={({ section }) => {
+              return (
+                <View
+                  style={{
+                    flex: 1,
+                    paddingTop: 10,
+                    flexDirection: "row",
+                    justifyContent: "center",
+                    alignItems: "center",
                   }}
-                  onSendPress={() => {
-                    const newMessage = removeEmptyLines(message);
-                    if (newMessage != "") {
-                      setMessage("");
-                      let params = {
-                        content: newMessage,
-                      };
-                      onSendMessage(params);
-                    }
+                >
+                  <View style={styles.simpleLine} />
+                  <Text
+                    style={{
+                      marginHorizontal: normalized(15),
+                      fontSize: normalized(14),
+                      paddingVertical: hv(4),
+                      color: AppColors.black.lightBlack,
+                      textAlign: "center",
+                    }}
+                  >{`${section.title} (${moment(
+                    section.title,
+                    "YYYY-MM-DD"
+                  ).format("ddd")})`}</Text>
+                  <View style={styles.simpleLine} />
+                </View>
+              );
+            }}
+            renderSectionHeader={({ section }) => {
+              return null;
+            }}
+          />
+        </View>
+        <KeyboardAvoidingView
+          keyboardVerticalOffset={
+            Platform.OS === "ios"
+              ? isSmallDevice
+                ? normalized(30)
+                : normalized(50)
+              : -5
+          }
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+        >
+          {!isBlocked && (
+            <View style={styles.chatBarStyle}>
+              <ChatBar
+                onAttachmentPress={() => {
+                  setOpenSelectionMediaModal(true);
+                }}
+                onSendPress={() => {
+                  const newMessage = removeEmptyLines(message);
+                  if (newMessage != "") {
                     setMessage("");
-                  }}
-                  smileBtnPress={() => {
-                    console.log("smileBtnPress=====>");
-                  }}
-                  audioBtnPress={() => {
-                    console.log("audioBtnPress=====>");
-                  }}
-                  value={message}
-                  onChangeText={(m) => {
-                    setMessage(m);
-                  }}
-                  isDisable={false}
-                />
-              </View>
-            )}
-          </KeyboardAvoidingView>
-        </>
+                    let params = {
+                      content: newMessage,
+                    };
+                    onSendMessage(params);
+                  }
+                  setMessage("");
+                }}
+                smileBtnPress={() => {
+                  console.log("smileBtnPress=====>");
+                }}
+                audioBtnPress={() => {
+                  console.log("audioBtnPress=====>");
+                }}
+                value={message}
+                onChangeText={(m) => {
+                  setMessage(m);
+                }}
+                isDisable={false}
+              />
+            </View>
+          )}
+        </KeyboardAvoidingView>
       </View>
       <SafeAreaView style={{ backgroundColor: AppColors.white.white }} />
       <Modal visible={showPdf} presentationStyle="fullScreen">

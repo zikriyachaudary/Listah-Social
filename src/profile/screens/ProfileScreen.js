@@ -18,7 +18,7 @@ import {
   logout as logoutAction,
 } from "../../auth/redux/actions";
 import { AppColors, AppImages, normalized } from "../../util/AppConstant";
-import { setDraftPost } from "../../redux/action/AppLogics";
+import { setDraftPost, setThreadList } from "../../redux/action/AppLogics";
 import { saveUserDraftPost } from "../../util/helperFun";
 import AlertModal from "../../common/AlertModal";
 import { Routes } from "../../util/Route";
@@ -62,6 +62,7 @@ const ProfileScreen = ({ profile, getProfile, logout, deleteUserAccount }) => {
     });
     await saveUserDraftPost([]);
     dispatch(setDraftPost([]));
+    dispatch(setThreadList([]));
     logout();
     setIsLoading(false);
   };
@@ -73,6 +74,7 @@ const ProfileScreen = ({ profile, getProfile, logout, deleteUserAccount }) => {
       userId: selector?.Auth?.user?.uid,
     });
     dispatch(setDraftPost([]));
+    dispatch(setThreadList([]));
     await saveUserDraftPost([]);
     deleteUserAccount();
     setIsLoading(false);

@@ -192,8 +192,6 @@ class ThreadManager {
   };
   //Chat Initialize Fun------>
   onSendCall = async (sender, receiver, docId, msg, onComplete) => {
-    console.log("sender------->", sender);
-    console.log("receiver------->", receiver);
     this.createThread(sender, receiver, docId, msg)
       .then(() => {
         this.createParticipant(sender, receiver, docId)

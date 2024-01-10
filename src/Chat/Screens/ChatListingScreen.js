@@ -1,5 +1,5 @@
-import { useFocusEffect, useIsFocused } from "@react-navigation/native";
-import React, { useEffect, useState } from "react";
+import { useIsFocused } from "@react-navigation/native";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 import { FlatList, Image, Text, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -25,7 +25,7 @@ const ChatListingScreen = ({ navigation, route }) => {
   const selector = useSelector((AppState) => AppState.Profile);
   const userData = selector?.profile;
   const [chatList, setChatList] = useState([]);
-  useFocusEffect(() => {
+  useLayoutEffect(() => {
     if (isFouced) {
       dispatch(setIsHideTabBar(true));
     }
