@@ -3,8 +3,6 @@ import { Platform } from "react-native";
 import storage from "@react-native-firebase/storage";
 import { Collections } from "../util/Strings";
 import { setThreadList } from "../redux/action/AppLogics";
-import { sendPushNotification } from "../network/Services/NotificationServices";
-
 let CHANNEL_COLLECTION = "channels";
 let PARTICIPATION_COLLECTION = "channel_participation";
 let THREAD_COLLECITON = "thread";

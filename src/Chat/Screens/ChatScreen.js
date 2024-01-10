@@ -35,6 +35,7 @@ import {
 } from "../../util/AppConstant";
 import { capitalizeFirstLetter, removeEmptyLines } from "../../util/helperFun";
 import { Notification_Types } from "../../util/Strings";
+import { sendPushNotification } from "../../network/Services/NotificationServices";
 const ChatScreen = (props) => {
   const selector = useSelector((AppState) => AppState?.Profile);
   const thread = props?.route?.params?.thread
