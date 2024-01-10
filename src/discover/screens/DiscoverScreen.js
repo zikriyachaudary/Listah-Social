@@ -55,10 +55,9 @@ const DiscoverScreen = ({ likedPosts, getLikedPosts, refreshLikedPosts }) => {
     }
   }, [isFocused]);
 
-
-  useEffect(()=>{
-    setLikePost(likedPosts)
-  }, [likedPosts])
+  useEffect(() => {
+    setLikePost(likedPosts);
+  }, [likedPosts]);
 
   const _renderListEmptyComponent = () => (
     <View center flex>
@@ -76,9 +75,7 @@ const DiscoverScreen = ({ likedPosts, getLikedPosts, refreshLikedPosts }) => {
 
   const _renderListHeaderComponent = () =>
     // <StackHeader title='Discover' left={<View />} />
-    searchPostVisible ? (
-      null
-    ) : (
+    searchPostVisible ? null : (
       <StackHeader
         title="Search"
         left={<View />}
@@ -108,7 +105,6 @@ const DiscoverScreen = ({ likedPosts, getLikedPosts, refreshLikedPosts }) => {
         getLikedPosts();
       }}
       postReport={async (isReportCount) => {
-        console.log("called");
         if (isReportCount == 2) {
           await blockUsers(item.author.userId);
           getLikedPosts();
@@ -127,59 +123,59 @@ const DiscoverScreen = ({ likedPosts, getLikedPosts, refreshLikedPosts }) => {
   return (
     <Container>
       {searchPostVisible ? (
-      <SafeAreaView>
-        <View style={styles.searchTopStyle}>
-          <TouchableOpacity
-            onPress={() => {
-              console.log("pppppp")
-              setFiltersPost([]);
-              setSearchTxt("");
-              setSearchPostVisible(!searchPostVisible);
-            }}
-          >
-            <View
-              style={{
-                paddingHorizontal: 5,
+        <SafeAreaView>
+          <View style={styles.searchTopStyle}>
+            <TouchableOpacity
+              onPress={() => {
+                console.log("pppppp");
+                setFiltersPost([]);
+                setSearchTxt("");
+                setSearchPostVisible(!searchPostVisible);
               }}
             >
-              <ChevronLeftIcon />
-            </View>
-          </TouchableOpacity>
+              <View
+                style={{
+                  paddingHorizontal: 5,
+                }}
+              >
+                <ChevronLeftIcon />
+              </View>
+            </TouchableOpacity>
 
-          <TextInput
-            style={{
-              flex: 1,
-              height: 40,
-              fontSize: 16,
-            }}
-            placeholder="Search in post..."
-            placeholderTextColor={"gray"}
-            value={searchTxt}
-            onChange={(txt) => {
-              let usersFiltersPost = [];
-              console.log("lllll ", likePosts)
-              likePosts.forEach((object) => {
-                const obj = getPostsById(selector, { id: object })
-                console.log("printMObject - > " , obj)
-                if (
-                  obj.searchTxt &&
-                  obj.searchTxt
-                    .toLowerCase()
-                    .includes(String(txt.nativeEvent.text).toLowerCase())
-                ) {
-                  usersFiltersPost.push(object);
-                }
-              });
-              console.log("filter -- > ", usersFiltersPost);
-              setFiltersPost(
-                txt.nativeEvent.text == "" ? [] : usersFiltersPost
-              );
-              setSearchTxt(txt);
-            }}
-          />
-        </View>
-      </SafeAreaView>
-    ) : null}
+            <TextInput
+              style={{
+                flex: 1,
+                height: 40,
+                fontSize: 16,
+              }}
+              placeholder="Search in post..."
+              placeholderTextColor={"gray"}
+              value={searchTxt}
+              onChange={(txt) => {
+                let usersFiltersPost = [];
+                console.log("lllll ", likePosts);
+                likePosts.forEach((object) => {
+                  const obj = getPostsById(selector, { id: object });
+                  console.log("printMObject - > ", obj);
+                  if (
+                    obj.searchTxt &&
+                    obj.searchTxt
+                      .toLowerCase()
+                      .includes(String(txt.nativeEvent.text).toLowerCase())
+                  ) {
+                    usersFiltersPost.push(object);
+                  }
+                });
+                console.log("filter -- > ", usersFiltersPost);
+                setFiltersPost(
+                  txt.nativeEvent.text == "" ? [] : usersFiltersPost
+                );
+                setSearchTxt(txt);
+              }}
+            />
+          </View>
+        </SafeAreaView>
+      ) : null}
       <FlatList
         data={searchPostVisible ? filtersPost : likePosts}
         refreshing={false}

@@ -417,6 +417,46 @@ class ThreadManager {
         }
       });
   };
+  getIsUserBlocked = async (blockedUser, blockedUserBy, onComplete) => {
+    let isUserBlocked = false;
+    await firestore()
+      .collection(Collections.BLOCKED_USER)
+      .where("blockedBy", "==", blockedUserBy)
+      .get()
+      .then(async (snapDoc) => {
+        if (snapDoc?.docs[0]?.data()?.blockUserId?.length > 0) {
+          let blockedList = snapDoc?.docs[0]?.data()?.blockUserId;
+          if (blockedList?.length > 0) {
+            let findedIndexValue = blockedList.findIndex(
+              (value) => value == blockedUser
+            );
+            if (findedIndexValue != -1) {
+              isUserBlocked = true;
+            }
+          }
+        }
+      });
+    if (!isUserBlocked) {
+      await firestore()
+        .collection(Collections.BLOCKED_USER)
+        .where("blockedBy", "==", blockedUser)
+        .get()
+        .then(async (snapDoc) => {
+          if (snapDoc?.docs[0]?.data()?.blockUserId?.length > 0) {
+            let blockedList = snapDoc?.docs[0]?.data()?.blockUserId;
+            if (blockedList?.length > 0) {
+              let findedIndexValue = blockedList.findIndex(
+                (value) => value == blockedUserBy
+              );
+              if (findedIndexValue != -1) {
+                isUserBlocked = true;
+              }
+            }
+          }
+        });
+    }
+    onComplete(isUserBlocked);
+  };
   // MESSAGE LISTNERS
   getInitialThreadMessages = (threadId, onMessageUpdates) => {
     firestore()

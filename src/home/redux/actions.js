@@ -193,9 +193,14 @@ export const getMyHomePosts = async () => {
           }
         } else {
           const obj = allPosts[i];
-          console.log("print --- > " , allPosts[i])
-          obj["author"] = allPosts[i].author.userIds ? allPosts[i].author.userIds : allPosts[i].author.userId;
-          if (followingUsers[j] === allPosts[i].author.userIds ? allPosts[i].author.userIds : allPosts[i].author.userId) {
+          obj["author"] = allPosts[i].author.userIds
+            ? allPosts[i].author.userIds
+            : allPosts[i].author.userId;
+          if (
+            followingUsers[j] === allPosts[i].author.userIds
+              ? allPosts[i].author.userIds
+              : allPosts[i].author.userId
+          ) {
             followedUserPost.push(obj);
           }
         }
@@ -206,8 +211,14 @@ export const getMyHomePosts = async () => {
         }
       } else {
         const obj = allPosts[i];
-        obj["author"] = allPosts[i].author.userIds ? allPosts[i].author.userIds : allPosts[i].author.userId;
-        if (allPosts[i].author.userIds ? allPosts[i].author.userIds : allPosts[i].author.userId === currentUserUid) {
+        obj["author"] = allPosts[i].author.userIds
+          ? allPosts[i].author.userIds
+          : allPosts[i].author.userId;
+        if (
+          allPosts[i].author.userIds
+            ? allPosts[i].author.userIds
+            : allPosts[i].author.userId === currentUserUid
+        ) {
           followedUserPost.push(obj);
         }
       }
@@ -257,13 +268,13 @@ export const getMyHomePosts = async () => {
       finalPopularPosts = populatedPosts;
     }
 
-    console.log("alreadyBlockUsersIdsHome - > ", finalPopularPosts.length)
+    console.log("alreadyBlockUsersIdsHome - > ", finalPopularPosts.length);
     // // populatedPosts.filter((item) => item.author)
 
     return finalPopularPosts;
     // dispatch({ type: constants.GET_HOME_POSTS.SUCCESS, payload: populatedPosts });
   } catch (error) {
-    console.log("error - > ", error)
+    console.log("error - > ", error);
 
     return [];
     // dispatch({ type: constants.GET_HOME_POSTS.FAIL, error });
@@ -823,32 +834,45 @@ export const reportAgainstThisPost = async (postID, reportTxt, reportCount) => {
   if (reportCount == 1) reportPostData["reprtPostAuthorID"] = postID;
   else reportPostData["reportPostId"] = postID;
 
-  console.log("report -- > ", reportPostData);
   const reportPostDoc = await ReportPostCollection.doc().set(reportPostData);
   console.log("reportPostDoc -- > ", reportPostDoc);
 };
 
 export const blockUsers = async (blockUserId) => {
   const currentUserUid = FireAuth().currentUser.uid;
-  console.log("currentUserId - > ", currentUserUid);
   const alreadyBlockUsersCollection = await BlockUsersCollection.where(
     "blockedBy",
     "==",
     currentUserUid
   ).get();
-  const alreadyBlockUsersId = alreadyBlockUsersCollection.docs;
+
+  const alreadyBlockUsersId = alreadyBlockUsersCollection?.docs[0]?._data;
   let mBlockUserIds = [];
-  console.log("printBlockUsersId - > ", alreadyBlockUsersId);
-  if (alreadyBlockUsersId) {
-    mBlockUserIds = alreadyBlockUsersId;
+  if (alreadyBlockUsersId?.blockUserId?.length > 0) {
+    mBlockUserIds = alreadyBlockUsersId?.blockUserId;
+    let findedIndexValue = mBlockUserIds.findIndex(
+      (value) => value == blockUserId
+    );
+    if (findedIndexValue == -1) {
+      mBlockUserIds.push(blockUserId);
+      await BlockUsersCollection.doc(currentUserUid).update({
+        blockUserId: mBlockUserIds,
+      });
+    }
+    // else {
+    //   mBlockUserIds.splice(findedIndexValue, 1);
+    // }
+    // await BlockUsersCollection.doc(currentUserUid).update({
+    //   blockUserId: mBlockUserIds,
+    // });
+  } else {
+    mBlockUserIds.push(blockUserId);
+    const blockUsersData = {
+      blockedBy: currentUserUid,
+      blockUserId: mBlockUserIds,
+    };
+    await BlockUsersCollection.doc(currentUserUid).set(blockUsersData);
   }
-  mBlockUserIds.push(blockUserId);
-  const blockUsersData = {
-    blockedBy: currentUserUid,
-    blockUserId: mBlockUserIds,
-  };
-  console.log("printBlockUsersData - > ", blockUsersData);
-  await BlockUsersCollection.doc().set(blockUsersData);
 };
 
 export const likeUnlikePostComments = async (postId, commentId) => {

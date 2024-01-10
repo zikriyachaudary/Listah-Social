@@ -4,6 +4,7 @@ export const Collections = {
   NOTIFICATION: "Notifications",
   CATEGORIES: "Categories",
   POST: "posts",
+  BLOCKED_USER: "blockUsers",
 };
 
 export const RequestStatus = {

@@ -645,23 +645,23 @@ const PostCreateScreen = ({
               </TouchableOpacity>
             ) : null}
 
-            {isLoading ? (
-              <ActivityIndicator
-                style={styles.indicator}
-                color={AppColors.blue.navy}
-              />
-            ) : (
-              <TouchableOpacity
-                activeOpacity={1}
-                onPress={() => {
-                  console.log("printBtnActive -- > ", isBtnActive.current);
-                    _handleSubmit();
-                }}
-                style={styles.uploadBtnCont}
-              >
+            <TouchableOpacity
+              activeOpacity={1}
+              onPress={() => {
+                _handleSubmit();
+              }}
+              disabled={isBtnActive.current}
+              style={styles.uploadBtnCont}
+            >
+              {isLoading ? (
+                <ActivityIndicator
+                  style={styles.indicator}
+                  color={AppColors.white.white}
+                />
+              ) : (
                 <Text style={styles.uploadTxt}>Upload</Text>
-              </TouchableOpacity>
-            )}
+              )}
+            </TouchableOpacity>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
