@@ -4,10 +4,11 @@ import FireAuth from "@react-native-firebase/auth";
 import { useNavigation } from "@react-navigation/native";
 import FastImage from "react-native-fast-image";
 import { useToast } from "react-native-toast-notifications";
+import FireStore from "@react-native-firebase/firestore";
+
 import {
   ActivityIndicator,
   Alert,
-  Image,
   Platform,
   Share,
   StyleSheet,
@@ -36,6 +37,8 @@ import {
 import { CHALLENGE_REQUEST } from "../../../suggestion/redux/constants";
 import { Notification_Types } from "../../../util/Strings";
 import useNotificationManger from "../../../hooks/useNotificationManger";
+import ThreadManager from "../../../ChatModule/ThreadManger";
+import moment from "moment";
 
 /* =============================================================================
 <PostActions />

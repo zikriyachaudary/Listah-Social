@@ -14,6 +14,8 @@ import * as constants from "./constants";
 import { useDispatch } from "react-redux";
 import { CHALLENGE_REQUEST } from "../../suggestion/redux/constants";
 import { setCreatePostFailError } from "../../redux/action/AppLogics";
+import moment from "moment";
+import ThreadManager from "../../ChatModule/ThreadManger";
 
 const PostsCollection = FireStore().collection("posts");
 const AnnouncementCollection = FireStore().collection("announcements");

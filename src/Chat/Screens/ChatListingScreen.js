@@ -11,7 +11,6 @@ import {
 } from "../../util/AppConstant";
 import SingleChatComponent from "../Components/SingleChatComponent";
 import { AppStyles } from "../../util/AppStyles";
-import { setIsHideTabBar } from "../../redux/action/AppLogics";
 import { filterListAndSorted } from "../../util/helperFun";
 import CustomHeader from "../../common/CommonHeader";
 import { Routes } from "../../util/Route";

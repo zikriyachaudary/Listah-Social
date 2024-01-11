@@ -44,8 +44,7 @@ import { fetchPostData } from "../../network/Services/ProfileServices";
 import LoadingImage from "../../common/LoadingImage";
 import { View } from "react-native";
 import { AppStyles } from "../../util/AppStyles";
-import { Button, ImagePickerButton, TextInput } from "../../common";
-import { getLoading } from "../redux/selectors";
+import { ImagePickerButton, TextInput } from "../../common";
 
 /* =============================================================================
 <PostCreateScreen />
@@ -743,7 +742,7 @@ const styles = StyleSheet.create({
   containerStyle: {
     flex: 1,
     marginHorizontal: AppHorizontalMargin,
-    marginTop: hv(20),
+    paddingTop: hv(20),
   },
   uploadBtnCont: {
     height: normalized(50),

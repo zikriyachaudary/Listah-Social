@@ -6,9 +6,10 @@ import {
   Image,
   StyleSheet,
   TouchableWithoutFeedback,
+  Text,
 } from "react-native";
 
-import Text from "../../Text";
+// import Text from "../../Text";
 import View from "../../View";
 import PostActions from "./PostActions";
 import PostItemHeader from "./PostItemHeader";
@@ -23,7 +24,9 @@ import { getProfile } from "../../../profile/redux/selectors";
 import Touchable from "../../Touchable";
 import { challengePostLikeUnlike } from "../../../home/redux/actions";
 import { CHALLENGE_REQUEST } from "../../../suggestion/redux/constants";
-import { AppColors, AppImages } from "../../../util/AppConstant";
+import { AppColors, AppImages, normalized } from "../../../util/AppConstant";
+import moment from "moment";
+import ThreadManager from "../../../ChatModule/ThreadManger";
 /* =============================================================================
 <PostItem />
 ============================================================================= */
@@ -57,9 +60,9 @@ const PostItem = ({
         : post.challenge.items
       : []
   );
+  const [time, setTime] = useState("");
   const [loading, setLoading] = useState(false);
   const [challengeLikeLoading, setChallengeLoading] = useState(false);
-
   const [likesCount, setLikesCount] = useState(
     post?.likeOne ? post?.likeOne : 0
   );
@@ -101,6 +104,18 @@ const PostItem = ({
     }
   };
 
+  const formatTime = (timeObject) => {
+    // Combine seconds and nanoseconds to create a Unix timestamp
+    const timestamp = timeObject.seconds + timeObject.nanoseconds / 1e9;
+
+    // Convert the timestamp to a moment object
+    const momentObj = moment.unix(timestamp);
+
+    // Format the moment object as a string
+    const formattedString = momentObj.format("YYYY-MM-DD HH:mm:ss.SSS Z");
+
+    return formattedString;
+  };
   useEffect(() => {
     if (post?.likeOneUsers) {
       const isLiked =
@@ -108,6 +123,15 @@ const PostItem = ({
           ? true
           : false;
       setLiked(isLiked);
+    }
+    if (post?.createdAt?.seconds && post?.createdAt?.nanoseconds) {
+      let dateTime = moment(
+        moment(
+          formatTime(post?.createdAt),
+          ThreadManager.instance.dateFormater.fullDate
+        )
+      );
+      setTime(moment(dateTime).fromNow());
     }
     if (post.challenge && post.challenge.likedUsers) {
       const isChallengeLiked =
@@ -251,7 +275,7 @@ const PostItem = ({
           </View>
         )}
 
-      {post.description && (
+      {post?.description && (
         <Text style={{ marginTop: 10, fontSize: 16, color: "black" }}>
           <B>
             {post?.announcement
@@ -280,6 +304,17 @@ const PostItem = ({
           }}
         />
       )}
+      {time ? (
+        <Text
+          style={{
+            fontSize: normalized(14),
+            color: AppColors.grey.dark,
+            marginBottom: normalized(10),
+          }}
+        >
+          {time}
+        </Text>
+      ) : null}
 
       {showLikeUserModal && (
         <LikeUserModal

@@ -2,7 +2,6 @@ import React, { useEffect } from "react";
 import { connect, useDispatch, useSelector } from "react-redux";
 import {
   ActivityIndicator,
-  Dimensions,
   Platform,
   StyleSheet,
   TouchableOpacity,
@@ -43,6 +42,8 @@ import {
 } from "../../network/Services/ProfileServices";
 import { setIsAppLoader } from "../../redux/action/AppLogics";
 import { Routes } from "../../util/Route";
+import moment from "moment";
+import ThreadManager from "../../ChatModule/ThreadManger";
 
 /* =============================================================================
 <HomeScreen />
