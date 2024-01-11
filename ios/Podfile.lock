@@ -872,7 +872,7 @@ PODS:
     - React-perflogger (= 0.69.2)
   - RNCAsyncStorage (1.21.0):
     - React-Core
-  - RNCCheckbox (0.5.16):
+  - RNCCheckbox (0.5.17):
     - BEMCheckBox (~> 1.4)
     - React-Core
   - RNFastImage (8.5.12):
@@ -1289,7 +1289,7 @@ SPEC CHECKSUMS:
   React-runtimeexecutor: 8030b9cf9b9e87b878d92da680b55b5e74c58e70
   ReactCommon: a9414b91f0d19de002b55d9f4f6cb176d6dd8452
   RNCAsyncStorage: 618d03a5f52fbccb3d7010076bc54712844c18ef
-  RNCCheckbox: 75255b03e604bbcc26411eb31c4cbe3e3865f538
+  RNCCheckbox: a3ca9978cb0846b981d28da4e9914bd437403d77
   RNFastImage: 0eb3130e3ae98b99033fe6e16c908a188e588fd4
   RNFBApp: b20db101b153a290d493fb0058c957e59690f17a
   RNFBAuth: 2ab073abc40a480c1c709e943075f02648236cd0
