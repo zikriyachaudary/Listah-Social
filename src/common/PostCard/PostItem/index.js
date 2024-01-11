@@ -131,7 +131,14 @@ const PostItem = ({
           ThreadManager.instance.dateFormater.fullDate
         )
       );
-      setTime(moment(dateTime).fromNow());
+      const endDate = moment();
+      const diffInDays = endDate.diff(dateTime, "days");
+      if (diffInDays < 7) {
+        setTime(moment(dateTime).fromNow());
+      } else {
+        const dateNTime = moment(dateTime).format("DD MMM YYYY");
+        setTime(dateNTime);
+      }
     }
     if (post.challenge && post.challenge.likedUsers) {
       const isChallengeLiked =
@@ -150,7 +157,6 @@ const PostItem = ({
       </Card>
     );
   }
-
   return (
     <ScrollView
       nestedScrollEnabled
