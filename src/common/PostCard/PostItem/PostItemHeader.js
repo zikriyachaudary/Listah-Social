@@ -48,11 +48,14 @@ const PostItemHeader = ({
     ? post?.challenge.author?.username
     : post?.author?.username;
   const authorId = isChallenge
-    ? post?.challenge.author?.userId
-    : post?.author?.userId;
+    ? post?.challenge?.author?.userId
+    : post?.author?.userId
+    ? post?.author?.userId
+    : post?.author;
   const profileImage = isChallenge
     ? post?.challenge?.author?.profileImage
     : post?.author?.profileImage;
+
   const isAuthor = authorId === FireAuth().currentUser.uid;
 
   const _toggleMenu = () => setVisible((prev) => !prev);
@@ -64,11 +67,7 @@ const PostItemHeader = ({
       isEdit: true,
       from: "EditPost",
     });
-    // navigation.navigate("PostEdit", {
-    //   id,
-    //   post: post,
-    //   postRefresh: postRefresh,
-    // });
+
     _toggleMenu();
   };
 

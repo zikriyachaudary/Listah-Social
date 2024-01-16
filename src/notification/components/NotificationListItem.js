@@ -4,13 +4,15 @@ import {
   StyleSheet,
   TouchableOpacity,
   TouchableWithoutFeedback,
+  Text,
 } from "react-native";
 
-import { Text, Touchable, View } from "../../common";
+import { Touchable, View } from "../../common";
 import LoadingImage from "../../common/LoadingImage";
 import { Notification_Types } from "../../util/Strings";
 import { AppColors, normalized } from "../../util/AppConstant";
 import { Routes } from "../../util/Route";
+import PostDetailScreen from "../../Post/Screens/PostDetailScreen";
 
 /* =============================================================================
 <NotificationListItem />
@@ -69,7 +71,11 @@ const NotificationListItem = ({ notification }) => {
   return (
     <TouchableWithoutFeedback
       onPress={() => {
-        if (
+        if (notification?.extraData?.postId) {
+          navigation.push(Routes.Post.postDetail, {
+            postId: notification?.extraData?.postId,
+          });
+        } else if (
           notification?.actionType == Notification_Types.announced ||
           notification?.actionType == Notification_Types.challenge ||
           notification?.actionType == Notification_Types.comment ||
@@ -122,11 +128,11 @@ const NotificationListItem = ({ notification }) => {
 
           <Text
             style={{
-              flex: 1,
-              flexWrap: "wrap",
+              width: normalized(290),
               marginStart: 8,
+              color: AppColors.black.black,
             }}
-            sm
+            numberOfLines={1}
           >
             {notification?.message}
           </Text>

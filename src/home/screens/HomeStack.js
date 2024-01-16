@@ -39,7 +39,6 @@ const HomeStack = () => {
     >
       <Stack.Screen name="Home" component={HomeScreen} />
       <Stack.Screen name="MyPosts" component={MyPostsScreen} />
-      <Stack.Screen name="ReportPost" component={ReportPost} />
       <Stack.Screen
         name="AcceptRejectChallenge"
         component={AcceptRejectChallenge}

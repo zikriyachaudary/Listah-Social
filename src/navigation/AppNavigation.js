@@ -37,6 +37,8 @@ import RNSplashScreen from "../auth/screens/SplashScreen";
 import { AppLoader } from "../common/AppLoader";
 import ThreadManager from "../ChatModule/ThreadManger";
 import { Routes } from "../util/Route";
+import PostDetailScreen from "../Post/Screens/PostDetailScreen";
+import ReportPost from "../home/screens/ReportPost";
 const Stack = createNativeStackNavigator();
 
 /* =============================================================================
@@ -157,7 +159,11 @@ const AppNavigation = ({ changeAuthState, getProfile, authenticated }) => {
 
   const openDetail = () => {
     let obj = selector?.sliceReducer?.push_Noti?._data;
-    if (
+    if (obj?.extraData?.postId) {
+      navigate(Routes.Post.postDetail, {
+        postId: obj?.extraData?.postId,
+      });
+    } else if (
       obj?.actionType == Notification_Types.announced ||
       obj?.actionType == Notification_Types.challenge ||
       obj?.actionType == Notification_Types.comment ||
@@ -265,9 +271,14 @@ const AppNavigation = ({ changeAuthState, getProfile, authenticated }) => {
                   component={ChatListingScreen}
                 />
                 <Stack.Screen
+                  name={Routes.Post.postDetail}
+                  component={PostDetailScreen}
+                />
+                <Stack.Screen
                   name={Routes.Chat.chatScreen}
                   component={ChatScreen}
                 />
+                <Stack.Screen name="ReportPost" component={ReportPost} />
               </>
             ) : (
               <Stack.Screen name="AuthStack" component={AuthStack} />

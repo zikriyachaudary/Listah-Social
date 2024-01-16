@@ -487,6 +487,17 @@ const useNotificationManger = (props) => {
         dispatch(setIsUnReadMsg(snapDoc?._data?.isUnRead ? true : false));
       });
   };
+  const fetchPostDetail = async (postId, onComplete) => {
+    await firestore()
+      .collection(Collections.POST)
+      .doc(postId?.toString())
+      .get()
+      .then(async (snapDoc) => {
+        if (snapDoc?.data) {
+          onComplete([snapDoc?._data]);
+        }
+      });
+  };
   return {
     userSubscribed,
     checkNUpdateFCMToken,
@@ -499,6 +510,7 @@ const useNotificationManger = (props) => {
     generateMultiplePushNotification,
     setMessageIsRead,
     fetchIsUnReadValue,
+    fetchPostDetail,
   };
 };
 export default useNotificationManger;

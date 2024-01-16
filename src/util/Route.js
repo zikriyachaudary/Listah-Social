@@ -11,4 +11,7 @@ export const Routes = {
     chatScreen: "ChatScreen",
     chatList: "ChatListingScreen",
   },
+  Post: {
+    postDetail: "PostDetailScreen",
+  },
 };
