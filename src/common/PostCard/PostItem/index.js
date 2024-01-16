@@ -143,7 +143,7 @@ const PostItem = ({
     if (post.challenge && post.challenge.likedUsers) {
       const isChallengeLiked =
         post.challenge.likedUsers.filter((id) => id == profile?.userId).length >
-        0
+          0
           ? true
           : false;
       setChallengeLiked(isChallengeLiked);
@@ -287,8 +287,8 @@ const PostItem = ({
             {post?.announcement
               ? "A-Listah"
               : post?.author?.username
-              ? post?.author?.username
-              : ""}
+                ? post?.author?.username
+                : ""}
           </B>{" "}
           {post.description}.
         </Text>
@@ -407,7 +407,7 @@ const mapStateToProps = (state) => ({
 const propsAreEqual = (prevProps, nextProps) =>
   prevProps.id === nextProps.id &&
   JSON.stringify(prevProps.post?.items) ===
-    JSON.stringify(nextProps?.post?.items);
+  JSON.stringify(nextProps?.post?.items);
 
 /* Export
 ============================================================================= */
