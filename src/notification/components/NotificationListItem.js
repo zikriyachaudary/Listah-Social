@@ -111,20 +111,26 @@ const NotificationListItem = ({ notification }) => {
           }}
         />
         <View>
-          <Text
-            style={{
-              flex: 1,
-              flexWrap: "wrap",
-              marginStart: 8,
-              color: AppColors.black.black,
-              fontSize: normalized(14),
-            }}
-          >
-            {notification?.actionType == Notification_Types.chat_messages &&
-            notification?.sender?.userName
-              ? `${notification?.sender?.userName} send message`
-              : ""}
-          </Text>
+          {
+            notification?.actionType == Notification_Types.chat_messages &&
+            notification?.sender?.userName && (
+              <Text
+                style={{
+                  flex: 1,
+                  flexWrap: "wrap",
+                  marginStart: 8,
+                  color: AppColors.black.black,
+                  fontSize: normalized(14),
+                }}
+              >
+                {notification?.actionType == Notification_Types.chat_messages &&
+                  notification?.sender?.userName
+                  ? `${notification?.sender?.userName} send message`
+                  : ""}
+              </Text>
+            )
+          }
+
 
           <Text
             style={{
@@ -145,6 +151,7 @@ const NotificationListItem = ({ notification }) => {
 const styles = StyleSheet.create({
   container: {
     marginTop: 20,
+    alignItems: "center"
   },
   profileImg: {
     marginRight: 15,

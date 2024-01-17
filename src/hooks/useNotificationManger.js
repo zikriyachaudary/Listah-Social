@@ -5,9 +5,12 @@ import {
   Notification_Messages,
   Notification_Types,
 } from "../util/Strings";
+import FireStore from "@react-native-firebase/firestore";
+
 import { sendPushNotification } from "../network/Services/NotificationServices";
 import { setIsUnReadMsg } from "../redux/action/AppLogics";
 import auth from "@react-native-firebase/auth";
+const ProfilesCollection = FireStore().collection("profiles");
 
 const useNotificationManger = (props) => {
   const dispatch = useDispatch();
@@ -44,7 +47,7 @@ const useNotificationManger = (props) => {
         .collection(Collections.NOTIFICATION)
         .doc(data?.userId)
         .update({ fcmToken: data?.fcmToken })
-        .then(() => {})
+        .then(() => { })
         .catch((error) => {
           console.error("Error updating array value:", error);
         });
@@ -453,7 +456,7 @@ const useNotificationManger = (props) => {
       .collection(Collections.NOTIFICATION)
       .doc(userId)
       .update({ isUnRead: true })
-      .then(() => {})
+      .then(() => { })
       .catch((error) => {
         console.error("Error updating array value:", error);
       });
@@ -494,7 +497,21 @@ const useNotificationManger = (props) => {
       .get()
       .then(async (snapDoc) => {
         if (snapDoc?.data) {
-          onComplete([snapDoc?._data]);
+          const postAuthor = await (
+            await ProfilesCollection.doc(snapDoc?._data?.author).get()
+          ).data();
+
+          const obj = {
+            ...snapDoc?._data,
+            author: {
+              userId: postAuthor?.userId,
+              username: postAuthor?.username,
+              profileImage: postAuthor?.profileImage,
+            },
+          }
+          onComplete([obj]);
+
+
         }
       });
   };
