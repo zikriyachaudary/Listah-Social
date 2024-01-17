@@ -19,12 +19,13 @@ import MenuIcon from "../../../assets/icons/edit-menu-icon.svg";
 import * as Colors from "../../../config/colors";
 
 import { getPostsById } from "../../../home/redux/selectors";
-import { deletePost as deletePostAction } from "../../../home/redux/actions";
+import { deletePost as deletePostAction, savePostInDb } from "../../../home/redux/actions";
 import LoadingImage from "../../LoadingImage";
 
 import AppLogoImg from "../../../assets/images/edit-app-logo.jpeg";
 import FastImage from "react-native-fast-image";
 import { AppColors, AppImages, normalized } from "../../../util/AppConstant";
+import { useToast } from "react-native-toast-notifications";
 
 /* =============================================================================
 <PostItemHeader />
@@ -39,9 +40,11 @@ const PostItemHeader = ({
   postIndex,
   showIndex,
   isChallenge = false,
+  postSaveTrigger = null
 }) => {
   const navigation = useNavigation();
   const [visible, setVisible] = useState(false);
+  const toast = useToast();
 
   const title = post?.title;
   const username = isChallenge
@@ -50,8 +53,8 @@ const PostItemHeader = ({
   const authorId = isChallenge
     ? post?.challenge?.author?.userId
     : post?.author?.userId
-    ? post?.author?.userId
-    : post?.author;
+      ? post?.author?.userId
+      : post?.author;
   const profileImage = isChallenge
     ? post?.challenge?.author?.profileImage
     : post?.author?.profileImage;
@@ -70,6 +73,18 @@ const PostItemHeader = ({
 
     _toggleMenu();
   };
+
+  const _savePost = async () => {
+    setVisible(false)
+    const data = await savePostInDb(post.id);
+
+    toast.show(data)
+
+    console.log("pppp ", postSaveTrigger())
+    if (postSaveTrigger()) {
+      postSaveTrigger()
+    }
+  }
 
   const _handleDeletePress = async () => {
     await deletePost(id);
@@ -202,6 +217,12 @@ const PostItemHeader = ({
             {isAuthor ? (
               <>
                 <MenuItem
+                  onPress={_savePost}
+                  textStyle={{ color: AppColors.black.black }}
+                >
+                  Save Post
+                </MenuItem>
+                <MenuItem
                   onPress={_handleEditPress}
                   textStyle={{ color: AppColors.black.black }}
                 >
@@ -216,6 +237,12 @@ const PostItemHeader = ({
               </>
             ) : (
               <>
+                <MenuItem
+                  onPress={_savePost}
+                  textStyle={{ color: AppColors.black.black }}
+                >
+                  Save Post
+                </MenuItem>
                 <MenuItem
                   onPress={blockUser}
                   textStyle={{ color: AppColors.black.black }}

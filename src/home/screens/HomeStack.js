@@ -17,6 +17,7 @@ import { Routes } from "../../util/Route";
 import UserRequestListScreen from "../../profile/screens/UserRequestList";
 import AppUserListScreen from "../../profile/screens/AppUsersListScreen";
 import RequestForVerifyAccountScreen from "../../profile/screens/RequestForVerifyAccountScreen";
+import SavePostsScreen from "../../profile/screens/SavePostsScreen";
 const Stack = createNativeStackNavigator();
 
 /* =============================================================================
@@ -52,6 +53,8 @@ const HomeStack = () => {
 
       {/* <Tab.Screen name="ProfileStack" component={ProfileStack} /> */}
       <Stack.Screen name="Profile" component={ProfileScreen} />
+      <Stack.Screen name="SavePosts" component={SavePostsScreen} />
+
       <Stack.Screen name="EditProfile" component={EditProfileScreen} />
       <Stack.Screen name="DraftPostListing" component={DraftPostListScreen} />
       <Stack.Screen

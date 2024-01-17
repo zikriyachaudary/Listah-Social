@@ -22,6 +22,7 @@ const AnnouncementCollection = FireStore().collection("announcements");
 const ProfilesCollection = FireStore().collection("profiles");
 const ReportPostCollection = FireStore().collection("reports");
 const BlockUsersCollection = FireStore().collection("blockUsers");
+const SavePostCollection = FireStore().collection("savePosts");
 
 const getHomePostsQuery = PostsCollection.orderBy("createdAt", "desc").limit(
   100
@@ -294,6 +295,100 @@ export const getUserProfilesById = async (likedUserList) => {
   return userDataList;
 };
 
+export const getUserSavedPost = async () => {
+  try {
+    const currentUserUid = FireAuth().currentUser.uid;
+    const usersSavedPostList = await SavePostCollection.doc(currentUserUid).get();
+
+    if (usersSavedPostList.exists) {
+      const savePostsIds = usersSavedPostList.data().savePostsIds || [];
+
+      if (savePostsIds.length > 0) {
+        const mSavedPostList = await Promise.all(savePostsIds.map(async (id) => {
+          const userPostSnapshot = await PostsCollection.where("id", "==", id).get();
+
+          if (!userPostSnapshot.empty) {
+            const userPost = userPostSnapshot.docs[0].data();
+
+            if (userPost) {
+              const postAuthorId = userPost.author && userPost.author.userId
+                ? userPost.author.userId
+                : userPost.author;
+
+              const userProfileOfPostSnapshot = await ProfilesCollection.doc(postAuthorId).get();
+              const userProfileOfPost = userProfileOfPostSnapshot.data();
+
+              const authorObj = {
+                profileImage: userProfileOfPost.profileImage,
+                userId: userProfileOfPost.userId,
+                username: userProfileOfPost.username,
+                verified: userProfileOfPost?.verified ? true : false,
+              };
+
+              const mObj = { ...userPost, author: authorObj };
+              return mObj;
+            }
+          }
+
+          // Return null for cases where userPost is not found or is undefined
+          return null;
+        }));
+
+        // Filter out null values before returning the result
+        const filteredSavedPostList = mSavedPostList.filter(post => post !== null);
+
+        console.log("findS - > ", filteredSavedPostList);
+        return filteredSavedPostList;
+      }
+    }
+
+    return []; // Return an empty array if no saved posts or if the user does not exist
+  } catch (error) {
+    console.log("printError - > ", error);
+    return []; // Return an empty array in case of an error
+  }
+};
+
+
+// export const getUserSavedPost = async () => {
+//   let savedPostsList = []
+//   try {
+//     const currentUserUid = FireAuth().currentUser.uid;
+
+//     const usersSavedPostList = await (await SavePostCollection.doc(currentUserUid).get()).data();
+//     if (usersSavedPostList && usersSavedPostList.savePostsIds && usersSavedPostList.savePostsIds.length > 0) {
+//       const mSavedPostList = await usersSavedPostList.savePostsIds.map(async (id) => {
+//         const userPost = await (await PostsCollection.where("id", "==", id).get()).data();
+//         const postAuthorId = userPost.author && userPost.author.userId
+//           ? userPost.author.userId
+//           : userPost.author;
+//         const userProfileOfPost = await (
+//           await ProfilesCollection.doc(postAuthorId).get()
+//         ).data();
+
+//         const authorObj = {
+//           profileImage: userProfileOfPost.profileImage,
+//           userId: userProfileOfPost.userId,
+//           username: userProfileOfPost.username,
+//           verified: userProfileOfPost?.verified ? true : false,
+//         };
+
+//         const mObj = { ...userPost, author: authorObj };
+//         console.log("printObj - > ", mObj)
+//         // savedPostsList.push(mObj)
+//         return mObj
+//       })
+
+//       console.log("findS - > ", mSavedPostList)
+//       return savedPostsList
+//     } else {
+//       return savedPostsList
+//     }
+//   } catch (error) {
+//     console.log("printError - > ", error)
+//     return savedPostsList
+//   }
+// }
 //get user post
 export const getPostsByID = async (userId) => {
   const userPosts = await PostsCollection.where("author", "==", userId).get();
@@ -506,6 +601,36 @@ export const createAnnouncementPost =
       dispatch({ type: constants.CREATE_POST.COMPLETE });
     }
   };
+
+export const savePostInDb = async (postId) => {
+  const currentUserId = FireAuth().currentUser.uid;
+  const alreadySavedPostList = await (await SavePostCollection.doc(currentUserId).get()).data();
+  let savePostIds = []
+  let messageDisplay = ''
+
+  if (alreadySavedPostList && alreadySavedPostList.savePostsIds && alreadySavedPostList.savePostsIds.length > 0) {
+    savePostIds = alreadySavedPostList.savePostsIds
+    console.log("postId0 > ", savePostIds)
+
+    if (savePostIds.filter((id) => id == postId).length > 0) {
+      savePostIds = savePostIds.filter((id) => id !== postId)
+      messageDisplay = "Post un save successfully"
+    } else {
+      savePostIds.push(postId)
+      messageDisplay = "Post save successfully"
+    }
+  } else {
+    savePostIds.push(postId)
+    messageDisplay = "Post save successfully"
+  }
+  const savePostsObj = {
+    savePostsIds: savePostIds
+  }
+  console.log("showAlready - > ", currentUserId, savePostsObj)
+  await SavePostCollection.doc(`${currentUserId}`).set(savePostsObj);
+  console.log("done - >< ", messageDisplay)
+  return messageDisplay
+}
 
 /**
  * CREATE POST

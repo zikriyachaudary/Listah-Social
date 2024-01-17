@@ -152,13 +152,13 @@ const ProfileScreen = ({ profile, getProfile, logout, deleteUserAccount }) => {
               <View style={styles.itemInfoContainer}>
                 <Text normal>
                   {reqBtnStatus == RequestStatus.newReq ||
-                  reqBtnStatus == RequestStatus.rejected
+                    reqBtnStatus == RequestStatus.rejected
                     ? "Request for verified Account"
                     : reqBtnStatus == RequestStatus.pending
-                    ? "Request Pending"
-                    : reqBtnStatus == RequestStatus.accepted
-                    ? "Request Accepted"
-                    : ""}
+                      ? "Request Pending"
+                      : reqBtnStatus == RequestStatus.accepted
+                        ? "Request Accepted"
+                        : ""}
                 </Text>
               </View>
             </TouchableOpacity>
@@ -191,6 +191,20 @@ const ProfileScreen = ({ profile, getProfile, logout, deleteUserAccount }) => {
             </View>
           )
         ) : null}
+
+        <TouchableOpacity
+          style={{ ...styles.item, paddingVertical: normalized(5) }}
+          activeOpacity={1}
+          onPress={() => {
+            navigation.navigate("SavePosts")
+            // _handleLogout();
+          }}
+        >
+          <Image source={AppImages.profile.savePosts} style={styles.icon} />
+          <View style={styles.itemInfoContainer}>
+            <Text normal>{"Save Posts"}</Text>
+          </View>
+        </TouchableOpacity>
 
         <TouchableOpacity
           style={{ ...styles.item, paddingVertical: normalized(5) }}

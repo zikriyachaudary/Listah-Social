@@ -40,6 +40,7 @@ const PostItem = ({
   showIndex,
   postIndex,
   profile,
+  postSaveTrigger = null
 }) => {
   const postItems =
     post.order && post.order == "1" ? post?.items : post?.items.reverse();
@@ -180,6 +181,13 @@ const PostItem = ({
         }}
         postReport={(isReportCount) => {
           postReport(isReportCount);
+        }}
+        postSaveTrigger={() => {
+
+          console.log("pppp ", postSaveTrigger)
+          if (postSaveTrigger) {
+            postSaveTrigger()
+          }
         }}
       />
       <PostInnerItems post={post} userPosts={postItems} />
