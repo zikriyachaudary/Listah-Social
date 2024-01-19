@@ -6,7 +6,6 @@ import * as React from "react";
 export const navigationRef = React.createRef();
 
 export function navigate(name, params = {}) {
-  console.log("name------>", name);
   navigationRef.current?.navigate(name, params);
 }
 export function reset(name, params = {}) {

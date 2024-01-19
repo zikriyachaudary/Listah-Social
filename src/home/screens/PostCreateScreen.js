@@ -566,13 +566,7 @@ const PostCreateScreen = ({
                 {Platform.OS == "android" ? (
                   <TouchableOpacity
                     onPress={() => {
-                      if (isSelect) {
-                        isSelect = false;
-                        setToggleCheckBox(isSelect);
-                      } else {
-                        isSelect = true;
-                        setToggleCheckBox(isSelect);
-                      }
+                      setToggleCheckBox(!toggleCheckBox);
                     }}
                   >
                     <View
@@ -588,7 +582,7 @@ const PostCreateScreen = ({
                         alignItems: "center",
                       }}
                     >
-                      {isSelect && (
+                      {toggleCheckBox && (
                         <View
                           style={{
                             width: 20,

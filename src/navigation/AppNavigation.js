@@ -34,7 +34,6 @@ import { Notification_Types } from "../util/Strings";
 import { navigate, navigationRef } from "./RootNavigation";
 import { fetchCategoriesList } from "../network/Services/ProfileServices";
 import RNSplashScreen from "../auth/screens/SplashScreen";
-import { AppLoader } from "../common/AppLoader";
 import ThreadManager from "../ChatModule/ThreadManger";
 import { Routes } from "../util/Route";
 import PostDetailScreen from "../Post/Screens/PostDetailScreen";
@@ -55,6 +54,8 @@ const AppNavigation = ({ changeAuthState, getProfile, authenticated }) => {
   const dispatch = useDispatch();
   // firebase user state check
   useEffect(() => {
+    let removeOnNotificationOpened;
+    let removeOnNotification;
     FirebaseAuth().onAuthStateChanged(async (user) => {
       if (user) {
         userCompleteObj.current = user;
@@ -62,21 +63,63 @@ const AppNavigation = ({ changeAuthState, getProfile, authenticated }) => {
         fetchIsUnReadValue(user?.uid);
         changeAuthState(user.toJSON());
         registerDevice();
-        onNotificationListener();
-        onNotificationOpenedListener();
+        /////////Notification----->
         getInitialNotification();
+        removeOnNotificationOpened = notifications.onNotificationOpened(
+          (notification) => {
+            if (notification?._data) {
+              console.log("onNotificationOpened------->");
+              // dispatch(setPushNotifi(notification));
+              setTimeout(() => {
+                openDetail(notification);
+              }, 2000);
+              let userId = userCompleteObj.current?.uid
+                ? userCompleteObj.current?.uid
+                : selector?.Profile?.profile?.userId
+                ? selector?.Profile?.profile?.userId
+                : null;
+              if (userId) {
+                fetchIsUnReadValue(userId);
+              }
+            }
+          }
+        );
+        removeOnNotification = notifications.onNotification((notification) => {
+          if (notification?._data) {
+            console.log("onNotification0------>");
+            dispatch(setPushNotifi(notification));
+            let userId = userCompleteObj.current?.uid
+              ? userCompleteObj.current?.uid
+              : selector?.Profile?.profile?.userId
+              ? selector?.Profile?.profile?.userId
+              : null;
+            if (userId) {
+              fetchIsUnReadValue(userId);
+            }
+          }
+        });
+        ////////////
       }
       setInitializing(false);
       SplashScreen.hide();
       setTimeout(() => {
         setShowSplash(false);
       }, 3000);
-      ThreadManager.instance.setupRedux(selector?.sliceReducer, dispatch);
+      // ThreadManager.instance.setupRedux(selector?.sliceReducer, dispatch);
       user?.uid ? setChat(user?.uid) : null;
       return () => {
         ThreadManager.instance.removeThreadObserver();
       };
     });
+
+    return () => {
+      removeOnNotificationOpened && removeOnNotificationOpened?.remove
+        ? removeOnNotificationOpened?.remove()
+        : null;
+      removeOnNotification && removeOnNotification?.remove
+        ? removeOnNotification?.remove()
+        : null;
+    };
   }, []);
   const setChat = async (userId) => {
     setTimeout(async () => {
@@ -140,37 +183,36 @@ const AppNavigation = ({ changeAuthState, getProfile, authenticated }) => {
     return await notifications.hasPermission();
   };
   const getInitialNotification = async () => {
-    const notification = await notifications
-      .getInitialNotification()
-      .then(async (remoteMessage) => {
-        if (remoteMessage?.notification) {
-          dispatch(setPushNotifi(notification));
-          setTimeout(() => {
-            openDetail();
-          }, 3000);
-        }
-      });
-    return notification;
+    const notification = await notifications.getInitialNotification();
+    if (notification?.notification?._data) {
+      console.log("getInitialNotification----->");
+      // dispatch(setPushNotifi(notification?.notification));
+      setTimeout(() => {
+        openDetail(notification?.notification);
+      }, 6000);
+    }
   };
 
   const postRefresh = () => {
     console.log("click");
   };
 
-  const openDetail = () => {
-    let obj = selector?.sliceReducer?.push_Noti?._data;
-    if (obj?.extraData?.postId) {
-      navigate(Routes.Post.postDetail, {
-        postId: obj?.extraData?.postId,
-      });
-    } else if (
-      obj?.actionType == Notification_Types.announced ||
-      obj?.actionType == Notification_Types.challenge ||
-      obj?.actionType == Notification_Types.comment ||
-      obj?.actionType == Notification_Types.follow ||
-      obj?.actionType == Notification_Types.like ||
-      obj?.actionType == Notification_Types.suggestion
+  const openDetail = (notification) => {
+    let obj = selector?.sliceReducer?.push_Noti?._data || notification?._data;
+    console.log("obj------>", obj);
+
+    if (
+      (obj?.actionType == Notification_Types.announced ||
+        obj?.actionType == Notification_Types.challenge ||
+        obj?.actionType == Notification_Types.comment ||
+        obj?.actionType == Notification_Types.like ||
+        obj?.actionType == Notification_Types.suggestion) &&
+      (obj?.extraData?.postId || obj?.postId)
     ) {
+      navigate(Routes.Post.postDetail, {
+        postId: obj?.extraData?.postId || obj?.postId,
+      });
+    } else if (obj?.actionType == Notification_Types.follow) {
       navigate("MyPosts", {
         userId: obj?.senderId,
         username: obj?.senderName,
@@ -182,45 +224,9 @@ const AppNavigation = ({ changeAuthState, getProfile, authenticated }) => {
         from: "Home",
       });
     }
-  };
-  const onNotificationOpenedListener = () => {
-    //this gets triggered when the application is in the background
-    notifications.onNotificationOpened((notification) => {
-      if (notification?._body) {
-        let userId = userCompleteObj.current?.uid
-          ? userCompleteObj.current?.uid
-          : selector?.Profile?.profile?.userId
-          ? selector?.Profile?.profile?.userId
-          : null;
-        if (userId) {
-          fetchIsUnReadValue(userId);
-        }
-        dispatch(setPushNotifi(notification));
-        setTimeout(() => {
-          openDetail();
-        }, 3000);
-      }
-    });
-  };
-  const onNotificationListener = async () => {
-    //remember to remove the listener on un mount
-    //this gets triggered when the application is in the forground/runnning
-    //for android make sure you manifest is setup - else this wont work
-    //Android will not have any info set on the notification properties (title, subtitle, etc..), but _data will still contain information
-
-    notifications.onNotification(async (notification) => {
-      if (notification?._body) {
-        let userId = userCompleteObj.current?.uid
-          ? userCompleteObj.current?.uid
-          : selector?.Profile?.profile?.userId
-          ? selector?.Profile?.profile?.userId
-          : null;
-        if (userId) {
-          fetchIsUnReadValue(userId);
-        }
-        dispatch(setPushNotifi(notification));
-      }
-    });
+    setTimeout(() => {
+      dispatch(setPushNotifi(null));
+    }, 1000);
   };
 
   ////--------------------------------->
@@ -340,7 +346,7 @@ const AppNavigation = ({ changeAuthState, getProfile, authenticated }) => {
           <SafeAreaView />
           <LocalNotification
             openView={() => {
-              openDetail();
+              openDetail(selector?.sliceReducer?.push_Noti);
               dispatch(setPushNotifi(null));
             }}
             closeView={() => {

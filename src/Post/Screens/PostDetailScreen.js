@@ -6,17 +6,26 @@ import { AppColors, AppImages, normalized } from "../../util/AppConstant";
 import useNotificationManger from "../../hooks/useNotificationManger";
 import { PostItem } from "../../common";
 import { blockUsers } from "../../home/redux/actions";
+import { useDispatch, useSelector } from "react-redux";
+import { setIsAppLoader } from "../../redux/action/AppLogics";
 
 const PostDetailScreen = (props) => {
+  const dispatch = useDispatch();
+  const selector = useSelector((AppState) => AppState);
   const { fetchPostDetail } = useNotificationManger();
   const postId = props?.route?.params?.postId;
   const [post, setPost] = useState(null);
+
   useLayoutEffect(() => {
     if (postId) {
+      dispatch(setIsAppLoader(true));
       fetchPostDetail(postId, (atRes) => {
         if (atRes?.length > 0) {
           setPost(atRes);
         }
+        setTimeout(() => {
+          dispatch(setIsAppLoader(false));
+        }, 1500);
       });
     }
   }, []);
@@ -70,7 +79,7 @@ const PostDetailScreen = (props) => {
             );
           }}
         />
-      ) : (
+      ) : !selector?.sliceReducer?.isLoaderStart ? (
         <View
           style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
         >
@@ -84,7 +93,7 @@ const PostDetailScreen = (props) => {
             Post not Found!
           </Text>
         </View>
-      )}
+      ) : null}
     </View>
   );
 };

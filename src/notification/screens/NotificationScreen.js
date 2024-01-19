@@ -51,9 +51,9 @@ const NotificationScreen = ({ notifications, getNotifications }) => {
         title={"Notifications"}
         mainStyle={{
           backgroundColor: AppColors.blue.royalBlue,
-          height: normalized(insets.top + 40),
         }}
       />
+
       {loader ? (
         <View
           style={{ flex: 1, justifyContent: "center", alignItems: "center" }}

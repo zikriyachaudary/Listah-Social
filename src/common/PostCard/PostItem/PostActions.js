@@ -72,7 +72,7 @@ const PostActions = ({
 
   const _handlePostReact = async () => {
     setLoading(true);
-    await likeUnlikeUserPosts(post?.id.toString(), async (response) => {
+    await likeUnlikeUserPosts(post?.id?.toString(), async (response) => {
       if (response?.status && authorId != selector?.Auth?.user?.uid) {
         await likeNUnLikePost({
           actionType: liked

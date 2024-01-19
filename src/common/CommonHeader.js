@@ -169,6 +169,7 @@ const styles = StyleSheet.create({
     fontSize: normalized(18),
     fontWeight: "500",
     maxWidth: "70%",
+    height: normalized(45),
   },
   line: {
     height: 0.5,

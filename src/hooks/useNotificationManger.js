@@ -47,7 +47,7 @@ const useNotificationManger = (props) => {
         .collection(Collections.NOTIFICATION)
         .doc(data?.userId)
         .update({ fcmToken: data?.fcmToken })
-        .then(() => { })
+        .then(() => {})
         .catch((error) => {
           console.error("Error updating array value:", error);
         });
@@ -346,6 +346,7 @@ const useNotificationManger = (props) => {
   };
   const sendPushNoti = async (obj, fcmToken) => {
     let title = selector?.Profile?.profile?.username;
+    console.log("fcmToken----->", fcmToken);
     if (fcmToken) {
       let notification = {
         title: title,
@@ -456,7 +457,7 @@ const useNotificationManger = (props) => {
       .collection(Collections.NOTIFICATION)
       .doc(userId)
       .update({ isUnRead: true })
-      .then(() => { })
+      .then(() => {})
       .catch((error) => {
         console.error("Error updating array value:", error);
       });
@@ -508,10 +509,8 @@ const useNotificationManger = (props) => {
               username: postAuthor?.username,
               profileImage: postAuthor?.profileImage,
             },
-          }
+          };
           onComplete([obj]);
-
-
         }
       });
   };
