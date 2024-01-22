@@ -17,17 +17,16 @@ import { connect } from "react-redux";
 import { AppColors, hv, normalized } from "../../../util/AppConstant";
 const PostInnerItems = ({ post, userPosts, profile }) => {
   const [showMore, setShowMore] = useState(false);
-  const [showMoreChallengePost, setShowMoreChallengePost] = useState(false);
 
   const [postItems, setPostItems] = useState(
-    userPosts.length > 3 ? userPosts.slice(0, 3) : userPosts
+    userPosts?.length > 3 ? userPosts.slice(0, 3) : userPosts
   );
 
   useEffect(() => {
     if (showMore) {
       setPostItems(userPosts);
     } else {
-      setPostItems(userPosts.length > 3 ? userPosts.slice(0, 3) : userPosts);
+      setPostItems(userPosts?.length > 3 ? userPosts.slice(0, 3) : userPosts);
     }
   }, [showMore, userPosts]);
   return (
@@ -76,7 +75,7 @@ const PostInnerItems = ({ post, userPosts, profile }) => {
                   adjustsFontSizeToFit={true}
                   numberOfLines={4}
                 >
-                  {item.name || "--"}
+                  {item?.name || "--"}
                 </Text>
               )}
 
@@ -108,7 +107,7 @@ const PostInnerItems = ({ post, userPosts, profile }) => {
           );
         })}
 
-      {userPosts.length > 3 && (
+      {userPosts?.length > 3 && (
         <View style={{ flex: 1, alignItems: "flex-end" }}>
           <TouchableOpacity onPress={() => setShowMore(!showMore)}>
             <Text

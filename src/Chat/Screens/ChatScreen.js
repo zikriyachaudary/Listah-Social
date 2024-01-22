@@ -36,6 +36,7 @@ import {
 import { capitalizeFirstLetter, removeEmptyLines } from "../../util/helperFun";
 import { Notification_Types } from "../../util/Strings";
 import { sendPushNotification } from "../../network/Services/NotificationServices";
+import { useIsFocused } from "@react-navigation/native";
 const ChatScreen = (props) => {
   const selector = useSelector((AppState) => AppState?.Profile);
   const thread = props?.route?.params?.thread
@@ -54,6 +55,7 @@ const ChatScreen = (props) => {
   const threadSelector = useSelector(
     (AppState) => AppState?.sliceReducer.threadList
   );
+  const isFoucsed = useIsFocused();
   const [isBlocked, setIsBlocked] = useState(false);
   const [currentUserData] = useState(selector?.profile);
   const [visibleMessages, setVisibleMessage] = useState([]);
@@ -69,7 +71,7 @@ const ChatScreen = (props) => {
     if (props?.route?.params?.thread) {
       fetchFcmToken();
     }
-  }, [props?.route?.params?.thread]);
+  }, [props?.route?.params?.thread, isFoucsed]);
   const fetchFcmToken = async () => {
     let participants = props?.route?.params?.thread
       ? typeof props?.route?.params?.thread?.participants == "string"
@@ -78,7 +80,14 @@ const ChatScreen = (props) => {
       : typeof thread.participants == "string"
       ? JSON.parse(thread.participants)
       : thread.participants;
-
+    let newThread = props?.route?.params?.thread
+      ? typeof props?.route?.params?.thread == "string"
+        ? JSON.parse(props?.route?.params?.thread)
+        : props?.route?.params?.thread
+      : typeof thread == "string"
+      ? JSON.parse(thread)
+      : thread;
+    threadRef.current = newThread;
     let otherIndex = participants.findIndex((value) => value.user != userId);
     if (otherIndex != -1) {
       await ThreadManager.instance.getIsUserBlocked(

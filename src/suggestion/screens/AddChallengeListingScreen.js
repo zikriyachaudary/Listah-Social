@@ -26,6 +26,7 @@ import { updateHomeData } from "../../home/redux/appLogics";
 import { UPDATE_CHALLENGE_FEATURE } from "../redux/constants";
 import { Notification_Types } from "../../util/Strings";
 import useNotificationManger from "../../hooks/useNotificationManger";
+import { setIsAppLoader } from "../../redux/action/AppLogics";
 
 const AddChallengeListingScreen = ({ challengePost, navigation, route }) => {
   const post = route.params.post;
@@ -79,8 +80,7 @@ const AddChallengeListingScreen = ({ challengePost, navigation, route }) => {
   const _handleSubmit = async (values) => {
     values["order"] = radioButtons.find((item) => item.selected).id;
     values["isNumberShowInItems"] = toggleCheckBox;
-    setLoading(true);
-
+    dispatch(setIsAppLoader(true));
     await challengePost(values, post, async (response) => {
       let authorId = post?.author?.userId || post?.author;
       if (response?.status && authorId != selector?.Auth?.user?.uid) {
@@ -91,7 +91,7 @@ const AddChallengeListingScreen = ({ challengePost, navigation, route }) => {
         });
       }
     });
-    setLoading(false);
+    dispatch(setIsAppLoader(false));
     UPDATE_CHALLENGE_FEATURE.isUpdate = true;
     dispatch(updateHomeData(!selector.Home.updateHomeData));
     navigation.goBack();

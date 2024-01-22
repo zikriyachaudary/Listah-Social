@@ -111,8 +111,7 @@ const NotificationListItem = ({ notification }) => {
           }}
         />
         <View>
-          {
-            notification?.actionType == Notification_Types.chat_messages &&
+          {notification?.actionType == Notification_Types.chat_messages &&
             notification?.sender?.userName && (
               <Text
                 style={{
@@ -124,13 +123,11 @@ const NotificationListItem = ({ notification }) => {
                 }}
               >
                 {notification?.actionType == Notification_Types.chat_messages &&
-                  notification?.sender?.userName
+                notification?.sender?.userName
                   ? `${notification?.sender?.userName} send message`
                   : ""}
               </Text>
-            )
-          }
-
+            )}
 
           <Text
             style={{
@@ -151,7 +148,7 @@ const NotificationListItem = ({ notification }) => {
 const styles = StyleSheet.create({
   container: {
     marginTop: 20,
-    alignItems: "center"
+    alignItems: "center",
   },
   profileImg: {
     marginRight: 15,

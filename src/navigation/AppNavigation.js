@@ -105,7 +105,7 @@ const AppNavigation = ({ changeAuthState, getProfile, authenticated }) => {
       setTimeout(() => {
         setShowSplash(false);
       }, 3000);
-      // ThreadManager.instance.setupRedux(selector?.sliceReducer, dispatch);
+      ThreadManager.instance.setupRedux(selector?.sliceReducer, dispatch);
       user?.uid ? setChat(user?.uid) : null;
       return () => {
         ThreadManager.instance.removeThreadObserver();
@@ -122,15 +122,13 @@ const AppNavigation = ({ changeAuthState, getProfile, authenticated }) => {
     };
   }, []);
   const setChat = async (userId) => {
-    setTimeout(async () => {
-      if (userId) {
-        await setUpChat(userId, async (result) => {
-          setTimeout(async () => {
-            ThreadManager.instance.setAppLoaded();
-          }, 3000);
-        });
-      }
-    }, 1000);
+    if (userId) {
+      await setUpChat(userId, async (result) => {
+        setTimeout(async () => {
+          ThreadManager.instance.setAppLoaded();
+        }, 3000);
+      });
+    }
   };
 
   // Get Profile
@@ -199,7 +197,6 @@ const AppNavigation = ({ changeAuthState, getProfile, authenticated }) => {
 
   const openDetail = (notification) => {
     let obj = selector?.sliceReducer?.push_Noti?._data || notification?._data;
-    console.log("obj------>", obj);
 
     if (
       (obj?.actionType == Notification_Types.announced ||

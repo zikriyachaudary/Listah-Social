@@ -298,44 +298,57 @@ export const getUserProfilesById = async (likedUserList) => {
 export const getUserSavedPost = async () => {
   try {
     const currentUserUid = FireAuth().currentUser.uid;
-    const usersSavedPostList = await SavePostCollection.doc(currentUserUid).get();
+    const usersSavedPostList = await SavePostCollection.doc(
+      currentUserUid
+    ).get();
 
     if (usersSavedPostList.exists) {
       const savePostsIds = usersSavedPostList.data().savePostsIds || [];
 
       if (savePostsIds.length > 0) {
-        const mSavedPostList = await Promise.all(savePostsIds.map(async (id) => {
-          const userPostSnapshot = await PostsCollection.where("id", "==", id).get();
+        const mSavedPostList = await Promise.all(
+          savePostsIds.map(async (id) => {
+            const userPostSnapshot = await PostsCollection.where(
+              "id",
+              "==",
+              id
+            ).get();
 
-          if (!userPostSnapshot.empty) {
-            const userPost = userPostSnapshot.docs[0].data();
+            if (!userPostSnapshot.empty) {
+              const userPost = userPostSnapshot.docs[0].data();
 
-            if (userPost) {
-              const postAuthorId = userPost.author && userPost.author.userId
-                ? userPost.author.userId
-                : userPost.author;
+              if (userPost) {
+                const postAuthorId =
+                  userPost.author && userPost.author.userId
+                    ? userPost.author.userId
+                    : userPost.author;
 
-              const userProfileOfPostSnapshot = await ProfilesCollection.doc(postAuthorId).get();
-              const userProfileOfPost = userProfileOfPostSnapshot.data();
+                const userProfileOfPostSnapshot = await ProfilesCollection.doc(
+                  postAuthorId
+                ).get();
+                const userProfileOfPost = userProfileOfPostSnapshot.data();
 
-              const authorObj = {
-                profileImage: userProfileOfPost.profileImage,
-                userId: userProfileOfPost.userId,
-                username: userProfileOfPost.username,
-                verified: userProfileOfPost?.verified ? true : false,
-              };
+                const authorObj = {
+                  profileImage: userProfileOfPost.profileImage,
+                  userId: userProfileOfPost.userId,
+                  username: userProfileOfPost.username,
+                  verified: userProfileOfPost?.verified ? true : false,
+                };
 
-              const mObj = { ...userPost, author: authorObj };
-              return mObj;
+                const mObj = { ...userPost, author: authorObj };
+                return mObj;
+              }
             }
-          }
 
-          // Return null for cases where userPost is not found or is undefined
-          return null;
-        }));
+            // Return null for cases where userPost is not found or is undefined
+            return null;
+          })
+        );
 
         // Filter out null values before returning the result
-        const filteredSavedPostList = mSavedPostList.filter(post => post !== null);
+        const filteredSavedPostList = mSavedPostList.filter(
+          (post) => post !== null
+        );
 
         console.log("findS - > ", filteredSavedPostList);
         return filteredSavedPostList;
@@ -348,7 +361,6 @@ export const getUserSavedPost = async () => {
     return []; // Return an empty array in case of an error
   }
 };
-
 
 // export const getUserSavedPost = async () => {
 //   let savedPostsList = []
@@ -529,7 +541,7 @@ export const createAnnouncementPost =
       const authorId = FireAuth().currentUser.uid;
 
       const post = {
-        id: postId,
+        id: postId?.toString(),
         title,
         order,
         isNumberShowInItems,
@@ -574,13 +586,11 @@ export const createAnnouncementPost =
           })
         );
       }
-
-      await AnnouncementCollection.doc(`${postId}`).set(post);
-      onComplete({ status: true, message: postId });
-
+      await AnnouncementCollection.doc(postId?.toString()).set(post);
       const createdPost = await (
-        await AnnouncementCollection.doc(postId).get()
+        await AnnouncementCollection.doc(postId?.toString()).get()
       ).data();
+
       const postAuthor = await (
         await ProfilesCollection.doc(createdPost?.author).get()
       ).data();
@@ -594,6 +604,7 @@ export const createAnnouncementPost =
         },
       };
       dispatch({ type: constants.CREATE_POST.SUCCESS, payload: populatedPost });
+      onComplete({ status: true, message: postId?.toString() });
     } catch (error) {
       dispatch({ type: constants.CREATE_POST.FAIL, error });
       dispatch(setCreatePostFailError(error));
@@ -604,33 +615,39 @@ export const createAnnouncementPost =
 
 export const savePostInDb = async (postId) => {
   const currentUserId = FireAuth().currentUser.uid;
-  const alreadySavedPostList = await (await SavePostCollection.doc(currentUserId).get()).data();
-  let savePostIds = []
-  let messageDisplay = ''
+  const alreadySavedPostList = await (
+    await SavePostCollection.doc(currentUserId).get()
+  ).data();
+  let savePostIds = [];
+  let messageDisplay = "";
 
-  if (alreadySavedPostList && alreadySavedPostList.savePostsIds && alreadySavedPostList.savePostsIds.length > 0) {
-    savePostIds = alreadySavedPostList.savePostsIds
-    console.log("postId0 > ", savePostIds)
+  if (
+    alreadySavedPostList &&
+    alreadySavedPostList.savePostsIds &&
+    alreadySavedPostList.savePostsIds.length > 0
+  ) {
+    savePostIds = alreadySavedPostList.savePostsIds;
+    console.log("postId0 > ", savePostIds);
 
     if (savePostIds.filter((id) => id == postId).length > 0) {
-      savePostIds = savePostIds.filter((id) => id !== postId)
-      messageDisplay = "Post un save successfully"
+      savePostIds = savePostIds.filter((id) => id !== postId);
+      messageDisplay = "Post un save successfully";
     } else {
-      savePostIds.push(postId)
-      messageDisplay = "Post save successfully"
+      savePostIds.push(postId);
+      messageDisplay = "Post save successfully";
     }
   } else {
-    savePostIds.push(postId)
-    messageDisplay = "Post save successfully"
+    savePostIds.push(postId);
+    messageDisplay = "Post save successfully";
   }
   const savePostsObj = {
-    savePostsIds: savePostIds
-  }
-  console.log("showAlready - > ", currentUserId, savePostsObj)
+    savePostsIds: savePostIds,
+  };
+  console.log("showAlready - > ", currentUserId, savePostsObj);
   await SavePostCollection.doc(`${currentUserId}`).set(savePostsObj);
-  console.log("done - >< ", messageDisplay)
-  return messageDisplay
-}
+  console.log("done - >< ", messageDisplay);
+  return messageDisplay;
+};
 
 /**
  * CREATE POST
@@ -740,12 +757,10 @@ export const challengePost =
 
         createdAt: FireStore.FieldValue.serverTimestamp(),
       };
-
       if (items) {
         challengePost.items = await Promise.all(
           items.map(async (item, index) => {
             let uploadImgUrl = "";
-
             if (item.image && item.image.uri != "") {
               const compressedImage = await ImageResizer.createResizedImage(
                 item.image.uri,
@@ -789,10 +804,10 @@ export const challengePost =
       await PostsCollection.doc(previousPost?.id?.toString()).update(
         uploadedChallengePost
       );
-
       const updatedPost = await (
         await PostsCollection.doc(previousPost?.id?.toString()).get()
       ).data();
+
       const postAuthorId =
         updatedPost?.author?.userId || updatedPost?.author?.userIds;
       const postAuthor = await (
@@ -808,12 +823,11 @@ export const challengePost =
           verified: postAuthor?.verified ? true : false,
         },
       };
-      onComplete({ status: true, message: "success" });
-      console.log("postAuthor --- > ", JSON.stringify(populatedPost));
       dispatch({
         type: constants.UPDATED_POST.SUCCESS,
         payload: populatedPost,
       });
+      onComplete({ status: true, message: "success", data: populatedPost });
     } catch (error) {
       console.log("errorCatch ", JSON.stringify(error));
       Alert.alert(error.message);

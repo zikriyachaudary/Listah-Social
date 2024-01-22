@@ -20,13 +20,13 @@ import { getPostsById as getDiscoverPostById } from "../../discover/redux/select
 <SelectSuggestionScreen />
 ============================================================================= */
 const SelectSuggestionScreen = ({ mpost, navigation, route }) => {
-  const post = route.params.post;
+  const post = route?.params?.post;
   const [selected, setSelected] = useState();
   const items = post?.items;
   const authorId = post?.author?.userId;
   const postId = post?.id;
   const postTitle = post?.title;
-
+  console.log("post-------->", post);
   useEffect(() => {
     // console.log("printPost999 - > ", post, authorId);
   }, []);
@@ -107,23 +107,26 @@ const SelectSuggestionScreen = ({ mpost, navigation, route }) => {
         />
 
         <View horizontal style={styles.itemsContainer}>
-          {items.length &&
-            items.map((item) => (
-              <Touchable
-                key={item?.id}
-                style={[
-                  styles.indexCounter,
-                  selected === item?.id && styles.itemCounterSelected,
-                ]}
-                onPress={() => _handleSelect(item?.id)}
-              >
-                <View style={styles.indexCounter}>
-                  <Text sm bold primary>
-                    {item?.id === 0 ? 1 : item?.id + 1}
-                  </Text>
-                </View>
-              </Touchable>
-            ))}
+          {items?.length
+            ? items.map((item) => {
+                return (
+                  <Touchable
+                    key={item?.id}
+                    style={[
+                      styles.indexCounter,
+                      selected === item?.id && styles.itemCounterSelected,
+                    ]}
+                    onPress={() => _handleSelect(item?.id)}
+                  >
+                    <View style={styles.indexCounter}>
+                      <Text sm bold primary>
+                        {item?.id === 0 ? 1 : item?.id + 1}
+                      </Text>
+                    </View>
+                  </Touchable>
+                );
+              })
+            : null}
         </View>
       </Content>
     </Container>

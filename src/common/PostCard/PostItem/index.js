@@ -40,10 +40,10 @@ const PostItem = ({
   showIndex,
   postIndex,
   profile,
-  postSaveTrigger = null
+  postSaveTrigger = null,
 }) => {
   const postItems =
-    post.order && post.order == "1" ? post?.items : post?.items.reverse();
+    post?.order && post.order == "1" ? post?.items : post?.items?.reverse();
 
   const challengePostItems = post.challenge
     ? post.challenge.order == "1"
@@ -144,7 +144,7 @@ const PostItem = ({
     if (post.challenge && post.challenge.likedUsers) {
       const isChallengeLiked =
         post.challenge.likedUsers.filter((id) => id == profile?.userId).length >
-          0
+        0
           ? true
           : false;
       setChallengeLiked(isChallengeLiked);
@@ -183,10 +183,9 @@ const PostItem = ({
           postReport(isReportCount);
         }}
         postSaveTrigger={() => {
-
-          console.log("pppp ", postSaveTrigger)
+          console.log("pppp ", postSaveTrigger);
           if (postSaveTrigger) {
-            postSaveTrigger()
+            postSaveTrigger();
           }
         }}
       />
@@ -295,8 +294,8 @@ const PostItem = ({
             {post?.announcement
               ? "A-Listah"
               : post?.author?.username
-                ? post?.author?.username
-                : ""}
+              ? post?.author?.username
+              : ""}
           </B>{" "}
           {post.description}.
         </Text>
@@ -415,7 +414,7 @@ const mapStateToProps = (state) => ({
 const propsAreEqual = (prevProps, nextProps) =>
   prevProps.id === nextProps.id &&
   JSON.stringify(prevProps.post?.items) ===
-  JSON.stringify(nextProps?.post?.items);
+    JSON.stringify(nextProps?.post?.items);
 
 /* Export
 ============================================================================= */

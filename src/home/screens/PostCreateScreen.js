@@ -316,7 +316,7 @@ const PostCreateScreen = ({
       await updatePost(values);
     } else if (route.params && route.params.isAnnouncement) {
       await createAnnouncementPost(values, async (response) => {
-        if (response?.status) {
+        if (response?.status && response?.message) {
           let isUserFetch = false;
           await userSubscribed(selector?.Auth?.user?.uid, async (res) => {
             if (res?.length > 0 && !isUserFetch) {
@@ -326,7 +326,7 @@ const PostCreateScreen = ({
                   receiverList: res,
                   extraData: { postId: response?.message.toString() },
                 });
-              }, 800);
+              }, 1500);
             }
             isUserFetch = true;
           });

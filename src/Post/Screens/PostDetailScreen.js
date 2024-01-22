@@ -14,7 +14,7 @@ const PostDetailScreen = (props) => {
   const selector = useSelector((AppState) => AppState);
   const { fetchPostDetail } = useNotificationManger();
   const postId = props?.route?.params?.postId;
-  const [post, setPost] = useState(null);
+  const [post, setPost] = useState([]);
 
   useLayoutEffect(() => {
     if (postId) {
@@ -22,10 +22,12 @@ const PostDetailScreen = (props) => {
       fetchPostDetail(postId, (atRes) => {
         if (atRes?.length > 0) {
           setPost(atRes);
-        }
-        setTimeout(() => {
+          setTimeout(() => {
+            dispatch(setIsAppLoader(false));
+          }, 1000);
+        } else {
           dispatch(setIsAppLoader(false));
-        }, 1500);
+        }
       });
     }
   }, []);

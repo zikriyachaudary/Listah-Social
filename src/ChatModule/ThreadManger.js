@@ -320,6 +320,7 @@ class ThreadManager {
                         participants: [snapData.docs[0].data(), snapObj],
                       };
                       this.threadList = [...this.threadList, findedData];
+                      this.threadList.push(findedData);
                       resolve(true);
                     })
                     .catch((error) => {
@@ -334,7 +335,6 @@ class ThreadManager {
             });
             promiseList.push(promise);
           }
-
           Promise.all(promiseList).finally(() => {
             this.updateStateList();
             onComplete(this.threadList);
@@ -350,14 +350,15 @@ class ThreadManager {
     let newArray = [];
     for (let i = 0; i < this.threadList.length; i++) {
       let obj = this.threadList[i];
-      let index = newArray.findIndex((item) => item.channelID == obj.channelID);
-
+      let index = newArray.findIndex(
+        (item) => item?.channelID == obj?.channelID
+      );
       if (index == -1) {
         newArray.push(obj);
       }
     }
-    this.threadList = newArray;
     this.dispatch(setThreadList(newArray));
+    this.threadList = newArray;
   };
   // MESSAGES METHOD
   sendMessage = async (docId, data) => {

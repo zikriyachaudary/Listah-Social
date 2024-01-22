@@ -390,7 +390,8 @@ const useNotificationManger = (props) => {
     let message = `${selector?.Profile?.profile?.username} ${Notification_Messages.announcment}`;
     for (let i = 0; i < obj?.receiverList?.length; i++) {
       let receiver = obj?.receiverList[i];
-      await updateMultiUserNotiList(message, receiver?.userId, extraData);
+      if (receiver?.userId)
+        await updateMultiUserNotiList(message, receiver?.userId, extraData);
     }
   };
   const updateMultiUserNotiList = async (msg, userId, data) => {
@@ -492,12 +493,13 @@ const useNotificationManger = (props) => {
       });
   };
   const fetchPostDetail = async (postId, onComplete) => {
+    console.log("postId------>", postId);
     await firestore()
       .collection(Collections.POST)
       .doc(postId?.toString())
       .get()
       .then(async (snapDoc) => {
-        if (snapDoc?.data) {
+        if (snapDoc?._data) {
           const postAuthor = await (
             await ProfilesCollection.doc(snapDoc?._data?.author).get()
           ).data();
@@ -511,6 +513,8 @@ const useNotificationManger = (props) => {
             },
           };
           onComplete([obj]);
+        } else {
+          onComplete([]);
         }
       });
   };
