@@ -55,10 +55,10 @@ export const getResponsiveFont = (fontSize) => {
     deviceWidth < 400
       ? 1
       : deviceWidth < 500
-        ? 1.2
-        : deviceWidth < 600
-          ? 1.3
-          : 1.5;
+      ? 1.2
+      : deviceWidth < 600
+      ? 1.3
+      : 1.5;
   return Math.round(scaleFactor * fontSize);
 };
 export const EmailValidator = (email) => {
@@ -151,7 +151,7 @@ export const AppImages = {
   profile: {
     logout: require("../assets/images/logout.png"),
     delete: require("../assets/images/delete.png"),
-    savePosts: require("../assets/images/Auth/save-posts.png")
+    savePosts: require("../assets/images/Auth/save-posts.png"),
   },
   Auth: {
     backIcon: require("../assets/images/Auth/backIcon.png"),

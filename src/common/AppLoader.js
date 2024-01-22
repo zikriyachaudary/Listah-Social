@@ -27,7 +27,7 @@ const AppLoader = (props) => {
           borderRadius: 10,
         }}
       >
-        {props.visible ? (
+        {props?.visible ? (
           <ActivityIndicator size="large" color={AppColors.blue.lightNavy} />
         ) : null}
       </View>

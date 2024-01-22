@@ -18,7 +18,11 @@ import {
   logout as logoutAction,
 } from "../../auth/redux/actions";
 import { AppColors, AppImages, normalized } from "../../util/AppConstant";
-import { setDraftPost, setThreadList } from "../../redux/action/AppLogics";
+import {
+  setDraftPost,
+  setIsAppLoader,
+  setThreadList,
+} from "../../redux/action/AppLogics";
 import { saveUserDraftPost } from "../../util/helperFun";
 import AlertModal from "../../common/AlertModal";
 import { Routes } from "../../util/Route";
@@ -36,7 +40,6 @@ const ProfileScreen = ({ profile, getProfile, logout, deleteUserAccount }) => {
   const { checkNUpdateFCMToken } = useNotificationManger();
   const selector = useSelector((AppState) => AppState);
   const [alertModal, setAlertModal] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const email = profile?.email;
@@ -55,7 +58,7 @@ const ProfileScreen = ({ profile, getProfile, logout, deleteUserAccount }) => {
   }, [isFocused]);
 
   const _handleLogout = async () => {
-    setIsLoading(true);
+    dispatch(setIsAppLoader(true));
     await checkNUpdateFCMToken({
       fcmToken: "",
       userId: selector?.Auth?.user?.uid,
@@ -64,11 +67,11 @@ const ProfileScreen = ({ profile, getProfile, logout, deleteUserAccount }) => {
     dispatch(setDraftPost([]));
     dispatch(setThreadList([]));
     logout();
-    setIsLoading(false);
+    dispatch(setIsAppLoader(false));
   };
 
   const _deleteAccount = async () => {
-    setIsLoading(true);
+    dispatch(setIsAppLoader(true));
     await checkNUpdateFCMToken({
       fcmToken: "",
       userId: selector?.Auth?.user?.uid,
@@ -77,7 +80,7 @@ const ProfileScreen = ({ profile, getProfile, logout, deleteUserAccount }) => {
     dispatch(setThreadList([]));
     await saveUserDraftPost([]);
     deleteUserAccount();
-    setIsLoading(false);
+    dispatch(setIsAppLoader(false));
   };
   const fetchReqStatus = async (id) => {
     await checkUserAccountRequestStatus(id, (res) => {
@@ -248,7 +251,6 @@ const ProfileScreen = ({ profile, getProfile, logout, deleteUserAccount }) => {
           message={"Are you sure, you want to delete your Account?"}
         />
       ) : null}
-      {isLoading ? <AppLoader visisble={isLoading} /> : null}
     </Container>
   );
 };
