@@ -202,7 +202,7 @@ const ProfileScreen = ({ profile, getProfile, logout, deleteUserAccount }) => {
         >
           <Image source={AppImages.profile.savePosts} style={styles.icon} />
           <View style={styles.itemInfoContainer}>
-            <Text normal>{"Save Posts"}</Text>
+            <Text normal>{"Saved Posts"}</Text>
           </View>
         </TouchableOpacity>
 

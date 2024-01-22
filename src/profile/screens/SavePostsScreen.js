@@ -76,7 +76,7 @@ const SavePostsScreen = () => {
     return (
         <Container>
             <StackHeader
-                title={"Save Posts"}
+                title={"Saved Posts"}
             />
 
             {loaderVisible ? (
