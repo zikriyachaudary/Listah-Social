@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useLayoutEffect } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   View,
   SafeAreaView,
@@ -17,7 +17,7 @@ import ImagePicker from "react-native-image-crop-picker";
 import { createThumbnail } from "react-native-create-thumbnail";
 import DocumentPicker, { types } from "react-native-document-picker";
 import RNFS from "react-native-fs";
-import { setIsAppLoader, setIsHideTabBar } from "../../redux/action/AppLogics";
+import { setIsAppLoader } from "../../redux/action/AppLogics";
 import ThreadManager from "../../ChatModule/ThreadManger";
 import moment from "moment";
 import ChatHeader from "../Components/ChatHeader";
@@ -39,9 +39,11 @@ import { sendPushNotification } from "../../network/Services/NotificationService
 import { useIsFocused } from "@react-navigation/native";
 const ChatScreen = (props) => {
   const selector = useSelector((AppState) => AppState?.Profile);
-  const thread = props?.route?.params?.thread
-    ? props?.route?.params?.thread
-    : [];
+  const thread =
+    props?.route?.params?.thread &&
+    typeof props?.route?.params?.thread == "string"
+      ? JSON.parse(props?.route?.params?.thread)
+      : props?.route?.params?.thread;
   var selectedUrl = useRef();
   const [openSelectionMediaModal, setOpenSelectionMediaModal] = useState(false);
   const dispatch = useDispatch();
@@ -73,32 +75,30 @@ const ChatScreen = (props) => {
     }
   }, [props?.route?.params?.thread, isFoucsed]);
   const fetchFcmToken = async () => {
-    let participants = props?.route?.params?.thread
-      ? typeof props?.route?.params?.thread?.participants == "string"
-        ? JSON.parse(props?.route?.params?.thread?.participants)
-        : props?.route?.params?.thread?.participants
-      : typeof thread.participants == "string"
-      ? JSON.parse(thread.participants)
-      : thread.participants;
-    let newThread = props?.route?.params?.thread
-      ? typeof props?.route?.params?.thread == "string"
+    let newThread =
+      props?.route?.params?.thread &&
+      typeof props?.route?.params?.thread == "string"
         ? JSON.parse(props?.route?.params?.thread)
-        : props?.route?.params?.thread
-      : typeof thread == "string"
-      ? JSON.parse(thread)
-      : thread;
+        : props?.route?.params?.thread;
     threadRef.current = newThread;
-    let otherIndex = participants.findIndex((value) => value.user != userId);
+    let participants =
+      thread && typeof thread?.participants == "string"
+        ? JSON.parse(thread?.participants)
+        : thread?.participants;
+    let otherIndex = -1;
+    if (participants?.length > 0) {
+      otherIndex = participants.findIndex((value) => value.user != userId);
+    }
     if (otherIndex != -1) {
       await ThreadManager.instance.getIsUserBlocked(
-        participants[otherIndex]?.user,
+        participants[otherIndex]?.user?.toString(),
         userId,
         (response) => {
           setIsBlocked(response);
         }
       );
       await ThreadManager.instance.getupdatedUserData(
-        participants[otherIndex]?.user,
+        participants[otherIndex]?.user?.toString(),
         (response) => {
           setReceiverFcmToken(response?.fcmToken);
         }
@@ -296,6 +296,7 @@ const ChatScreen = (props) => {
         otherUserRef.current = participants[otherUserIndex];
         name = participants[otherUserIndex]?.userName;
       }
+
       return name;
     }
   };
@@ -515,7 +516,6 @@ const ChatScreen = (props) => {
       return data.path;
     }
   };
-
   return (
     <>
       <SafeAreaView style={{ backgroundColor: AppColors.white.white }} />
