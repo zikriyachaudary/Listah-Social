@@ -144,7 +144,7 @@ const PostItem = ({
     if (post.challenge && post.challenge.likedUsers) {
       const isChallengeLiked =
         post.challenge.likedUsers.filter((id) => id == profile?.userId).length >
-        0
+          0
           ? true
           : false;
       setChallengeLiked(isChallengeLiked);
@@ -189,7 +189,7 @@ const PostItem = ({
           }
         }}
       />
-      <PostInnerItems post={post} userPosts={postItems} />
+      <PostInnerItems post={post} userPosts={post?.order && post.order == "1" ? post?.items : post?.items?.reverse()} />
 
       {post?.challenge &&
         post?.challengeRequest == CHALLENGE_REQUEST.ACCEPT && (
@@ -254,7 +254,13 @@ const PostItem = ({
               }}
               isChallenge={true}
             />
-            <PostInnerItems post={post} userPosts={challengePostItems} />
+            <PostInnerItems post={post} userPosts={
+              post.challenge
+                ? post.challenge.order == "1"
+                  ? post.challenge.items
+                  : post.challenge.items.reverse()
+                : []
+            } />
 
             <Touchable
               horizontal
@@ -294,8 +300,8 @@ const PostItem = ({
             {post?.announcement
               ? "A-Listah"
               : post?.author?.username
-              ? post?.author?.username
-              : ""}
+                ? post?.author?.username
+                : ""}
           </B>{" "}
           {post.description}.
         </Text>
@@ -414,7 +420,7 @@ const mapStateToProps = (state) => ({
 const propsAreEqual = (prevProps, nextProps) =>
   prevProps.id === nextProps.id &&
   JSON.stringify(prevProps.post?.items) ===
-    JSON.stringify(nextProps?.post?.items);
+  JSON.stringify(nextProps?.post?.items);
 
 /* Export
 ============================================================================= */

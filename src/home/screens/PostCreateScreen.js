@@ -124,37 +124,83 @@ const PostCreateScreen = ({
 
   const initialFun = async (postId) => {
     let data = null;
-    await fetchPostData(postId, (res) => {
-      data = res;
+    console.log("fetchId -- > ", postId)
+    await fetchPostData(Number(postId), async (res) => {
+      if (res) {
+        data = res;
+
+        if (data) {
+          setSelectedCategory(data?.category ? data?.category : "");
+          if (data?.isNumberShowInItems) {
+            setToggleCheckBox(true);
+          }
+          if (data?.order == "2") {
+            setRadioButtons([
+              {
+                id: "1", // acts as primary key, should be unique and non-empty string
+                label: "Ascending List",
+                value: "ascendinglist",
+                borderColor: "#6d14c4",
+              },
+              {
+                id: "2",
+                label: "Descending List",
+                value: "descendinglist",
+                borderColor: "#6d14c4",
+                selected: true,
+              },
+            ]);
+          }
+          setTitle(data?.title ? data?.title : "");
+          title2.current = data?.title ? data?.title : "";
+          setDes(data?.description ? data?.description : "");
+          des2.current = data?.description ? data?.description : "";
+          setItemList(data?.items);
+        }
+      } else {
+        const sendPostId = "" + postId
+        console.log("enterrrrrr ", res, sendPostId)
+        await fetchPostData(sendPostId, (res) => {
+          console.log("resres ", res)
+
+          if (res) {
+            data = res;
+          }
+
+          if (data) {
+            setSelectedCategory(data?.category ? data?.category : "");
+            if (data?.isNumberShowInItems) {
+              setToggleCheckBox(true);
+            }
+            if (data?.order == "2") {
+              setRadioButtons([
+                {
+                  id: "1", // acts as primary key, should be unique and non-empty string
+                  label: "Ascending List",
+                  value: "ascendinglist",
+                  borderColor: "#6d14c4",
+                },
+                {
+                  id: "2",
+                  label: "Descending List",
+                  value: "descendinglist",
+                  borderColor: "#6d14c4",
+                  selected: true,
+                },
+              ]);
+            }
+            setTitle(data?.title ? data?.title : "");
+            title2.current = data?.title ? data?.title : "";
+            setDes(data?.description ? data?.description : "");
+            des2.current = data?.description ? data?.description : "";
+            setItemList(data?.items);
+          }
+        });
+      }
     });
-    if (data) {
-      setSelectedCategory(data?.category ? data?.category : "");
-      if (data?.isNumberShowInItems) {
-        setToggleCheckBox(true);
-      }
-      if (data?.order == "2") {
-        setRadioButtons([
-          {
-            id: "1", // acts as primary key, should be unique and non-empty string
-            label: "Ascending List",
-            value: "ascendinglist",
-            borderColor: "#6d14c4",
-          },
-          {
-            id: "2",
-            label: "Descending List",
-            value: "descendinglist",
-            borderColor: "#6d14c4",
-            selected: true,
-          },
-        ]);
-      }
-      setTitle(data?.title ? data?.title : "");
-      title2.current = data?.title ? data?.title : "";
-      setDes(data?.description ? data?.description : "");
-      des2.current = data?.description ? data?.description : "";
-      setItemList(data?.items);
-    }
+    console.log("data -- > ", data)
+
+
   };
 
   const clearStates = () => {
@@ -471,71 +517,71 @@ const PostCreateScreen = ({
           <View>
             {itemList.length > 0
               ? itemList.map((item, index) => (
-                  <View key={index} style={styles.dynamicFieldContainer}>
-                    {item?.image && item.image !== "a" ? (
-                      <LoadingImage
-                        isDisable={true}
-                        source={
-                          item?.image?.base64
-                            ? item?.image
-                            : { uri: item?.image }
-                        }
-                        style={styles.img}
-                      />
-                    ) : (
-                      <ImagePickerButton
-                        btnSize="small"
-                        style={styles.img}
-                        onImageSelect={(img) => {
-                          updateStates("image", index, img);
-                        }}
-                      />
-                    )}
-
-                    <View
-                      style={{
-                        width: "70%",
-                        height: normalized(135),
-                        marginVertical: normalized(10),
+                <View key={index} style={styles.dynamicFieldContainer}>
+                  {item?.image && item.image !== "a" ? (
+                    <LoadingImage
+                      isDisable={true}
+                      source={
+                        item?.image?.base64
+                          ? item?.image
+                          : { uri: item?.image }
+                      }
+                      style={styles.img}
+                    />
+                  ) : (
+                    <ImagePickerButton
+                      btnSize="small"
+                      style={styles.img}
+                      onImageSelect={(img) => {
+                        updateStates("image", index, img);
                       }}
-                    >
-                      <TextInput
-                        value={item?.name}
-                        inputStyle={styles.input}
-                        placeholder="Enter name..."
-                        containerStyle={styles.inputContainer}
-                        errorText={
-                          item?.name?.length == 0 ? "!Empty Field" : null
-                        }
-                        onChange={(val) => {
-                          updateStates("name", index, val);
-                        }}
-                      />
-                      <TextInput
-                        value={item?.description}
-                        inputStyle={styles.input}
-                        placeholder="Enter description..."
-                        containerStyle={styles.inputContainer}
-                        errorText={
-                          item?.description?.length == 0 ? "!Empty Field" : null
-                        }
-                        onChange={(des) => {
-                          updateStates("description", index, des);
-                        }}
-                      />
-                    </View>
+                    />
+                  )}
 
-                    <TouchableOpacity
-                      center
-                      style={styles.deleteBtn}
-                      onPress={() => {
-                        _handleRemove(index);
+                  <View
+                    style={{
+                      width: "70%",
+                      height: normalized(135),
+                      marginVertical: normalized(10),
+                    }}
+                  >
+                    <TextInput
+                      value={item?.name}
+                      inputStyle={styles.input}
+                      placeholder="Enter name..."
+                      containerStyle={styles.inputContainer}
+                      errorText={
+                        item?.name?.length == 0 ? "!Empty Field" : null
+                      }
+                      onChange={(val) => {
+                        updateStates("name", index, val);
                       }}
-                    >
-                      <DeleteIcon />
-                    </TouchableOpacity>
+                    />
+                    <TextInput
+                      value={item?.description}
+                      inputStyle={styles.input}
+                      placeholder="Enter description..."
+                      containerStyle={styles.inputContainer}
+                      errorText={
+                        item?.description?.length == 0 ? "!Empty Field" : null
+                      }
+                      onChange={(des) => {
+                        updateStates("description", index, des);
+                      }}
+                    />
                   </View>
-                ))
+
+                  <TouchableOpacity
+                    center
+                    style={styles.deleteBtn}
+                    onPress={() => {
+                      _handleRemove(index);
+                    }}
+                  >
+                    <DeleteIcon />
+                  </TouchableOpacity>
+                </View>
+              ))
               : null}
 
             <View

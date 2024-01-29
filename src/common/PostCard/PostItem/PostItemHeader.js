@@ -64,6 +64,7 @@ const PostItemHeader = ({
   const _toggleMenu = () => setVisible((prev) => !prev);
 
   const _handleEditPress = () => {
+    console.log("showPostttt - > ", JSON.stringify(post))
     navigation.navigate("DiscoverStack", {
       id: id,
       data: post,

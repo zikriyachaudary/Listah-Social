@@ -21,7 +21,6 @@ const PostInnerItems = ({ post, userPosts, profile }) => {
   const [postItems, setPostItems] = useState(
     userPosts?.length > 3 ? userPosts.slice(0, 3) : userPosts
   );
-
   useEffect(() => {
     if (showMore) {
       setPostItems(userPosts);
