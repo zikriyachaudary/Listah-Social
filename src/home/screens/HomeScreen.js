@@ -44,6 +44,7 @@ import { setIsAppLoader } from "../../redux/action/AppLogics";
 import { Routes } from "../../util/Route";
 import moment from "moment";
 import ThreadManager from "../../ChatModule/ThreadManger";
+import VideoPlayerModal from "../../common/VideoPlayerModal";
 
 /* =============================================================================
 <HomeScreen />
@@ -52,6 +53,7 @@ import ThreadManager from "../../ChatModule/ThreadManger";
 const HomeScreen = ({ posts, getProfile }) => {
   const selector = useSelector((AppState) => AppState);
   const dispatch = useDispatch();
+  const [openVideoModal, setOpenVideoModal] = useState("");
   const [followerModal, setFollowerModal] = useState(false);
   const [loaderVisible, setLoaderVisible] = useState(true);
   const profileData = selector?.Profile?.profile;
@@ -86,7 +88,6 @@ const HomeScreen = ({ posts, getProfile }) => {
   const [isUpdate, setUpdate] = useState(false);
 
   useEffect(() => {
-    // setIsFilterPopup(true);
     setLoaderVisible(true);
     getProfile();
     getMyUserHomePosts();
@@ -100,7 +101,6 @@ const HomeScreen = ({ posts, getProfile }) => {
   const getMyUserHomePosts = async () => {
     const mAnnouncementPosts = await getAnnouncementPosts();
     const mHomePosts = await getMyHomePosts();
-    // allHomePosts = mHomePosts;
     if (UPDATE_CHALLENGE_FEATURE.isUpdate) {
       setHomePosts([]);
       UPDATE_CHALLENGE_FEATURE.isUpdate = false;
@@ -168,6 +168,10 @@ const HomeScreen = ({ posts, getProfile }) => {
         }}
         postDel={() => {
           getMyUserHomePosts();
+        }}
+        openVideoModal={(uri) => {
+          console.log("uri----->", uri);
+          setOpenVideoModal(uri);
         }}
         postReport={async (isReportCount) => {
           console.log("called");
@@ -412,6 +416,14 @@ const HomeScreen = ({ posts, getProfile }) => {
           setFollowerModal(!followerModal);
         }}
       />
+      {openVideoModal ? (
+        <VideoPlayerModal
+          item={{ url: openVideoModal }}
+          onClose={() => {
+            setOpenVideoModal("");
+          }}
+        />
+      ) : null}
     </View>
   );
 };

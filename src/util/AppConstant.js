@@ -3,7 +3,7 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 export const platformVersion = Platform.Version;
 
 export type ScreenProps = NativeStackScreenProps<any, any>;
-
+export const maxImageSizeInBytes = 30 * 1024 * 1024; // 10MB
 export const ScreenSize = Dimensions.get("window");
 const templateWidth = 375;
 const templateHeight = 812;
@@ -124,6 +124,9 @@ export const colorsList = [AppColors.gradient.dark, AppColors.gradient.light];
 
 export const AppImages = {
   appIcon: require("../assets/images/appIcon.png"),
+  playbutton: require("../assets/images/playbutton.png"),
+  VideoError: require("../assets/images/VideoError.png"),
+
   Common: {
     appLogo: require("../assets/images/Common/logo.png"),
     PlusBtn: require("../assets/images/Common/PlusBtn.png"),
@@ -236,5 +239,18 @@ export const mediaSelectionConstants = [
     id: 2,
     image: AppImages.Chat.Document,
     text: "Upload document",
+  },
+];
+
+export const imagePickerConstants = [
+  {
+    id: 1,
+    image: AppImages.Chat.Gallery,
+    text: "Upload from Gallery",
+  },
+  {
+    id: 2,
+    image: AppImages.Auth.Camera,
+    text: "Upload from Camera",
   },
 ];

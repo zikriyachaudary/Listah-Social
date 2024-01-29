@@ -163,7 +163,7 @@ const styles = StyleSheet.create({
     marginBottom: normalized(-5),
   },
   title: {
-    marginTop: 10,
+    marginTop: normalized(20),
     marginStart: normalized(10),
     color: AppColors.white.white,
     fontSize: normalized(18),

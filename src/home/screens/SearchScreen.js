@@ -38,12 +38,14 @@ import CustomHeader from "../../common/CommonHeader";
 import LoadingImage from "../../common/LoadingImage";
 import { setIsAppLoader } from "../../redux/action/AppLogics";
 import { filterPostReq } from "../../network/Services/ProfileServices";
+import VideoPlayerModal from "../../common/VideoPlayerModal";
 
 let allHomePosts = [];
 /* =============================================================================
 <search screen/>
 ============================================================================= */
 const SearchScreen = ({ posts, getProfile }) => {
+  const [openVideoModal, setOpenVideoModal] = useState("");
   const selector = useSelector((AppState) => AppState);
   const dispatch = useDispatch();
   const isFocused = useIsFocused();
@@ -145,6 +147,9 @@ const SearchScreen = ({ posts, getProfile }) => {
       postRefresh={() => {
         setLoaderVisible(true);
         getMyUserHomePosts();
+      }}
+      openVideoModal={(uri) => {
+        setOpenVideoModal(uri);
       }}
       postDel={() => {
         getMyUserHomePosts();
@@ -330,6 +335,14 @@ const SearchScreen = ({ posts, getProfile }) => {
       )}
 
       <WrapperComponent />
+      {openVideoModal ? (
+        <VideoPlayerModal
+          item={{ url: openVideoModal }}
+          onClose={() => {
+            setOpenVideoModal("");
+          }}
+        />
+      ) : null}
     </View>
   );
 };

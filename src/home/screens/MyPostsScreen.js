@@ -31,6 +31,7 @@ import { Routes } from "../../util/Route";
 import ThreadManager from "../../ChatModule/ThreadManger";
 import { makeObjForInitialChat } from "../../util/helperFun";
 import { setIsAlertShow, setIsAppLoader } from "../../redux/action/AppLogics";
+import VideoPlayerModal from "../../common/VideoPlayerModal";
 
 // import View from '../../common/View';
 // import Avatar from '../../common/Avatar';
@@ -43,6 +44,7 @@ import { setIsAlertShow, setIsAppLoader } from "../../redux/action/AppLogics";
 const MyPostsScreen = ({ profile, route, unFollowUser, followUser }) => {
   const [loading, setLoading] = useState(false);
   const isFocused = useIsFocused();
+  const [openVideoModal, setOpenVideoModal] = useState("");
   const [userPosts, setUserPosts] = useState([]);
   const [loaderVisible, setLoaderVisible] = useState(true);
   const navigation = useNavigation();
@@ -96,6 +98,9 @@ const MyPostsScreen = ({ profile, route, unFollowUser, followUser }) => {
         postDel={() => {
           getPostsByUserId();
           route.params.refreshCall();
+        }}
+        openVideoModal={(uri) => {
+          setOpenVideoModal(uri);
         }}
         postReport={async (isReportCount) => {
           if (isReportCount == 2) {
@@ -390,6 +395,14 @@ const MyPostsScreen = ({ profile, route, unFollowUser, followUser }) => {
         visible={followersModal}
         onClose={_toggleFollowersModal}
       />
+      {openVideoModal ? (
+        <VideoPlayerModal
+          item={{ url: openVideoModal }}
+          onClose={() => {
+            setOpenVideoModal("");
+          }}
+        />
+      ) : null}
     </Container>
   );
 };

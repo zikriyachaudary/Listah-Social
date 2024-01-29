@@ -281,6 +281,7 @@ const AppNavigation = ({ changeAuthState, getProfile, authenticated }) => {
                   name={Routes.Chat.chatScreen}
                   component={ChatScreen}
                 />
+
                 <Stack.Screen name="ReportPost" component={ReportPost} />
               </>
             ) : (

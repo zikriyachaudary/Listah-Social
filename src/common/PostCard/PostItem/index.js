@@ -41,6 +41,7 @@ const PostItem = ({
   postIndex,
   profile,
   postSaveTrigger = null,
+  openVideoModal,
 }) => {
   const postItems =
     post?.order && post.order == "1" ? post?.items : post?.items?.reverse();
@@ -183,13 +184,20 @@ const PostItem = ({
           postReport(isReportCount);
         }}
         postSaveTrigger={() => {
-          console.log("pppp ", postSaveTrigger);
           if (postSaveTrigger) {
             postSaveTrigger();
           }
         }}
       />
-      <PostInnerItems post={post} userPosts={postItems} />
+      <PostInnerItems
+        post={post}
+        userPosts={postItems}
+        setOpenVideoModal={(uri) => {
+          if (openVideoModal) {
+            openVideoModal(uri);
+          }
+        }}
+      />
 
       {post?.challenge &&
         post?.challengeRequest == CHALLENGE_REQUEST.ACCEPT && (
@@ -254,7 +262,15 @@ const PostItem = ({
               }}
               isChallenge={true}
             />
-            <PostInnerItems post={post} userPosts={challengePostItems} />
+            <PostInnerItems
+              post={post}
+              userPosts={challengePostItems}
+              setOpenVideoModal={(uri) => {
+                if (openVideoModal) {
+                  openVideoModal(uri);
+                }
+              }}
+            />
 
             <Touchable
               horizontal

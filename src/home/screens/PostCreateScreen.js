@@ -3,6 +3,7 @@ import { connect, useDispatch, useSelector } from "react-redux";
 import {
   ActivityIndicator,
   BackHandler,
+  Image,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -10,6 +11,7 @@ import {
   Text,
   TouchableOpacity,
 } from "react-native";
+import { createThumbnail } from "react-native-create-thumbnail";
 import DeleteIcon from "../../assets/icons/edit-trash-icon.svg";
 import AddIcon from "../../assets/icons/edit-plus-square.svg";
 import { useToast } from "react-native-toast-notifications";
@@ -18,12 +20,14 @@ import { updatePost as updatePostAction } from "../redux/actions";
 import { createAnnouncementPost as createAnnouncementPostAction } from "../redux/actions";
 import { RadioGroup } from "react-native-radio-buttons-group";
 import CheckBox from "@react-native-community/checkbox";
+import UploadIcon from "../../assets/icons/edit-upload-icon.svg";
 import { setPostRefresh } from "../redux/appLogics";
 import { makeid } from "../../util/functions";
 import {
   setAllUserFCMToken,
   setCreatePostFailError,
   setDraftPost,
+  setIsAppLoader,
 } from "../../redux/action/AppLogics";
 import AlertModal from "../../common/AlertModal";
 import { saveUserDraftPost } from "../../util/helperFun";
@@ -44,7 +48,10 @@ import { fetchPostData } from "../../network/Services/ProfileServices";
 import LoadingImage from "../../common/LoadingImage";
 import { View } from "react-native";
 import { AppStyles } from "../../util/AppStyles";
-import { ImagePickerButton, TextInput } from "../../common";
+import { TextInput } from "../../common";
+import MediaPickerModal from "../../common/MediaPickerModal";
+import VideoPlayerModal from "../../common/VideoPlayerModal";
+import ThreadManager from "../../ChatModule/ThreadManger";
 
 /* =============================================================================
 <PostCreateScreen />
@@ -58,6 +65,7 @@ const PostCreateScreen = ({
 }) => {
   const { generateMultiplePushNotification, userSubscribed } =
     useNotificationManger();
+  const [openVideoModal, setOpenVideoModal] = useState("");
   const [selectedcategory, setSelectedCategory] = useState("");
   const [categoryError, setCategoryError] = useState("");
   const dispatch = useDispatch();
@@ -104,7 +112,11 @@ const PostCreateScreen = ({
       },
     ],
   });
-
+  const [openMediaModal, setOpenMediaModal] = useState({
+    value: false,
+    data: null,
+    index: -1,
+  });
   const [alertModal, setAlertModal] = useState({
     value: false,
     data: null,
@@ -114,7 +126,7 @@ const PostCreateScreen = ({
   const [toggleCheckBox, setToggleCheckBox] = useState(false);
 
   useEffect(() => {
-    if (isFocused && route?.params?.isEdit) {
+    if (isFocused && route?.params?.isEdit && route?.params?.data?.id) {
       initialFun(route?.params?.data?.id);
     }
     return () => {
@@ -242,7 +254,7 @@ const PostCreateScreen = ({
   };
   const _handleAdd = () => {
     let newArr = [...itemList];
-    if (newArr?.length >= 10) {
+    if (newArr?.length >= 7) {
       setShowAddBtn(false);
     } else {
       newArr.push({
@@ -271,6 +283,7 @@ const PostCreateScreen = ({
   const _handleSubmit = async () => {
     isBtnActive.current = true;
     if (selectedcategory == "") {
+      isBtnActive.current = false;
       setCategoryError("Please select Category");
     }
     if (title == "") {
@@ -349,14 +362,34 @@ const PostCreateScreen = ({
   const fetchItemList = () => {
     let newArr = [];
     itemList.map((el, i) => {
-      newArr.push({
-        id: i,
-        name: el?.name,
-        description: el?.description,
-        image: el?.image,
-      });
+      if (el?.video?.video?.uri || el?.videoObj) {
+        newArr.push({
+          id: i,
+          name: el?.name,
+          description: el?.description,
+          videoObj: el?.video || el?.videoObj,
+        });
+      } else {
+        newArr.push({
+          id: i,
+          name: el?.name,
+          description: el?.description,
+          image: el?.image,
+        });
+      }
     });
     return newArr;
+  };
+
+  const uploadThumnail = async (path, onComlpete) => {
+    await ThreadManager.instance.uploadMedia(path, false, (url) => {
+      if (url !== "error") {
+        onComlpete(url);
+      } else {
+        dispatch(setIsAppLoader(false));
+        Alert.alert("", "Error while uploading media");
+      }
+    });
   };
   const updateDraftFun = async (obj) => {
     let draftArr;
@@ -397,7 +430,9 @@ const PostCreateScreen = ({
   const updateStates = (type, index, value) => {
     const updatedArray = [...itemList];
     let previousObj = updatedArray[index];
-    let newObj = {
+    let newObj = {};
+
+    newObj = {
       ...previousObj,
       [`${type}`]: value,
     };
@@ -406,7 +441,6 @@ const PostCreateScreen = ({
   };
   return (
     <View style={AppStyles.MainStyle}>
-      {/* <SafeAreaView /> */}
       <CustomHeader
         isStatusBar={true}
         atBackPress={() => {
@@ -472,24 +506,62 @@ const PostCreateScreen = ({
             {itemList.length > 0
               ? itemList.map((item, index) => (
                   <View key={index} style={styles.dynamicFieldContainer}>
-                    {item?.image && item.image !== "a" ? (
-                      <LoadingImage
-                        isDisable={true}
-                        source={
-                          item?.image?.base64
-                            ? item?.image
-                            : { uri: item?.image }
-                        }
-                        style={styles.img}
-                      />
+                    {(item?.image && item.image !== "a") ||
+                    item?.video?.thumbnail ||
+                    item?.videoObj?.thumbnail ? (
+                      <>
+                        {item?.video || item?.videoObj ? (
+                          <TouchableOpacity
+                            onPress={() => {
+                              setOpenVideoModal(
+                                item?.video?.video?.uri
+                                  ? item?.video?.video?.uri
+                                  : item?.videoObj?.video
+                              );
+                            }}
+                          >
+                            <LoadingImage
+                              isDisable={true}
+                              source={{
+                                uri:
+                                  item?.video?.thumbnail ||
+                                  item?.videoObj?.thumbnail,
+                              }}
+                              style={styles.img}
+                            />
+
+                            <Image
+                              source={AppImages.playbutton}
+                              style={styles.playIcon}
+                            />
+                          </TouchableOpacity>
+                        ) : (
+                          <LoadingImage
+                            isDisable={true}
+                            source={
+                              item?.image?.base64
+                                ? item?.image
+                                : item?.video?.thumbnail
+                                ? { uri: item?.video?.thumbnail }
+                                : { uri: item?.image }
+                            }
+                            style={styles.img}
+                          />
+                        )}
+                      </>
                     ) : (
-                      <ImagePickerButton
-                        btnSize="small"
-                        style={styles.img}
-                        onImageSelect={(img) => {
-                          updateStates("image", index, img);
+                      <TouchableOpacity
+                        style={styles.unSelectedPic}
+                        onPress={() => {
+                          setOpenMediaModal({
+                            value: true,
+                            data: item,
+                            index: index,
+                          });
                         }}
-                      />
+                      >
+                        <UploadIcon />
+                      </TouchableOpacity>
                     )}
 
                     <View
@@ -677,6 +749,57 @@ const PostCreateScreen = ({
           message={alertModal?.message}
         />
       ) : null}
+      {openMediaModal?.value ? (
+        <MediaPickerModal
+          onClose={() => {
+            setOpenMediaModal({
+              value: false,
+              data: null,
+              index: -1,
+            });
+          }}
+          onMediaSelection={(value) => {
+            let type = value?.type.includes("video") ? "video" : "image";
+            if (type == "video") {
+              dispatch(setIsAppLoader(true));
+              createThumbnail({
+                url: value?.uri,
+                timeStamp: 10000,
+              })
+                .then(async (response) => {
+                  await uploadThumnail(response?.path, (thumbnailUrl) => {
+                    if (thumbnailUrl) {
+                      dispatch(setIsAppLoader(false));
+                      updateStates(type, openMediaModal?.index, {
+                        thumbnail: thumbnailUrl,
+                        video: value,
+                      });
+                    }
+                  });
+                })
+                .catch((err) => {
+                  dispatch(setIsAppLoader(false));
+                  console.log("printImgErr ", err);
+                });
+            } else {
+              updateStates(type, openMediaModal?.index, value);
+            }
+            setOpenMediaModal({
+              value: false,
+              data: null,
+              index: -1,
+            });
+          }}
+        />
+      ) : null}
+      {openVideoModal ? (
+        <VideoPlayerModal
+          item={{ url: openVideoModal }}
+          onClose={() => {
+            setOpenVideoModal("");
+          }}
+        />
+      ) : null}
     </View>
   );
 };
@@ -721,13 +844,13 @@ const styles = StyleSheet.create({
     alignSelf: "center",
   },
   img: {
-    width: normalized(40),
-    height: normalized(40),
-    borderRadius: normalized(40 / 2),
+    width: normalized(50),
+    height: normalized(50),
+    borderRadius: normalized(50 / 2),
     marginVertical: 0,
     justifyContent: "center",
     alignItems: "center",
-    marginHorizontal: normalized(5),
+    marginHorizontal: normalized(3),
   },
   deleteBtn: {
     padding: normalized(5),
@@ -752,6 +875,22 @@ const styles = StyleSheet.create({
     fontSize: normalized(16),
     color: AppColors.white.white,
     fontWeight: "600",
+  },
+  unSelectedPic: {
+    borderColor: AppColors.blue.navy,
+    borderWidth: 1,
+    borderRadius: normalized(50 / 2),
+    height: normalized(50),
+    width: normalized(50),
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  playIcon: {
+    height: normalized(15),
+    width: normalized(15),
+    position: "absolute",
+    alignSelf: "center",
+    top: normalized(20),
   },
 });
 

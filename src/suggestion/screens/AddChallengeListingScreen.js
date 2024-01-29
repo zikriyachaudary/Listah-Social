@@ -1,23 +1,18 @@
 import React, { useState } from "react";
-import { StyleSheet } from "react-native";
-import * as yup from "yup";
-import { Formik, FieldArray, ErrorMessage } from "formik";
-import FastImage from "react-native-fast-image";
 import {
-  View,
-  Button,
-  Content,
-  Container,
-  TextInput,
-  Touchable,
-  StackHeader,
-  ImagePickerButton,
-  Text,
-} from "../../common";
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
+import { createThumbnail } from "react-native-create-thumbnail";
+import { View, Container, TextInput, StackHeader, Text } from "../../common";
 import DeleteIcon from "../../assets/icons/edit-trash-icon.svg";
 import AddIcon from "../../assets/icons/edit-plus-square.svg";
 import { connect, useDispatch, useSelector } from "react-redux";
-
+import UploadIcon from "../../assets/icons/edit-upload-icon.svg";
 import { getLoading } from "../redux/selectors";
 import { RadioGroup } from "react-native-radio-buttons-group";
 import CheckBox from "@react-native-community/checkbox";
@@ -27,12 +22,36 @@ import { UPDATE_CHALLENGE_FEATURE } from "../redux/constants";
 import { Notification_Types } from "../../util/Strings";
 import useNotificationManger from "../../hooks/useNotificationManger";
 import { setIsAppLoader } from "../../redux/action/AppLogics";
+import VideoPlayerModal from "../../common/VideoPlayerModal";
+import MediaPickerModal from "../../common/MediaPickerModal";
+import ThreadManager from "../../ChatModule/ThreadManger";
+import {
+  AppColors,
+  AppHorizontalMargin,
+  AppImages,
+  hv,
+  normalized,
+} from "../../util/AppConstant";
+import LoadingImage from "../../common/LoadingImage";
 
 const AddChallengeListingScreen = ({ challengePost, navigation, route }) => {
   const post = route.params.post;
+  const [itemList, setItemList] = useState([
+    {
+      name: "",
+      image: "",
+      description: "",
+    },
+  ]);
   const { challengeAtPost } = useNotificationManger();
   const [isShowAddBtn, setShowAddBtn] = useState(true);
-  const [loading, setLoading] = useState(false);
+  const [openVideoModal, setOpenVideoModal] = useState("");
+  const [openMediaModal, setOpenMediaModal] = useState({
+    value: false,
+    data: null,
+    index: -1,
+  });
+
   const [radioButtons, setRadioButtons] = useState([
     {
       id: "1", // acts as primary key, should be unique and non-empty string
@@ -51,35 +70,53 @@ const AddChallengeListingScreen = ({ challengePost, navigation, route }) => {
   const dispatch = useDispatch();
   const selector = useSelector((AppState) => AppState);
 
-  const _handleAdd = (arrayHelpers) => {
-    let arraySize = arrayHelpers.form.values.items.length + 1;
-    arrayHelpers.push({
-      name: "",
-      image: "",
-      description: "",
-    });
-    if (arraySize == 10 || arraySize > 10) {
-      setShowAddBtn(false);
-    } else {
-      setShowAddBtn(true);
-    }
-  };
-
   const [toggleCheckBox, setToggleCheckBox] = useState(false);
 
-  const _handleRemove = (arrayHelpers, index) => {
-    let arraySize = arrayHelpers.form.values.items.length - 1;
-
-    arrayHelpers.remove(index);
-    if (arraySize < 10) {
+  const _handleAdd = () => {
+    let newArr = [...itemList];
+    if (newArr?.length >= 7) {
+      setShowAddBtn(false);
+    } else {
+      newArr.push({
+        name: "",
+        image: "",
+        description: "",
+      });
+      setShowAddBtn(true);
+      setItemList(newArr);
+    }
+  };
+  const _handleRemove = (index) => {
+    let newArr = [];
+    itemList.map((el, i) => {
+      if (i !== index) {
+        newArr.push(el);
+      }
+    });
+    setItemList(newArr);
+    if (newArr?.length < 10) {
       setShowAddBtn(true);
     } else {
       setShowAddBtn(false);
     }
   };
-  const _handleSubmit = async (values) => {
+  const _handleSubmit = async () => {
+    let isErrorFound = false;
+    if (itemList?.length > 0) {
+      itemList.map((el) => {
+        if (!el?.name || !el?.description) {
+          isErrorFound = true;
+        }
+      });
+    }
+    if (isErrorFound) {
+      return;
+    }
+    let values = {};
     values["order"] = radioButtons.find((item) => item.selected).id;
     values["isNumberShowInItems"] = toggleCheckBox;
+    values["items"] = itemList?.length > 0 ? fetchItemList() : [];
+
     dispatch(setIsAppLoader(true));
     await challengePost(values, post, async (response) => {
       let authorId = post?.author?.userId || post?.author;
@@ -97,168 +134,337 @@ const AddChallengeListingScreen = ({ challengePost, navigation, route }) => {
     navigation.goBack();
   };
 
+  const fetchItemList = () => {
+    let newArr = [];
+    itemList.map((el, i) => {
+      if (el?.video?.video?.uri || el?.videoObj) {
+        newArr.push({
+          id: i,
+          name: el?.name,
+          description: el?.description,
+          videoObj: el?.video || el?.videoObj,
+        });
+      } else {
+        newArr.push({
+          id: i,
+          name: el?.name,
+          description: el?.description,
+          image: el?.image,
+        });
+      }
+    });
+    return newArr;
+  };
+
   const onPressRadioButton = (radioButtonsArray) => {
     setRadioButtons(radioButtonsArray);
+  };
+  const uploadThumnail = async (path, onComlpete) => {
+    await ThreadManager.instance.uploadMedia(path, false, (url) => {
+      if (url !== "error") {
+        onComlpete(url);
+      } else {
+        dispatch(setIsAppLoader(false));
+        Alert.alert("", "Error while uploading media");
+      }
+    });
+  };
+
+  const updateStates = (type, index, value) => {
+    const updatedArray = [...itemList];
+    let previousObj = updatedArray[index];
+    let newObj = {};
+
+    newObj = {
+      ...previousObj,
+      [`${type}`]: value,
+    };
+    updatedArray[index] = newObj;
+    setItemList(updatedArray);
   };
   return (
     <Container style={styles.content}>
       <StackHeader />
-      <Formik
-        initialValues={initialValues}
-        validationSchema={schema}
-        onSubmit={_handleSubmit}
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        keyboardVerticalOffset={Platform.OS === "ios" ? hv(35) : hv(30)}
       >
-        {({ handleChange, handleSubmit, setFieldValue, values, errors }) => (
-          <FieldArray
-            name="items"
-            render={(arrayHelpers) => (
-              <Content contentContainerStyle={styles.content}>
-                <View center>
-                  <Text bold>Create your challenge list:</Text>
-                  {values.items && values.items.length > 0
-                    ? values.items.map((item, index) => (
-                        <View
-                          horizontal
-                          key={index}
-                          style={styles.dynamicFieldContainer}
+        <ScrollView
+          style={styles.containerStyle}
+          showsVerticalScrollIndicator={false}
+        >
+          {itemList.length > 0
+            ? itemList.map((item, index) => (
+                <View key={index} style={styles.dynamicFieldContainer}>
+                  {(item?.image && item?.image !== "a") ||
+                  item?.video?.thumbnail ||
+                  item?.videoObj?.thumbnail ? (
+                    <>
+                      {item?.video || item?.videoObj ? (
+                        <TouchableOpacity
+                          onPress={() => {
+                            setOpenVideoModal(
+                              item?.video?.video?.uri
+                                ? item?.video?.video?.uri
+                                : item?.videoObj?.video
+                            );
+                          }}
                         >
-                          {item?.image && item.image !== "a" ? (
-                            <FastImage
-                              style={{ ...styles.img, marginEnd: 10 }}
-                              source={item?.image}
-                            />
-                          ) : (
-                            <View center>
-                              <ImagePickerButton
-                                btnSize="small"
-                                style={{
-                                  ...styles.img,
-                                  marginEnd: 10,
-                                  marginHorizontal: 0,
-                                }}
-                                onImageSelect={(img) =>
-                                  setFieldValue(`items.${index}.image`, img)
-                                }
-                              />
-                              {/* {errors?.items && errors?.items[index] ? (
-                            <Text sm style={styles.errorText}>
-                              {errors?.items[index].image}
-                            </Text>
-                          ) : null} */}
-                            </View>
-                          )}
-                          <TextInput
-                            value={item.name}
-                            inputStyle={styles.input}
-                            placeholder="Enter name..."
-                            containerStyle={styles.inputContainer}
-                            errorText={
-                              errors?.items && errors?.items[index]
-                                ? errors?.items[index].name
-                                : null
+                          <LoadingImage
+                            isDisable={true}
+                            source={
+                              item?.image?.base64
+                                ? item?.image
+                                : item?.video?.thumbnail
+                                ? { uri: item?.video?.thumbnail }
+                                : { uri: item?.image }
                             }
-                            onChange={handleChange(`items.${index}.name`)}
+                            style={styles.img}
                           />
-                          <TextInput
-                            value={item.description}
-                            inputStyle={styles.input}
-                            placeholder="Enter description..."
-                            containerStyle={styles.inputContainer}
-                            errorText={
-                              errors?.items && errors?.items[index]
-                                ? errors?.items[index].description
-                                : null
-                            }
-                            onChange={handleChange(
-                              `items.${index}.description`
-                            )}
+                          <Image
+                            source={AppImages.playbutton}
+                            style={styles.playIcon}
                           />
-                          <Touchable
-                            center
-                            style={styles.deleteBtn}
-                            onPress={() => _handleRemove(arrayHelpers, index)}
-                          >
-                            <DeleteIcon />
-                          </Touchable>
-                        </View>
-                      ))
-                    : null}
+                        </TouchableOpacity>
+                      ) : (
+                        <LoadingImage
+                          isDisable={true}
+                          source={
+                            item?.image?.base64
+                              ? item?.image
+                              : item?.video?.thumbnail
+                              ? { uri: item?.video?.thumbnail }
+                              : { uri: item?.image }
+                          }
+                          style={styles.img}
+                        />
+                      )}
+                    </>
+                  ) : (
+                    <TouchableOpacity
+                      style={styles.unSelectedPic}
+                      onPress={() => {
+                        setOpenMediaModal({
+                          value: true,
+                          data: item,
+                          index: index,
+                        });
+                      }}
+                    >
+                      <UploadIcon />
+                    </TouchableOpacity>
+                  )}
 
                   <View
                     style={{
-                      alignItems: "flex-start",
-                      marginVertical: 10,
-                      // backgroundColor: "red"
+                      width: "70%",
+                      height: normalized(135),
+                      marginVertical: normalized(10),
                     }}
                   >
-                    <RadioGroup
-                      radioButtons={radioButtons}
-                      onPress={onPressRadioButton}
-                      layout="row"
-                      containerStyle={{
-                        paddingHorizontal: 10,
-                        paddingVertical: 25,
+                    <TextInput
+                      value={item?.name}
+                      inputStyle={styles.input}
+                      placeholder="Enter name..."
+                      containerStyle={styles.inputContainer}
+                      errorText={
+                        item?.name?.length == 0 ? "!Empty Field" : null
+                      }
+                      onChange={(val) => {
+                        updateStates("name", index, val);
                       }}
                     />
-
-                    <View
-                      style={{
-                        flexDirection: "row",
-                        alignItems: "center",
-                        paddingHorizontal: 18,
-                        justifyContent: "center",
-                        alignItems: "center",
+                    <TextInput
+                      value={item?.description}
+                      inputStyle={styles.input}
+                      placeholder="Enter description..."
+                      containerStyle={styles.inputContainer}
+                      errorText={
+                        item?.description?.length == 0 ? "!Empty Field" : null
+                      }
+                      onChange={(des) => {
+                        updateStates("description", index, des);
                       }}
-                    >
-                      <CheckBox
-                        value={toggleCheckBox}
-                        tintColor="#6d14c4"
-                        onCheckColor="#6d14c4"
-                        onTintColor="#6d14c4"
-                        lineWidth={2}
-                        style={{
-                          transform: [{ scaleX: 0.85 }, { scaleY: 0.85 }],
-                        }}
-                        boxType={"circle"}
-                        onValueChange={(newValue) => {
-                          // setShhowModal(false)
-                          console.log("showNewValue - > ", newValue);
-                          setToggleCheckBox(newValue);
-                        }}
-                      />
-                      <Text
-                        style={{
-                          fontSize: 14,
-                          marginStart: 5,
-                          color: "black",
-                        }}
-                      >
-                        Numbered List
-                      </Text>
-                    </View>
+                    />
                   </View>
 
-                  {isShowAddBtn ? (
-                    <Touchable
-                      style={styles.addBtn}
-                      onPress={() => _handleAdd(arrayHelpers)}
-                    >
-                      <AddIcon />
-                    </Touchable>
-                  ) : null}
+                  <TouchableOpacity
+                    center
+                    style={styles.deleteBtn}
+                    onPress={() => {
+                      _handleRemove(index);
+                    }}
+                  >
+                    <DeleteIcon />
+                  </TouchableOpacity>
                 </View>
-                <View center>
-                  <Button
-                    title="Challenge"
-                    loading={loading}
-                    onPress={handleSubmit}
-                  />
-                </View>
-              </Content>
-            )}
-          />
-        )}
-      </Formik>
+              ))
+            : null}
+
+          <View
+            style={{
+              alignItems: "flex-start",
+              marginVertical: 10,
+            }}
+          >
+            <RadioGroup
+              radioButtons={radioButtons}
+              onPress={onPressRadioButton}
+              layout="row"
+              containerStyle={{
+                paddingHorizontal: 10,
+                paddingVertical: 25,
+              }}
+            />
+
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                paddingHorizontal: normalized(18),
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              {Platform.OS == "android" ? (
+                <TouchableOpacity
+                  onPress={() => {
+                    setToggleCheckBox(!toggleCheckBox);
+                  }}
+                >
+                  <View
+                    style={{
+                      width: 25,
+                      height: 25,
+                      borderColor: "#6d14c4",
+
+                      borderWidth: 1,
+                      borderRadius: 5,
+                      marginEnd: 10,
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    {toggleCheckBox && (
+                      <View
+                        style={{
+                          width: 20,
+                          height: 20,
+                          backgroundColor: "#6d14c4",
+                          borderRadius: 5,
+                          justifyContent: "center",
+                          alignItems: "center",
+                        }}
+                      ></View>
+                    )}
+                  </View>
+                </TouchableOpacity>
+              ) : (
+                <CheckBox
+                  value={toggleCheckBox}
+                  tintColor="#6d14c4"
+                  onCheckColor="#6d14c4"
+                  onTintColor="#6d14c4"
+                  tintColors={{ true: "black", false: "#a9a9a9" }}
+                  lineWidth={2}
+                  onFillColor="#6d14c4"
+                  style={{
+                    transform: [{ scaleX: 0.85 }, { scaleY: 0.85 }],
+                  }}
+                  boxType={"circle"}
+                  onValueChange={(newValue) => {
+                    setToggleCheckBox(newValue);
+                  }}
+                />
+              )}
+
+              <Text
+                style={{
+                  fontSize: 14,
+                  marginStart: 5,
+                  color: AppColors.black.black,
+                }}
+              >
+                Numbered List
+              </Text>
+            </View>
+          </View>
+
+          {isShowAddBtn ? (
+            <TouchableOpacity
+              style={styles.addBtn}
+              onPress={() => {
+                _handleAdd();
+              }}
+            >
+              <AddIcon />
+            </TouchableOpacity>
+          ) : null}
+
+          <TouchableOpacity
+            activeOpacity={1}
+            onPress={() => {
+              _handleSubmit();
+            }}
+            style={styles.uploadBtnCont}
+          >
+            <Text style={styles.uploadTxt}>Challenge</Text>
+          </TouchableOpacity>
+        </ScrollView>
+      </KeyboardAvoidingView>
+
+      {openMediaModal?.value ? (
+        <MediaPickerModal
+          onClose={() => {
+            setOpenMediaModal({
+              value: false,
+              data: null,
+              index: -1,
+            });
+          }}
+          onMediaSelection={(value) => {
+            let type = value?.type.includes("video") ? "video" : "image";
+            if (type == "video") {
+              dispatch(setIsAppLoader(true));
+              createThumbnail({
+                url: value?.uri,
+                timeStamp: 10000,
+              })
+                .then(async (response) => {
+                  await uploadThumnail(response?.path, (thumbnailUrl) => {
+                    if (thumbnailUrl) {
+                      dispatch(setIsAppLoader(false));
+                      updateStates(type, openMediaModal?.index, {
+                        thumbnail: thumbnailUrl,
+                        video: value,
+                      });
+                    }
+                  });
+                })
+                .catch((err) => {
+                  dispatch(setIsAppLoader(false));
+                  console.log("printImgErr ", err);
+                });
+            } else {
+              updateStates(type, openMediaModal?.index, value);
+            }
+            setOpenMediaModal({
+              value: false,
+              data: null,
+              index: -1,
+            });
+          }}
+        />
+      ) : null}
+      {openVideoModal ? (
+        <VideoPlayerModal
+          item={{ url: openVideoModal }}
+          onClose={() => {
+            setOpenVideoModal("");
+          }}
+        />
+      ) : null}
     </Container>
   );
 };
@@ -277,35 +483,14 @@ export default connect(
   mapDispatchToProps
 )(AddChallengeListingScreen);
 
-const initialValues = {
-  items: [
-    {
-      name: "",
-      image: "",
-      description: "",
-    },
-  ],
-};
-
-const schema = yup.object().shape({
-  //   title: yup.string().required("!Empty Field"),
-  //   description: yup.string().required("!Empty Field"),
-  items: yup.array().of(
-    yup.object().shape({
-      name: yup.string().required("!Empty Field"),
-      // image: yup.object()
-      //   .required('!Empty Field'),
-      description: yup.string().required("!Empty Field"),
-    })
-  ),
-});
-
 const styles = StyleSheet.create({
   dynamicFieldContainer: {
     width: "100%",
     borderRadius: 20,
-    alignItems: "flex-start",
     marginTop: 20,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
   },
   content: {
     justifyContent: "space-between",
@@ -334,15 +519,56 @@ const styles = StyleSheet.create({
   addBtn: {
     padding: 20,
     marginTop: 20,
+    alignItems: "center",
   },
   img: {
-    width: 40,
-    height: 40,
-    borderRadius: 40 / 2,
+    width: normalized(50),
+    height: normalized(50),
+    borderRadius: normalized(50 / 2),
     marginVertical: 0,
+    justifyContent: "center",
+    alignItems: "center",
+    marginHorizontal: normalized(3),
   },
   deleteBtn: {
     paddingVertical: 8,
     paddingHorizontal: 10,
+  },
+
+  containerStyle: {
+    flex: 1,
+    marginHorizontal: AppHorizontalMargin,
+    paddingTop: hv(20),
+  },
+  uploadBtnCont: {
+    height: normalized(50),
+    backgroundColor: AppColors.blue.navy,
+    borderRadius: normalized(40),
+    width: normalized(180),
+    marginVertical: hv(30),
+    alignSelf: "center",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  uploadTxt: {
+    fontSize: normalized(16),
+    color: AppColors.white.white,
+    fontWeight: "600",
+  },
+  unSelectedPic: {
+    borderColor: AppColors.blue.navy,
+    borderWidth: 1,
+    borderRadius: normalized(50 / 2),
+    height: normalized(50),
+    width: normalized(50),
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  playIcon: {
+    height: normalized(15),
+    width: normalized(15),
+    position: "absolute",
+    alignSelf: "center",
+    top: normalized(20),
   },
 });
