@@ -126,7 +126,7 @@ const CustomHeader = (props) => {
                         alignItems: "center",
                       }
                     : {
-                        backgroundColor: AppColors.blue.light,
+                        backgroundColor: AppColors.blue.navy,
                         height: normalized(40),
                         width: normalized(80),
                         borderRadius: normalized(8),

@@ -9,8 +9,8 @@ import {
   TouchableOpacity,
   StatusBar,
 } from "react-native";
-import { launchCamera, launchImageLibrary } from "react-native-image-picker";
-
+import { launchImageLibrary } from "react-native-image-picker";
+import ImagePicker from "react-native-image-crop-picker";
 import { useDispatch } from "react-redux";
 import {
   AppColors,
@@ -27,68 +27,48 @@ import { AppStrings } from "../util/Strings";
 
 const MediaPickerModal = (props) => {
   const dispatch = useDispatch();
-  const pickImage = async (index) => {
-    try {
-      let options = {
-        mediaType: props?.openMediaModal?.type,
-        quality: 0.7,
-        includeBase64: true,
-      };
-      props?.openMediaModal?.type == "video"
-        ? (options["maxDuration"] = 30)
-        : null;
-      const maxDuration = 30;
 
-      if (index == 0) {
-        launchImageLibrary(options, (response) => {
-          if (response?.assets?.length > 0) {
-            if (response?.assets[0]?.type?.includes("video")) {
-              if (
-                response?.assets[0]?.duration <= maxDuration &&
-                maxImageSizeInBytes
-              ) {
-                props?.onMediaSelection(response?.assets[0]);
-              } else {
-                props.onClose();
-                dispatch(
-                  setShowToast("Selected video exceeds the maximum duration.")
-                );
-              }
+  const mediaSelection = () => {
+    ImagePicker.openPicker({
+      multiple: false,
+      mediaType: props?.openMediaModal?.type,
+      compressImageQuality: 0.5,
+      durationLimit: 30,
+    })
+      .then((images) => {
+        let maxDuration = 30000;
+        let maxSize = 20000;
+        console.log("images----->", images);
+        if (images?.path && props?.openMediaModal?.type) {
+          if (props?.openMediaModal?.type == "video") {
+            let isValidVideo = images?.duration < maxDuration;
+            if (isValidVideo) {
+              props?.onMediaSelection(images);
             } else {
-              if (response?.assets) {
-                if (response.assets[0].fileSize > maxImageSizeInBytes) {
-                  props.onClose();
-                  dispatch(
-                    setShowToast(AppStrings.Validation.maxImageSizeError)
-                  );
-                  return;
-                }
-                props?.onMediaSelection(response?.assets[0]);
-              }
+              props.onClose();
+              dispatch(
+                setShowToast("Selected video exceeds the maximum duration.")
+              );
+            }
+          } else {
+            let isValidPhoto = images?.size < maxSize;
+            if (isValidPhoto) {
+              props?.onMediaSelection(images);
+            } else {
+              props.onClose();
+              dispatch(setShowToast(AppStrings.Validation.maxImageSizeError));
             }
           }
-        });
+        }
+      })
+      .catch((e) => console.log("Err ", e));
+  };
+  const pickImage = async (index) => {
+    try {
+      if (index == 0) {
+        mediaSelection();
       } else {
-        // setTimeout(async () => {
-        //   await launchCamera({
-        //     mediaType: "mixed",
-        //     quality: 0.7,
-        //     includeBase64: true,
-        //   }).then((result) => {
-        //     if (result.assets) {
-        //       if (result.assets[0].fileSize > maxImageSizeInBytes) {
-        //         dispatch(
-        //           setIsAlertShow({
-        //             value: true,
-        //             message: AppStrings.Validation.maxImageSizeError,
-        //           })
-        //         );
-        //         return;
-        //       }
-        //       console.log("hello------->", result.assets);
-        //     }
-        //   });
-        // }, 500);
+        props?.onMediaSelection(null);
       }
     } catch (e) {
       console.log("Pick Image err ", e);

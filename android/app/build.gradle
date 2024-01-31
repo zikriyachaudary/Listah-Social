@@ -266,7 +266,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics:17.2.2'
 
     //noinspection GradleDynamicVersion
-    implementation "com.facebook.react:react-native:+"  // From node_modules
+    implementation "com.facebook.react:react-native:0.69.2"  // From node_modules
      // For animated GIF support
     implementation 'com.facebook.fresco:animated-gif:2.5.0'
     // For WebP support, including animated WebP

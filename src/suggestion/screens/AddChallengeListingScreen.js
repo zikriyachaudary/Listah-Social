@@ -33,9 +33,12 @@ import {
   normalized,
 } from "../../util/AppConstant";
 import LoadingImage from "../../common/LoadingImage";
+import MediaTypeSelection from "../../common/MediaTypeSelection";
+import { Routes } from "../../util/Route";
 
 const AddChallengeListingScreen = ({ challengePost, navigation, route }) => {
   const post = route.params.post;
+  const [openTypeModal, setOpenTypeModal] = useState(false);
   const [itemList, setItemList] = useState([
     {
       name: "",
@@ -245,11 +248,7 @@ const AddChallengeListingScreen = ({ challengePost, navigation, route }) => {
                     <TouchableOpacity
                       style={styles.unSelectedPic}
                       onPress={() => {
-                        setOpenMediaModal({
-                          value: true,
-                          data: item,
-                          index: index,
-                        });
+                        setOpenTypeModal(true);
                       }}
                     >
                       <UploadIcon />
@@ -414,8 +413,24 @@ const AddChallengeListingScreen = ({ challengePost, navigation, route }) => {
         </ScrollView>
       </KeyboardAvoidingView>
 
+      {openTypeModal ? (
+        <MediaTypeSelection
+          onClose={() => {
+            setOpenTypeModal(false);
+          }}
+          atMediaTypeSelection={(value) => {
+            setOpenTypeModal(false);
+            setOpenMediaModal({
+              value: true,
+              data: null,
+              type: value,
+            });
+          }}
+        />
+      ) : null}
       {openMediaModal?.value ? (
         <MediaPickerModal
+          openMediaModal={openMediaModal}
           onClose={() => {
             setOpenMediaModal({
               value: false,
@@ -424,30 +439,42 @@ const AddChallengeListingScreen = ({ challengePost, navigation, route }) => {
             });
           }}
           onMediaSelection={(value) => {
-            let type = value?.type.includes("video") ? "video" : "image";
-            if (type == "video") {
-              dispatch(setIsAppLoader(true));
-              createThumbnail({
-                url: value?.uri,
-                timeStamp: 10000,
-              })
-                .then(async (response) => {
-                  await uploadThumnail(response?.path, (thumbnailUrl) => {
-                    if (thumbnailUrl) {
-                      dispatch(setIsAppLoader(false));
-                      updateStates(type, openMediaModal?.index, {
-                        thumbnail: thumbnailUrl,
-                        video: value,
-                      });
-                    }
-                  });
-                })
-                .catch((err) => {
-                  dispatch(setIsAppLoader(false));
-                  console.log("printImgErr ", err);
-                });
+            if (!value) {
+              let mediaTypeObj = openMediaModal;
+              navigation.navigate(Routes.Post.videoCreateScreen, {
+                isImage: mediaTypeObj?.type == "photo",
+                atBack: (obj) => {
+                  console.log("obj------->", obj);
+                  if (obj) {
+                  }
+                },
+              });
             } else {
-              updateStates(type, openMediaModal?.index, value);
+              let type = value?.type.includes("video") ? "video" : "image";
+              if (type == "video") {
+                dispatch(setIsAppLoader(true));
+                createThumbnail({
+                  url: value?.uri,
+                  timeStamp: 10000,
+                })
+                  .then(async (response) => {
+                    await uploadThumnail(response?.path, (thumbnailUrl) => {
+                      if (thumbnailUrl) {
+                        dispatch(setIsAppLoader(false));
+                        updateStates(type, openMediaModal?.index, {
+                          thumbnail: thumbnailUrl,
+                          video: value,
+                        });
+                      }
+                    });
+                  })
+                  .catch((err) => {
+                    dispatch(setIsAppLoader(false));
+                    console.log("printImgErr ", err);
+                  });
+              } else {
+                updateStates(type, openMediaModal?.index, value);
+              }
             }
             setOpenMediaModal({
               value: false,

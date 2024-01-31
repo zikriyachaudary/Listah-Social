@@ -8,7 +8,6 @@ import {
   ActivityIndicator,
   Image,
   SafeAreaView,
-  StatusBar,
 } from "react-native";
 import Video from "react-native-video";
 import { AppColors, AppImages, hv, normalized } from "../util/AppConstant";
@@ -35,10 +34,7 @@ const VideoPlayerModal = (props) => {
             width: normalized(40),
           }}
         />
-        <Text numberOfLines={1} style={styles.titleText}>
-          {"Video Player"}
-        </Text>
-        <TouchableWithoutFeedback onPress={props.onClose}>
+        <TouchableWithoutFeedback onPress={props?.onClose}>
           <View style={styles.crossView}>
             <Image
               source={AppImages.Common.cross}
@@ -137,14 +133,10 @@ const styles = StyleSheet.create({
   },
   headerSection: {
     height: 60,
-    backgroundColor: AppColors.blue.royalBlue,
+    backgroundColor: "rgba(0,0,0,0.9)",
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    borderTopRightRadius: 10,
-    borderTopLeftRadius: 10,
-    borderWidth: 1,
-    borderColor: AppColors.blue.royalBlue,
     borderBottomWidth: 0,
   },
   backgroundVideo: {

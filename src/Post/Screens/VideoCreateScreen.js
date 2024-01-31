@@ -11,31 +11,37 @@ import {
   View,
 } from "react-native";
 import { useCameraDevices, Camera } from "react-native-vision-camera";
-import ImagePicker from "react-native-image-crop-picker";
+import { createThumbnail } from "react-native-create-thumbnail";
 import Permissions, { PERMISSIONS, RESULTS } from "react-native-permissions";
 import { useDispatch } from "react-redux";
 import { AppStyles } from "../../util/AppStyles";
 import {
   AppColors,
   AppHorizontalMargin,
+  AppImages,
   hv,
   normalized,
 } from "../../util/AppConstant";
 import VideoRecorderBtn from "../Components/VideoRecorderBtn";
+import CustomHeader from "../../common/CommonHeader";
+import VideoPlayerModal from "../../common/VideoPlayerModal";
+import { setIsAppLoader } from "../../redux/action/AppLogics";
+import ThreadManager from "../../ChatModule/ThreadManger";
+import LoadingImage from "../../common/LoadingImage";
 
 const VideoCreateScreen = (props) => {
   const dispatch = useDispatch();
-  const cameraRef = useRef < any > {};
+  const cameraRef = useRef({});
   const devices = useCameraDevices();
   const [deviceDir, setDeviceDir] = useState("back");
   const device = devices[deviceDir];
+  const [openVideoModal, setOpenVideoModal] = useState("");
   const [flashMode, setFlashMode] = useState("off");
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
-  const [selectedPitchObj, setSelectedPitchObj] = useState(null);
-  const [showTimerPopup, setShowTimerPopup] = useState(false);
-  const [timerValue, setTimerValue] = useState < number > 0;
+  const [mediaPreObj, setMediaPreObj] = useState(null);
+  const [timerValue] = useState(0);
 
-  const [recordingTypeIndex, setRecordingTypeIndex] = useState(0);
+  const [recordingTypeIndex] = useState(props?.route?.params?.isImage ? 0 : 1);
   const [isVideoRecording, setIsVideoRecording] = useState(false);
 
   const [showScreen, setShowScreen] = useState(false);
@@ -59,6 +65,16 @@ const VideoCreateScreen = (props) => {
     }
   };
 
+  const uploadThumnail = async (path, onComlpete) => {
+    await ThreadManager.instance.uploadMedia(path, false, (url) => {
+      if (url !== "error") {
+        onComlpete(url);
+      } else {
+        dispatch(setIsAppLoader(false));
+        Alert.alert("", "Error while uploading media");
+      }
+    });
+  };
   ////Capture from Camera========>
   const handleStartRecordVideo = async () => {
     try {
@@ -66,7 +82,30 @@ const VideoCreateScreen = (props) => {
       cameraRef?.current?.startRecording({
         flash: flashMode,
         onRecordingFinished: async (video) => {
-          console.log("showVIDEO pAT - > ", video);
+          console.log("showVIDEO pAT - > ", video?.path);
+          if (!video?.path) {
+            return;
+          }
+          dispatch(setIsAppLoader(true));
+          createThumbnail({
+            url: video?.path,
+            timeStamp: 10000,
+          })
+            .then(async (response) => {
+              await uploadThumnail(response?.path, (thumbnailUrl) => {
+                if (thumbnailUrl) {
+                  dispatch(setIsAppLoader(false));
+                  setMediaPreObj({
+                    thumbnail: thumbnailUrl,
+                    video: { uri: video?.path },
+                  });
+                }
+              });
+            })
+            .catch((err) => {
+              dispatch(setIsAppLoader(false));
+              console.log("printImgErr ", err);
+            });
         },
         onRecordingError: (error) => {
           console.error("onRecordingError======>", error);
@@ -92,7 +131,7 @@ const VideoCreateScreen = (props) => {
         flash: flashMode,
       });
       if (photo?.path) {
-        console.log("photo?.path----->", photo?.path);
+        setMediaPreObj({ image: photo?.path });
       }
     } catch (e) {
       console.log("Image click error ", e);
@@ -102,7 +141,7 @@ const VideoCreateScreen = (props) => {
   const [countdown, setCountdown] = useState(0);
 
   useEffect(() => {
-    var timerInterval: any;
+    var timerInterval;
     if (startInterval) {
       timerInterval = setInterval(() => {
         if (countdown > 0) {
@@ -127,6 +166,22 @@ const VideoCreateScreen = (props) => {
 
   return (
     <View style={AppStyles.MainStyle}>
+      <CustomHeader
+        isStatusBar={true}
+        atBackPress={() => {
+          props?.navigation.goBack();
+        }}
+        leftIcon={AppImages.Common.backArrow}
+        logo={AppImages.Common.appLogo}
+        mainStyle={{ backgroundColor: AppColors.blue.royalBlue }}
+        rightTxt={"Save"}
+        isRightAction={mediaPreObj}
+        atRightBtn={() => {
+          if (props?.route?.params?.atBack) {
+            props?.route?.params?.atBack(mediaPreObj);
+          }
+        }}
+      />
       {showScreen && (
         <KeyboardAvoidingView
           style={{ flex: 1 }}
@@ -152,19 +207,29 @@ const VideoCreateScreen = (props) => {
             )}
 
             <View style={styles.bottomCont}>
-              <TouchableOpacity onPress={() => {}}>
-                <View style={styles.singleBottomEndBox}>
-                  {/* <Image
-                    source={
-                      selectedPitchObj
-                        ? AppImages.createVideo.doneIcon
-                        : AppImages.createVideo.smileIcon
-                    }
-                    style={{ height: normalized(30), width: normalized(30) }}
-                  /> */}
-                  <Text style={styles.simpleDesTxt}>Pitch Ideas</Text>
-                </View>
+              <TouchableOpacity
+                onPress={() => {
+                  if (mediaPreObj?.thumbnail) {
+                    setOpenVideoModal(
+                      mediaPreObj?.video?.uri
+                        ? mediaPreObj?.video?.uri
+                        : mediaPreObj?.video
+                    );
+                  }
+                }}
+                activeOpacity={1}
+              >
+                <LoadingImage
+                  isDisable={mediaPreObj?.thumbnail}
+                  source={{
+                    uri: mediaPreObj?.image || mediaPreObj?.thumbnail,
+                  }}
+                  style={styles.img}
+                />
+
+                <Image source={AppImages.playbutton} style={styles.playIcon} />
               </TouchableOpacity>
+
               <View style={{ alignItems: "center" }}>
                 <VideoRecorderBtn
                   isImage={recordingTypeIndex == 0}
@@ -188,10 +253,19 @@ const VideoCreateScreen = (props) => {
                   isVideoRecording={isVideoRecording}
                 />
               </View>
+              <View style={{ marginHorizontal: normalized(30) }} />
             </View>
           </ScrollView>
         </KeyboardAvoidingView>
       )}
+      {openVideoModal ? (
+        <VideoPlayerModal
+          item={{ url: openVideoModal }}
+          onClose={() => {
+            setOpenVideoModal("");
+          }}
+        />
+      ) : null}
     </View>
   );
 };
@@ -236,8 +310,9 @@ const styles = StyleSheet.create({
     width: normalized(60),
   },
   simpleDesTxt: {
-    fontSize: normalized(10),
-    color: AppColors.white.white,
+    fontSize: normalized(12),
+    color: AppColors.black.black,
+    fontWeight: "400",
   },
   permissionBtn: {
     color: AppColors.red.dark,
@@ -248,6 +323,22 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+  },
+  img: {
+    width: normalized(50),
+    height: normalized(50),
+    borderRadius: normalized(50 / 2),
+    marginVertical: 0,
+    justifyContent: "center",
+    alignItems: "center",
+    marginHorizontal: normalized(3),
+  },
+  playIcon: {
+    height: normalized(15),
+    width: normalized(15),
+    position: "absolute",
+    alignSelf: "center",
+    top: normalized(20),
   },
 });
 export default VideoCreateScreen;

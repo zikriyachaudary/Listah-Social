@@ -7,18 +7,12 @@ import {
 } from "react-native";
 import ProgressCircle from "react-native-progress-circle";
 import { AppColors, normalized } from "../../util/AppConstant";
-import { AppStyles } from "../../util/AppStyles";
-interface Props {
-  isImage: boolean;
-  onImageClick: () => void;
-  onVideRecordingStart: () => void;
-  onVideoRecordingEnd: () => void;
-  isVideoRecording: boolean;
-}
 
-const VideoRecorderBtn = (props: Props) => {
+const VideoRecorderBtn = (props) => {
   return (
     <TouchableOpacity
+      style={{}}
+      activeOpacity={0.6}
       onPress={() => {
         if (props.isImage) {
           props.onImageClick();
@@ -78,14 +72,14 @@ export const styles = StyleSheet.create({
 
 export default VideoRecorderBtn;
 
-const AnimatedCircle = ({ onEnd }: any) => {
+const AnimatedCircle = ({ onEnd }) => {
   const [duration, setDuration] = useState(0);
   const [radius, setRadius] = useState(30);
 
   useEffect(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setRadius(40);
-    let interval: any;
+    let interval;
     interval = setInterval(() => {
       setDuration((prevDuration) => prevDuration + 1);
     }, 1000);

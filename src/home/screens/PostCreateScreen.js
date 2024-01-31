@@ -53,6 +53,7 @@ import MediaPickerModal from "../../common/MediaPickerModal";
 import VideoPlayerModal from "../../common/VideoPlayerModal";
 import ThreadManager from "../../ChatModule/ThreadManger";
 import MediaTypeSelection from "../../common/MediaTypeSelection";
+import { Routes } from "../../util/Route";
 
 /* =============================================================================
 <PostCreateScreen />
@@ -134,7 +135,7 @@ const PostCreateScreen = ({
     return () => {
       clearStates();
     };
-  }, [isFocused]);
+  }, [route?.params?.isEdit]);
 
   const initialFun = async (postId) => {
     let data = null;
@@ -558,15 +559,7 @@ const PostCreateScreen = ({
                       <TouchableOpacity
                         style={styles.unSelectedPic}
                         onPress={() => {
-                          setOpenTypeModal({
-                            value: true,
-                            type: "",
-                          });
-                          // setOpenMediaModal({
-                          //   value: true,
-                          //   data: item,
-                          //   index: index,
-                          // });
+                          setOpenTypeModal(true);
                         }}
                       >
                         <UploadIcon />
@@ -784,37 +777,48 @@ const PostCreateScreen = ({
             });
           }}
           onMediaSelection={(value) => {
-            console.log("value----->", value);
-            // let type = value?.type.includes("video") ? "video" : "image";
-            // if (type == "video") {
-            //   dispatch(setIsAppLoader(true));
-            //   createThumbnail({
-            //     url: value?.uri,
-            //     timeStamp: 10000,
-            //   })
-            //     .then(async (response) => {
-            //       await uploadThumnail(response?.path, (thumbnailUrl) => {
-            //         if (thumbnailUrl) {
-            //           dispatch(setIsAppLoader(false));
-            //           updateStates(type, openMediaModal?.index, {
-            //             thumbnail: thumbnailUrl,
-            //             video: value,
-            //           });
-            //         }
-            //       });
-            //     })
-            //     .catch((err) => {
-            //       dispatch(setIsAppLoader(false));
-            //       console.log("printImgErr ", err);
-            //     });
-            // } else {
-            //   updateStates(type, openMediaModal?.index, value);
-            // }
-            // setOpenMediaModal({
-            //   value: false,
-            //   data: null,
-            //   index: -1,
-            // });
+            if (!value) {
+              let mediaTypeObj = openMediaModal;
+              navigation.navigate(Routes.Post.videoCreateScreen, {
+                isImage: mediaTypeObj?.type == "photo",
+                atBack: (obj) => {
+                  console.log("obj------->", obj);
+                  if (obj) {
+                  }
+                },
+              });
+            } else {
+              let type = value?.type.includes("video") ? "video" : "image";
+              if (type == "video") {
+                dispatch(setIsAppLoader(true));
+                createThumbnail({
+                  url: value?.uri,
+                  timeStamp: 10000,
+                })
+                  .then(async (response) => {
+                    await uploadThumnail(response?.path, (thumbnailUrl) => {
+                      if (thumbnailUrl) {
+                        dispatch(setIsAppLoader(false));
+                        updateStates(type, openMediaModal?.index, {
+                          thumbnail: thumbnailUrl,
+                          video: value,
+                        });
+                      }
+                    });
+                  })
+                  .catch((err) => {
+                    dispatch(setIsAppLoader(false));
+                    console.log("printImgErr ", err);
+                  });
+              } else {
+                updateStates(type, openMediaModal?.index, value);
+              }
+            }
+            setOpenMediaModal({
+              value: false,
+              data: null,
+              index: -1,
+            });
           }}
         />
       ) : null}
