@@ -11,7 +11,11 @@ target 'ListaApp' do
   config = use_native_modules!
   $static_framework += [
     'Permission-Notifications',
+    'Permission-Microphone',
+    'Permission-Camera',
+    'Permission-PhotoLibrary',
   ]
+
 
   use_react_native!(
     :path => config[:reactNativePath],

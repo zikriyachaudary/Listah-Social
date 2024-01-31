@@ -38,7 +38,10 @@ import { Routes } from "../../util/Route";
 
 const AddChallengeListingScreen = ({ challengePost, navigation, route }) => {
   const post = route.params.post;
-  const [openTypeModal, setOpenTypeModal] = useState(false);
+  const [openTypeModal, setOpenTypeModal] = useState({
+    value: false,
+    index: -1,
+  });
   const [itemList, setItemList] = useState([
     {
       name: "",
@@ -250,7 +253,7 @@ const AddChallengeListingScreen = ({ challengePost, navigation, route }) => {
                     <TouchableOpacity
                       style={styles.unSelectedPic}
                       onPress={() => {
-                        setOpenTypeModal(true);
+                        setOpenTypeModal({ value: true, index: index });
                       }}
                     >
                       <UploadIcon />
@@ -415,18 +418,19 @@ const AddChallengeListingScreen = ({ challengePost, navigation, route }) => {
         </ScrollView>
       </KeyboardAvoidingView>
 
-      {openTypeModal ? (
+      {openTypeModal?.value ? (
         <MediaTypeSelection
           onClose={() => {
-            setOpenTypeModal(false);
+            setOpenTypeModal({ value: false, index: -1 });
           }}
           atMediaTypeSelection={(value) => {
-            setOpenTypeModal(false);
             setOpenMediaModal({
               value: true,
               data: null,
               type: value,
+              index: openTypeModal?.index,
             });
+            setOpenTypeModal({ value: false, index: -1 });
           }}
         />
       ) : null}
@@ -465,7 +469,7 @@ const AddChallengeListingScreen = ({ challengePost, navigation, route }) => {
                     await uploadThumnail(response?.path, (thumbnailUrl) => {
                       if (thumbnailUrl) {
                         dispatch(setIsAppLoader(false));
-                        updateStates(type, openMediaModal?.index, {
+                        updateStates(type, mediaTypeObj?.index, {
                           thumbnail: thumbnailUrl,
                           video: value,
                         });
@@ -477,7 +481,7 @@ const AddChallengeListingScreen = ({ challengePost, navigation, route }) => {
                     console.log("printImgErr ", err);
                   });
               } else {
-                updateStates(type, openMediaModal?.index, value);
+                updateStates(type, mediaTypeObj?.index, value);
               }
             }
             setOpenMediaModal({

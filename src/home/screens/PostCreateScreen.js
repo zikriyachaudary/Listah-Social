@@ -67,7 +67,10 @@ const PostCreateScreen = ({
 }) => {
   const { generateMultiplePushNotification, userSubscribed } =
     useNotificationManger();
-  const [openTypeModal, setOpenTypeModal] = useState(false);
+  const [openTypeModal, setOpenTypeModal] = useState({
+    value: false,
+    index: -1,
+  });
   const [openVideoModal, setOpenVideoModal] = useState("");
   const [selectedcategory, setSelectedCategory] = useState("");
   const [categoryError, setCategoryError] = useState("");
@@ -135,7 +138,7 @@ const PostCreateScreen = ({
     return () => {
       clearStates();
     };
-  }, [route?.params?.isEdit]);
+  }, []);
 
   const initialFun = async (postId) => {
     let data = null;
@@ -434,11 +437,11 @@ const PostCreateScreen = ({
     const updatedArray = [...itemList];
     let previousObj = updatedArray[index];
     let newObj = {};
-
     newObj = {
       ...previousObj,
       [`${type}`]: value,
     };
+    console.log("newObj------>", index);
     updatedArray[index] = newObj;
     setItemList(updatedArray);
   };
@@ -507,111 +510,115 @@ const PostCreateScreen = ({
 
           <View>
             {itemList.length > 0
-              ? itemList.map((item, index) => (
-                  <View
-                    key={String(index)}
-                    style={styles.dynamicFieldContainer}
-                  >
-                    {(item?.image && item.image !== "a") ||
-                    item?.video?.thumbnail ||
-                    item?.videoObj?.thumbnail ? (
-                      <>
-                        {item?.video || item?.videoObj ? (
-                          <TouchableOpacity
-                            onPress={() => {
-                              setOpenVideoModal(
-                                item?.video?.video?.uri
-                                  ? item?.video?.video?.uri
-                                  : el?.video?.uri
-                                  ? el?.video?.uri
-                                  : item?.videoObj?.video
-                              );
-                            }}
-                          >
+              ? itemList.map((item, index) => {
+                  return (
+                    <View
+                      key={String(index)}
+                      style={styles.dynamicFieldContainer}
+                    >
+                      {(item?.image && item.image !== "a") ||
+                      item?.video?.thumbnail ||
+                      item?.videoObj?.thumbnail ? (
+                        <>
+                          {item?.video || item?.videoObj ? (
+                            <TouchableOpacity
+                              onPress={() => {
+                                setOpenVideoModal(
+                                  item?.video?.video?.uri
+                                    ? item?.video?.video?.uri
+                                    : el?.video?.uri
+                                    ? el?.video?.uri
+                                    : item?.videoObj?.video
+                                );
+                              }}
+                            >
+                              <LoadingImage
+                                isDisable={true}
+                                source={{
+                                  uri:
+                                    item?.video?.thumbnail ||
+                                    item?.videoObj?.thumbnail,
+                                }}
+                                style={styles.img}
+                              />
+
+                              <Image
+                                source={AppImages.playbutton}
+                                style={styles.playIcon}
+                              />
+                            </TouchableOpacity>
+                          ) : (
                             <LoadingImage
                               isDisable={true}
-                              source={{
-                                uri:
-                                  item?.video?.thumbnail ||
-                                  item?.videoObj?.thumbnail,
-                              }}
+                              source={
+                                item?.image?.base64
+                                  ? item?.image
+                                  : item?.video?.thumbnail
+                                  ? { uri: item?.video?.thumbnail }
+                                  : { uri: item?.image }
+                              }
                               style={styles.img}
                             />
+                          )}
+                        </>
+                      ) : (
+                        <TouchableOpacity
+                          style={styles.unSelectedPic}
+                          onPress={() => {
+                            setOpenTypeModal({ value: true, index: index });
+                          }}
+                        >
+                          <UploadIcon />
+                        </TouchableOpacity>
+                      )}
 
-                            <Image
-                              source={AppImages.playbutton}
-                              style={styles.playIcon}
-                            />
-                          </TouchableOpacity>
-                        ) : (
-                          <LoadingImage
-                            isDisable={true}
-                            source={
-                              item?.image?.base64
-                                ? item?.image
-                                : item?.video?.thumbnail
-                                ? { uri: item?.video?.thumbnail }
-                                : { uri: item?.image }
-                            }
-                            style={styles.img}
-                          />
-                        )}
-                      </>
-                    ) : (
-                      <TouchableOpacity
-                        style={styles.unSelectedPic}
-                        onPress={() => {
-                          setOpenTypeModal(true);
+                      <View
+                        style={{
+                          width: "70%",
+                          height: normalized(135),
+                          marginVertical: normalized(10),
                         }}
                       >
-                        <UploadIcon />
+                        <TextInput
+                          value={item?.name}
+                          inputStyle={styles.input}
+                          placeholder="Enter name..."
+                          containerStyle={styles.inputContainer}
+                          errorText={
+                            item?.name?.length == 0 ? "!Empty Field" : null
+                          }
+                          onChange={(val) => {
+                            updateStates("name", index, val);
+                          }}
+                        />
+                        <TextInput
+                          value={item?.description}
+                          inputStyle={styles.input}
+                          placeholder="Enter description..."
+                          containerStyle={styles.inputContainer}
+                          errorText={
+                            item?.description?.length == 0
+                              ? "!Empty Field"
+                              : null
+                          }
+                          onChange={(des) => {
+                            updateStates("description", index, des);
+                          }}
+                        />
+                      </View>
+
+                      <TouchableOpacity
+                        center
+                        style={styles.deleteBtn}
+                        onPress={() => {
+                          _handleRemove(index);
+                        }}
+                      >
+                        <DeleteIcon />
                       </TouchableOpacity>
-                    )}
-
-                    <View
-                      style={{
-                        width: "70%",
-                        height: normalized(135),
-                        marginVertical: normalized(10),
-                      }}
-                    >
-                      <TextInput
-                        value={item?.name}
-                        inputStyle={styles.input}
-                        placeholder="Enter name..."
-                        containerStyle={styles.inputContainer}
-                        errorText={
-                          item?.name?.length == 0 ? "!Empty Field" : null
-                        }
-                        onChange={(val) => {
-                          updateStates("name", index, val);
-                        }}
-                      />
-                      <TextInput
-                        value={item?.description}
-                        inputStyle={styles.input}
-                        placeholder="Enter description..."
-                        containerStyle={styles.inputContainer}
-                        errorText={
-                          item?.description?.length == 0 ? "!Empty Field" : null
-                        }
-                        onChange={(des) => {
-                          updateStates("description", index, des);
-                        }}
-                      />
                     </View>
-
-                    <TouchableOpacity
-                      center
-                      style={styles.deleteBtn}
-                      onPress={() => {
-                        _handleRemove(index);
-                      }}
-                    >
-                      <DeleteIcon />
-                    </TouchableOpacity>
-                  </View>
-                ))
+                  );
+                })
               : null}
 
             <View
@@ -753,18 +760,19 @@ const PostCreateScreen = ({
           message={alertModal?.message}
         />
       ) : null}
-      {openTypeModal ? (
+      {openTypeModal?.value ? (
         <MediaTypeSelection
           onClose={() => {
-            setOpenTypeModal(false);
+            setOpenTypeModal({ value: false, index: -1 });
           }}
           atMediaTypeSelection={(value) => {
-            setOpenTypeModal(false);
             setOpenMediaModal({
               value: true,
               data: null,
               type: value,
+              index: openTypeModal?.index,
             });
+            setOpenTypeModal({ value: false, index: -1 });
           }}
         />
       ) : null}
@@ -779,8 +787,8 @@ const PostCreateScreen = ({
             });
           }}
           onMediaSelection={(value) => {
+            let mediaTypeObj = openMediaModal;
             if (!value) {
-              let mediaTypeObj = openMediaModal;
               navigation.navigate(Routes.Post.videoCreateScreen, {
                 isImage: mediaTypeObj?.type == "photo",
                 atBack: (obj) => {
@@ -803,7 +811,7 @@ const PostCreateScreen = ({
                     await uploadThumnail(response?.path, (thumbnailUrl) => {
                       if (thumbnailUrl) {
                         dispatch(setIsAppLoader(false));
-                        updateStates(type, openMediaModal?.index, {
+                        updateStates(type, mediaTypeObj?.index, {
                           thumbnail: thumbnailUrl,
                           video: value,
                         });
@@ -815,7 +823,7 @@ const PostCreateScreen = ({
                     console.log("printImgErr ", err);
                   });
               } else {
-                updateStates(type, openMediaModal?.index, value);
+                updateStates(type, mediaTypeObj?.index, value);
               }
             }
             setOpenMediaModal({

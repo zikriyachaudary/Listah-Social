@@ -19,6 +19,7 @@ import {
   hv,
   imagePickerConstants,
   isSmallDevice,
+  maxImageSizeInBytes,
   normalized,
 } from "../util/AppConstant";
 import { setShowToast } from "../redux/action/AppLogics";
