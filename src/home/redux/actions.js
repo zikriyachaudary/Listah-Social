@@ -617,6 +617,11 @@ export const createAnnouncementPost =
                   description: item?.description,
                 };
               }
+            } else {
+              return {
+                ...item,
+                id: index,
+              };
             }
           })
         );
@@ -761,6 +766,11 @@ export const createPost = (postContent) => async (dispatch) => {
               videoObj: { ...item?.videoObj, video: uploadMediaUrl },
               description: item?.description,
             };
+          } else {
+            return {
+              ...item,
+              id: index,
+            };
           }
         })
       );
@@ -867,6 +877,11 @@ export const challengePost =
                 name: item?.name,
                 videoObj: { ...item?.videoObj, video: uploadMediaUrl },
                 description: item?.description,
+              };
+            } else {
+              return {
+                ...item,
+                id: index,
               };
             }
           })

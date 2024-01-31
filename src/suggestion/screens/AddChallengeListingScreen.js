@@ -140,7 +140,7 @@ const AddChallengeListingScreen = ({ challengePost, navigation, route }) => {
   const fetchItemList = () => {
     let newArr = [];
     itemList.map((el, i) => {
-      if (el?.video?.video?.uri || el?.videoObj) {
+      if (el?.video?.video?.uri || el?.video?.uri || el?.videoObj) {
         newArr.push({
           id: i,
           name: el?.name,
@@ -210,6 +210,8 @@ const AddChallengeListingScreen = ({ challengePost, navigation, route }) => {
                             setOpenVideoModal(
                               item?.video?.video?.uri
                                 ? item?.video?.video?.uri
+                                  ? el?.video?.uri
+                                  : el?.video?.uri
                                 : item?.videoObj?.video
                             );
                           }}
@@ -444,8 +446,10 @@ const AddChallengeListingScreen = ({ challengePost, navigation, route }) => {
               navigation.navigate(Routes.Post.videoCreateScreen, {
                 isImage: mediaTypeObj?.type == "photo",
                 atBack: (obj) => {
-                  console.log("obj------->", obj);
-                  if (obj) {
+                  if (obj?.thumbnail) {
+                    updateStates("video", mediaTypeObj?.index, obj);
+                  } else if (obj?.image) {
+                    updateStates("image", mediaTypeObj?.index, obj);
                   }
                 },
               });

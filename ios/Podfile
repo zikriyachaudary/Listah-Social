@@ -1,7 +1,6 @@
+
 require_relative '../node_modules/react-native/scripts/react_native_pods'
 require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
-
-
 $FirebaseSDKVersion = '8.12.1'
 platform :ios, '13.0'
 install! 'cocoapods', :deterministic_uuids => false
@@ -13,9 +12,6 @@ target 'ListaApp' do
   $static_framework += [
     'Permission-Notifications',
   ]
- 
-  # Flags change depending on the env values.
-  # flags = get_default_flags()
 
   use_react_native!(
     :path => config[:reactNativePath],
@@ -27,9 +23,8 @@ target 'ListaApp' do
     # # An absolute path to your application root.
     # :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
-
+  
   use_flipper!()
-
   target 'ListaAppTests' do
     inherit! :complete
     # Pods for testing

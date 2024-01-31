@@ -19,7 +19,6 @@ import {
   hv,
   imagePickerConstants,
   isSmallDevice,
-  maxImageSizeInBytes,
   normalized,
 } from "../util/AppConstant";
 import { setShowToast } from "../redux/action/AppLogics";
@@ -65,8 +64,45 @@ const MediaPickerModal = (props) => {
   };
   const pickImage = async (index) => {
     try {
+      let options = {
+        mediaType: props?.openMediaModal?.type,
+        quality: 0.7,
+        includeBase64: true,
+      };
+      props?.openMediaModal?.type == "video"
+        ? (options["maxDuration"] = 30)
+        : null;
+      const maxDuration = 30;
+
       if (index == 0) {
-        mediaSelection();
+        launchImageLibrary(options, (response) => {
+          if (response?.assets?.length > 0) {
+            if (response?.assets[0]?.type?.includes("video")) {
+              if (
+                response?.assets[0]?.duration <= maxDuration &&
+                maxImageSizeInBytes
+              ) {
+                props?.onMediaSelection(response?.assets[0]);
+              } else {
+                props.onClose();
+                dispatch(
+                  setShowToast("Selected video exceeds the maximum duration.")
+                );
+              }
+            } else {
+              if (response?.assets) {
+                if (response.assets[0].fileSize > maxImageSizeInBytes) {
+                  props.onClose();
+                  dispatch(
+                    setShowToast(AppStrings.Validation.maxImageSizeError)
+                  );
+                  return;
+                }
+                props?.onMediaSelection(response?.assets[0]);
+              }
+            }
+          }
+        });
       } else {
         props?.onMediaSelection(null);
       }

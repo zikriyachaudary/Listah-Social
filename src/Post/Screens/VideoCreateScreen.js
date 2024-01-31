@@ -86,21 +86,16 @@ const VideoCreateScreen = (props) => {
           if (!video?.path) {
             return;
           }
-          dispatch(setIsAppLoader(true));
           createThumbnail({
             url: video?.path,
             timeStamp: 10000,
           })
             .then(async (response) => {
-              await uploadThumnail(response?.path, (thumbnailUrl) => {
-                if (thumbnailUrl) {
-                  dispatch(setIsAppLoader(false));
-                  setMediaPreObj({
-                    thumbnail: thumbnailUrl,
-                    video: { uri: video?.path },
-                  });
-                }
-              });
+              let obj = {
+                thumbnail: response?.path,
+                video: { video: { uri: video?.path } },
+              };
+              setMediaPreObj(obj);
             })
             .catch((err) => {
               dispatch(setIsAppLoader(false));
@@ -131,7 +126,7 @@ const VideoCreateScreen = (props) => {
         flash: flashMode,
       });
       if (photo?.path) {
-        setMediaPreObj({ image: photo?.path });
+        setMediaPreObj({ image: photo });
       }
     } catch (e) {
       console.log("Image click error ", e);
@@ -176,9 +171,26 @@ const VideoCreateScreen = (props) => {
         mainStyle={{ backgroundColor: AppColors.blue.royalBlue }}
         rightTxt={"Save"}
         isRightAction={mediaPreObj}
-        atRightBtn={() => {
-          if (props?.route?.params?.atBack) {
-            props?.route?.params?.atBack(mediaPreObj);
+        atRightBtn={async () => {
+          if (props?.route?.params?.atBack && mediaPreObj) {
+            let obj = { ...mediaPreObj };
+            if (mediaPreObj?.thumbnail || mediaPreObj?.image) {
+              dispatch(setIsAppLoader(true));
+              await uploadThumnail(
+                mediaPreObj?.thumbnail || mediaPreObj?.image?.path,
+                (url) => {
+                  if (url) {
+                    dispatch(setIsAppLoader(false));
+                    if (mediaPreObj?.thumbnail) {
+                      obj["thumbnail"] = url;
+                    } else {
+                      obj["image"] = url;
+                    }
+                  }
+                }
+              );
+            }
+            props?.route?.params?.atBack(obj);
           }
         }}
       />
@@ -211,8 +223,8 @@ const VideoCreateScreen = (props) => {
                 onPress={() => {
                   if (mediaPreObj?.thumbnail) {
                     setOpenVideoModal(
-                      mediaPreObj?.video?.uri
-                        ? mediaPreObj?.video?.uri
+                      mediaPreObj?.video?.video?.uri
+                        ? mediaPreObj?.video?.video?.uri
                         : mediaPreObj?.video
                     );
                   }
