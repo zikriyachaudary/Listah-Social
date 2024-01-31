@@ -254,3 +254,14 @@ export const imagePickerConstants = [
     text: "Upload from Camera",
   },
 ];
+
+export const TYPE_SELECTION_ARR = [
+  {
+    id: 1,
+    text: "video",
+  },
+  {
+    id: 2,
+    text: "photo",
+  },
+];

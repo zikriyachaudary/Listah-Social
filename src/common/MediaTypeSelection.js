@@ -9,92 +9,17 @@ import {
   TouchableOpacity,
   StatusBar,
 } from "react-native";
-import { launchCamera, launchImageLibrary } from "react-native-image-picker";
-
-import { useDispatch } from "react-redux";
 import {
   AppColors,
   AppImages,
   ScreenSize,
+  TYPE_SELECTION_ARR,
   hv,
-  imagePickerConstants,
   isSmallDevice,
-  maxImageSizeInBytes,
   normalized,
 } from "../util/AppConstant";
-import { setShowToast } from "../redux/action/AppLogics";
-import { AppStrings } from "../util/Strings";
 
-const MediaPickerModal = (props) => {
-  const dispatch = useDispatch();
-  const pickImage = async (index) => {
-    try {
-      let options = {
-        mediaType: props?.openMediaModal?.type,
-        quality: 0.7,
-        includeBase64: true,
-      };
-      props?.openMediaModal?.type == "video"
-        ? (options["maxDuration"] = 30)
-        : null;
-      const maxDuration = 30;
-
-      if (index == 0) {
-        launchImageLibrary(options, (response) => {
-          if (response?.assets?.length > 0) {
-            if (response?.assets[0]?.type?.includes("video")) {
-              if (
-                response?.assets[0]?.duration <= maxDuration &&
-                maxImageSizeInBytes
-              ) {
-                props?.onMediaSelection(response?.assets[0]);
-              } else {
-                props.onClose();
-                dispatch(
-                  setShowToast("Selected video exceeds the maximum duration.")
-                );
-              }
-            } else {
-              if (response?.assets) {
-                if (response.assets[0].fileSize > maxImageSizeInBytes) {
-                  props.onClose();
-                  dispatch(
-                    setShowToast(AppStrings.Validation.maxImageSizeError)
-                  );
-                  return;
-                }
-                props?.onMediaSelection(response?.assets[0]);
-              }
-            }
-          }
-        });
-      } else {
-        // setTimeout(async () => {
-        //   await launchCamera({
-        //     mediaType: "mixed",
-        //     quality: 0.7,
-        //     includeBase64: true,
-        //   }).then((result) => {
-        //     if (result.assets) {
-        //       if (result.assets[0].fileSize > maxImageSizeInBytes) {
-        //         dispatch(
-        //           setIsAlertShow({
-        //             value: true,
-        //             message: AppStrings.Validation.maxImageSizeError,
-        //           })
-        //         );
-        //         return;
-        //       }
-        //       console.log("hello------->", result.assets);
-        //     }
-        //   });
-        // }, 500);
-      }
-    } catch (e) {
-      console.log("Pick Image err ", e);
-    }
-  };
-
+const MediaTypeSelection = (props) => {
   return (
     <Modal transparent animationType="slide" onRequestClose={props.onClose}>
       <View style={styles.outerContainer}>
@@ -119,21 +44,23 @@ const MediaPickerModal = (props) => {
             </TouchableWithoutFeedback>
           </View>
           <View style={styles.pickersContainer}>
-            {imagePickerConstants.map((item, index) => (
+            {TYPE_SELECTION_ARR.map((item, index) => (
               <TouchableOpacity
                 onPress={() => {
-                  pickImage(index);
+                  props?.atMediaTypeSelection(item?.text);
                 }}
-                key={String(index)}
+                key={index}
                 activeOpacity={1}
                 style={styles.singlePicker}
               >
-                <Image
+                {/* <Image
                   source={item.image}
                   style={styles.pickerImg}
                   resizeMode="contain"
-                />
-                <Text style={styles.pickerText}>{item.text}</Text>
+                /> */}
+                <Text style={styles.pickerText}>
+                  {item?.text.toUpperCase()}
+                </Text>
               </TouchableOpacity>
             ))}
           </View>
@@ -143,7 +70,7 @@ const MediaPickerModal = (props) => {
   );
 };
 
-export default MediaPickerModal;
+export default MediaTypeSelection;
 
 const styles = StyleSheet.create({
   outerContainer: {
@@ -212,8 +139,8 @@ const styles = StyleSheet.create({
   },
   pickerText: {
     color: AppColors.black.black,
-    fontSize: normalized(12),
-    marginTop: hv(10),
+    fontSize: normalized(18),
+    fontWeight: "500",
     textAlign: "center",
   },
 });

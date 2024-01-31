@@ -52,6 +52,7 @@ import { TextInput } from "../../common";
 import MediaPickerModal from "../../common/MediaPickerModal";
 import VideoPlayerModal from "../../common/VideoPlayerModal";
 import ThreadManager from "../../ChatModule/ThreadManger";
+import MediaTypeSelection from "../../common/MediaTypeSelection";
 
 /* =============================================================================
 <PostCreateScreen />
@@ -65,6 +66,7 @@ const PostCreateScreen = ({
 }) => {
   const { generateMultiplePushNotification, userSubscribed } =
     useNotificationManger();
+  const [openTypeModal, setOpenTypeModal] = useState(false);
   const [openVideoModal, setOpenVideoModal] = useState("");
   const [selectedcategory, setSelectedCategory] = useState("");
   const [categoryError, setCategoryError] = useState("");
@@ -505,7 +507,10 @@ const PostCreateScreen = ({
           <View>
             {itemList.length > 0
               ? itemList.map((item, index) => (
-                  <View key={index} style={styles.dynamicFieldContainer}>
+                  <View
+                    key={String(index)}
+                    style={styles.dynamicFieldContainer}
+                  >
                     {(item?.image && item.image !== "a") ||
                     item?.video?.thumbnail ||
                     item?.videoObj?.thumbnail ? (
@@ -553,11 +558,15 @@ const PostCreateScreen = ({
                       <TouchableOpacity
                         style={styles.unSelectedPic}
                         onPress={() => {
-                          setOpenMediaModal({
+                          setOpenTypeModal({
                             value: true,
-                            data: item,
-                            index: index,
+                            type: "",
                           });
+                          // setOpenMediaModal({
+                          //   value: true,
+                          //   data: item,
+                          //   index: index,
+                          // });
                         }}
                       >
                         <UploadIcon />
@@ -749,8 +758,24 @@ const PostCreateScreen = ({
           message={alertModal?.message}
         />
       ) : null}
+      {openTypeModal ? (
+        <MediaTypeSelection
+          onClose={() => {
+            setOpenTypeModal(false);
+          }}
+          atMediaTypeSelection={(value) => {
+            setOpenTypeModal(false);
+            setOpenMediaModal({
+              value: true,
+              data: null,
+              type: value,
+            });
+          }}
+        />
+      ) : null}
       {openMediaModal?.value ? (
         <MediaPickerModal
+          openMediaModal={openMediaModal}
           onClose={() => {
             setOpenMediaModal({
               value: false,
@@ -759,36 +784,37 @@ const PostCreateScreen = ({
             });
           }}
           onMediaSelection={(value) => {
-            let type = value?.type.includes("video") ? "video" : "image";
-            if (type == "video") {
-              dispatch(setIsAppLoader(true));
-              createThumbnail({
-                url: value?.uri,
-                timeStamp: 10000,
-              })
-                .then(async (response) => {
-                  await uploadThumnail(response?.path, (thumbnailUrl) => {
-                    if (thumbnailUrl) {
-                      dispatch(setIsAppLoader(false));
-                      updateStates(type, openMediaModal?.index, {
-                        thumbnail: thumbnailUrl,
-                        video: value,
-                      });
-                    }
-                  });
-                })
-                .catch((err) => {
-                  dispatch(setIsAppLoader(false));
-                  console.log("printImgErr ", err);
-                });
-            } else {
-              updateStates(type, openMediaModal?.index, value);
-            }
-            setOpenMediaModal({
-              value: false,
-              data: null,
-              index: -1,
-            });
+            console.log("value----->", value);
+            // let type = value?.type.includes("video") ? "video" : "image";
+            // if (type == "video") {
+            //   dispatch(setIsAppLoader(true));
+            //   createThumbnail({
+            //     url: value?.uri,
+            //     timeStamp: 10000,
+            //   })
+            //     .then(async (response) => {
+            //       await uploadThumnail(response?.path, (thumbnailUrl) => {
+            //         if (thumbnailUrl) {
+            //           dispatch(setIsAppLoader(false));
+            //           updateStates(type, openMediaModal?.index, {
+            //             thumbnail: thumbnailUrl,
+            //             video: value,
+            //           });
+            //         }
+            //       });
+            //     })
+            //     .catch((err) => {
+            //       dispatch(setIsAppLoader(false));
+            //       console.log("printImgErr ", err);
+            //     });
+            // } else {
+            //   updateStates(type, openMediaModal?.index, value);
+            // }
+            // setOpenMediaModal({
+            //   value: false,
+            //   data: null,
+            //   index: -1,
+            // });
           }}
         />
       ) : null}

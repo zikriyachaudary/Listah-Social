@@ -38,6 +38,7 @@ import ThreadManager from "../ChatModule/ThreadManger";
 import { Routes } from "../util/Route";
 import PostDetailScreen from "../Post/Screens/PostDetailScreen";
 import ReportPost from "../home/screens/ReportPost";
+import ToastComp from "../common/ToastComp";
 const Stack = createNativeStackNavigator();
 
 /* =============================================================================
@@ -243,7 +244,6 @@ const AppNavigation = ({ changeAuthState, getProfile, authenticated }) => {
   if (initializing) {
     return null;
   }
-
   return (
     <NavigationContainer theme={THEME} ref={navigationRef}>
       {/* <StatusBar
@@ -320,6 +320,7 @@ const AppNavigation = ({ changeAuthState, getProfile, authenticated }) => {
           </View>
         </View>
       ) : null}
+      {selector?.sliceReducer?.showToast ? <ToastComp /> : null}
       {selector?.DraftPost?.isAlertShow?.value ? (
         <AlertModal
           visible={selector?.DraftPost?.isAlertShow?.value}

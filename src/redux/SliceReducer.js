@@ -8,6 +8,7 @@ import {
   SET_APP_LOADER,
   SET_THREAD_LIST,
   SET_HIDE_TAB,
+  SET_SHOW_TOAST,
 } from "./action/types";
 
 const initialState = {
@@ -20,6 +21,7 @@ const initialState = {
   threadList: [],
   isLoaderStart: false,
   isHideTabBar: false,
+  showToast: "",
 };
 const SliceReducer = (state = initialState, action) => {
   switch (action.type) {
@@ -68,6 +70,11 @@ const SliceReducer = (state = initialState, action) => {
       return {
         ...state,
         isLoaderStart: action.data,
+      };
+    case SET_SHOW_TOAST:
+      return {
+        ...state,
+        showToast: action.data,
       };
     default:
       return state;
