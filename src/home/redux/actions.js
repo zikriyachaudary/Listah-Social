@@ -559,10 +559,23 @@ export const createAnnouncementPost =
       if (items) {
         post.items = await Promise.all(
           items.map(async (item, index) => {
-            let uploadImgUrl = "";
+            let uploadMediaUrl = "";
+            if (
+              (typeof item?.image == "string" &&
+                item?.image.includes("https")) ||
+              (typeof item?.videoObj?.video == "string" &&
+                item?.videoObj?.video.includes("https"))
+            ) {
+              console.log("return--->");
+              return {
+                ...item,
+                id: index,
+              };
+            }
             if (item?.image && item?.image?.uri != "") {
+              console.log("image------>");
               const compressedImage = await ImageResizer.createResizedImage(
-                item.image.uri,
+                item?.image?.uri,
                 1000,
                 1000,
                 "PNG",
@@ -573,54 +586,39 @@ export const createAnnouncementPost =
                 .ref("post_media")
                 .child(item.image.fileName);
               await storageRef.putFile(compressedImage.uri);
-              uploadImgUrl = await storageRef.getDownloadURL();
+              uploadMediaUrl = await storageRef.getDownloadURL();
+
               return {
                 id: index,
-                name: item.name,
-                image: uploadImgUrl,
-                description: item.description,
+                name: item?.name,
+                image: uploadMediaUrl,
+                description: item?.description,
               };
-            } else if (item?.videoObj) {
-              if (item?.videoObj?.video?.uri) {
-                let filename =
-                  ThreadManager.instance.makeid(6) +
-                  item?.videoObj?.video?.uri.substring(
-                    item?.videoObj?.video?.uri.lastIndexOf("/") + 1
-                  );
-                let uploadUri =
-                  Platform.OS === "ios"
-                    ? item?.videoObj?.video?.uri.replace("file://", "")
-                    : item?.videoObj?.video?.uri;
-                if (uploadUri.includes("mov")) {
-                  let fileArr = filename.split(".");
-                  const ext = fileArr[fileArr.length - 1];
-                  if (ext.toLowerCase() == "mov") {
-                    filename = filename.replace(/mov/g, "mp4");
-                  }
+            } else if (item?.videoObj && item?.videoObj?.video?.uri) {
+              let filename =
+                ThreadManager.instance.makeid(6) +
+                item?.videoObj?.video?.uri.substring(
+                  item?.videoObj?.video?.uri.lastIndexOf("/") + 1
+                );
+              let uploadUri = item?.videoObj?.video?.uri.replace("file://", "");
+
+              if (uploadUri.includes("mov")) {
+                let fileArr = filename.split(".");
+                const ext = fileArr[fileArr.length - 1];
+                if (ext.toLowerCase() == "mov") {
+                  filename = filename.replace(/mov/g, "mp4");
                 }
-                const storageRef = FireStorage()
-                  .ref("post_media")
-                  .child(filename);
-                await storageRef.putFile(uploadUri);
-                let uploadMediaUrl = await storageRef.getDownloadURL();
-                return {
-                  id: index,
-                  name: item?.name,
-                  videoObj: { ...item?.videoObj, video: uploadMediaUrl },
-                  description: item?.description,
-                };
-              } else {
-                return {
-                  id: index,
-                  name: item?.name,
-                  videoObj: item?.videoObj,
-                  description: item?.description,
-                };
               }
-            } else {
+              const storageRef = FireStorage()
+                .ref("post_media")
+                .child(filename);
+              await storageRef.putFile(uploadUri);
+              uploadMediaUrl = await storageRef.getDownloadURL();
               return {
-                ...item,
                 id: index,
+                name: item?.name,
+                videoObj: { ...item?.videoObj, video: uploadMediaUrl },
+                description: item?.description,
               };
             }
           })
@@ -685,7 +683,7 @@ export const savePostInDb = async (postId) => {
   };
   console.log("showAlready - > ", currentUserId, savePostsObj);
   await SavePostCollection.doc(`${currentUserId}`).set(savePostsObj);
-  console.log("done - >< ", messageDisplay);
+
   return messageDisplay;
 };
 
@@ -719,7 +717,19 @@ export const createPost = (postContent) => async (dispatch) => {
       post.items = await Promise.all(
         items.map(async (item, index) => {
           let uploadMediaUrl = "";
+          if (
+            (typeof item?.image == "string" && item?.image.includes("https")) ||
+            (typeof item?.videoObj?.video == "string" &&
+              item?.videoObj?.video.includes("https"))
+          ) {
+            console.log("return--->");
+            return {
+              ...item,
+              id: index,
+            };
+          }
           if (item?.image && item?.image?.uri != "") {
+            console.log("image------>");
             const compressedImage = await ImageResizer.createResizedImage(
               item?.image?.uri,
               1000,
@@ -746,10 +756,8 @@ export const createPost = (postContent) => async (dispatch) => {
               item?.videoObj?.video?.uri.substring(
                 item?.videoObj?.video?.uri.lastIndexOf("/") + 1
               );
-            let uploadUri =
-              Platform.OS === "ios"
-                ? item?.videoObj?.video?.uri.replace("file://", "")
-                : item?.videoObj?.video?.uri;
+            let uploadUri = item?.videoObj?.video?.uri.replace("file://", "");
+
             if (uploadUri.includes("mov")) {
               let fileArr = filename.split(".");
               const ext = fileArr[fileArr.length - 1];
@@ -765,11 +773,6 @@ export const createPost = (postContent) => async (dispatch) => {
               name: item?.name,
               videoObj: { ...item?.videoObj, video: uploadMediaUrl },
               description: item?.description,
-            };
-          } else {
-            return {
-              ...item,
-              id: index,
             };
           }
         })
@@ -829,10 +832,23 @@ export const challengePost =
       if (items) {
         challengePost.items = await Promise.all(
           items.map(async (item, index) => {
-            let uploadImgUrl = "";
+            let uploadMediaUrl = "";
+            if (
+              (typeof item?.image == "string" &&
+                item?.image.includes("https")) ||
+              (typeof item?.videoObj?.video == "string" &&
+                item?.videoObj?.video.includes("https"))
+            ) {
+              console.log("return--->");
+              return {
+                ...item,
+                id: index,
+              };
+            }
             if (item?.image && item?.image?.uri != "") {
+              console.log("image------>");
               const compressedImage = await ImageResizer.createResizedImage(
-                item.image.uri,
+                item?.image?.uri,
                 1000,
                 1000,
                 "PNG",
@@ -843,12 +859,13 @@ export const challengePost =
                 .ref("post_media")
                 .child(item.image.fileName);
               await storageRef.putFile(compressedImage.uri);
-              uploadImgUrl = await storageRef.getDownloadURL();
+              uploadMediaUrl = await storageRef.getDownloadURL();
+
               return {
                 id: index,
-                name: item.name,
-                image: uploadImgUrl,
-                description: item.description,
+                name: item?.name,
+                image: uploadMediaUrl,
+                description: item?.description,
               };
             } else if (item?.videoObj && item?.videoObj?.video?.uri) {
               let filename =
@@ -856,10 +873,8 @@ export const challengePost =
                 item?.videoObj?.video?.uri.substring(
                   item?.videoObj?.video?.uri.lastIndexOf("/") + 1
                 );
-              let uploadUri =
-                Platform.OS === "ios"
-                  ? item?.videoObj?.video?.uri.replace("file://", "")
-                  : item?.videoObj?.video?.uri;
+              let uploadUri = item?.videoObj?.video?.uri.replace("file://", "");
+
               if (uploadUri.includes("mov")) {
                 let fileArr = filename.split(".");
                 const ext = fileArr[fileArr.length - 1];
@@ -871,22 +886,18 @@ export const challengePost =
                 .ref("post_media")
                 .child(filename);
               await storageRef.putFile(uploadUri);
-              let uploadMediaUrl = await storageRef.getDownloadURL();
+              uploadMediaUrl = await storageRef.getDownloadURL();
               return {
                 id: index,
                 name: item?.name,
                 videoObj: { ...item?.videoObj, video: uploadMediaUrl },
                 description: item?.description,
               };
-            } else {
-              return {
-                ...item,
-                id: index,
-              };
             }
           })
         );
       }
+
       const postObj = previousPost;
       postObj["author"] =
         previousPost.author && previousPost.author.userId
@@ -963,62 +974,62 @@ export const updatePost = (changes) => async (dispatch) => {
     if (post?.items) {
       post.items = await Promise.all(
         post?.items.map(async (item, index) => {
-          if (typeof item.image === "object") {
+          let uploadMediaUrl = "";
+          if (
+            (typeof item?.image == "string" && item?.image.includes("https")) ||
+            (typeof item?.videoObj?.video == "string" &&
+              item?.videoObj?.video.includes("https"))
+          ) {
+            console.log("return--->");
+            return {
+              ...item,
+              id: index,
+            };
+          }
+          if (item?.image && item?.image?.uri != "") {
+            const compressedImage = await ImageResizer.createResizedImage(
+              item?.image?.uri,
+              1000,
+              1000,
+              "PNG",
+              100,
+              0
+            );
             const storageRef = FireStorage()
               .ref("post_media")
               .child(item.image.fileName);
-            await storageRef.putFile(item.image.uri);
-            const uploadImgUrl = await storageRef.getDownloadURL();
+            await storageRef.putFile(compressedImage.uri);
+            uploadMediaUrl = await storageRef.getDownloadURL();
 
             return {
               id: index,
-              name: item.name,
-              image: uploadImgUrl,
-              description: item.description,
+              name: item?.name,
+              image: uploadMediaUrl,
+              description: item?.description,
             };
-          } else if (item?.videoObj) {
-            if (item?.videoObj?.video?.uri) {
-              let filename =
-                ThreadManager.instance.makeid(6) +
-                item?.videoObj?.video?.uri.substring(
-                  item?.videoObj?.video?.uri.lastIndexOf("/") + 1
-                );
-              let uploadUri =
-                Platform.OS === "ios"
-                  ? item?.videoObj?.video?.uri.replace("file://", "")
-                  : item?.videoObj?.video?.uri;
-              if (uploadUri.includes("mov")) {
-                let fileArr = filename.split(".");
-                const ext = fileArr[fileArr.length - 1];
-                if (ext.toLowerCase() == "mov") {
-                  filename = filename.replace(/mov/g, "mp4");
-                }
+          } else if (item?.videoObj && item?.videoObj?.video?.uri) {
+            let filename =
+              ThreadManager.instance.makeid(6) +
+              item?.videoObj?.video?.uri.substring(
+                item?.videoObj?.video?.uri.lastIndexOf("/") + 1
+              );
+            let uploadUri = item?.videoObj?.video?.uri.replace("file://", "");
+
+            if (uploadUri.includes("mov")) {
+              let fileArr = filename.split(".");
+              const ext = fileArr[fileArr.length - 1];
+              if (ext.toLowerCase() == "mov") {
+                filename = filename.replace(/mov/g, "mp4");
               }
-              const storageRef = FireStorage()
-                .ref("post_media")
-                .child(filename);
-              await storageRef.putFile(uploadUri);
-              let uploadMediaUrl = await storageRef.getDownloadURL();
-              return {
-                id: index,
-                name: item?.name,
-                videoObj: { ...item?.videoObj, video: uploadMediaUrl },
-                description: item?.description,
-              };
-            } else {
-              return {
-                id: index,
-                name: item?.name,
-                videoObj: item?.videoObj,
-                description: item?.description,
-              };
             }
-          } else {
+            const storageRef = FireStorage().ref("post_media").child(filename);
+            await storageRef.putFile(uploadUri);
+            uploadMediaUrl = await storageRef.getDownloadURL();
             return {
               id: index,
-              name: item.name,
-              image: item?.image,
-              description: item.description,
+              name: item?.name,
+              videoObj: { ...item?.videoObj, video: uploadMediaUrl },
+              description: item?.description,
             };
           }
         })

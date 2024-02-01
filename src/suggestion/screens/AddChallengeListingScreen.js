@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   Image,
   KeyboardAvoidingView,
@@ -42,6 +42,8 @@ const AddChallengeListingScreen = ({ challengePost, navigation, route }) => {
     value: false,
     index: -1,
   });
+
+  const isBtnActive = useRef(false);
   const [itemList, setItemList] = useState([
     {
       name: "",
@@ -107,6 +109,7 @@ const AddChallengeListingScreen = ({ challengePost, navigation, route }) => {
     }
   };
   const _handleSubmit = async () => {
+    isBtnActive.current = true;
     let isErrorFound = false;
     if (itemList?.length > 0) {
       itemList.map((el) => {
@@ -116,14 +119,15 @@ const AddChallengeListingScreen = ({ challengePost, navigation, route }) => {
       });
     }
     if (isErrorFound) {
+      isBtnActive.current = false;
       return;
     }
     let values = {};
     values["order"] = radioButtons.find((item) => item.selected).id;
     values["isNumberShowInItems"] = toggleCheckBox;
     values["items"] = itemList?.length > 0 ? fetchItemList() : [];
-
     dispatch(setIsAppLoader(true));
+    isBtnActive.current = false;
     await challengePost(values, post, async (response) => {
       let authorId = post?.author?.userId || post?.author;
       if (response?.status && authorId != selector?.Auth?.user?.uid) {
@@ -408,6 +412,7 @@ const AddChallengeListingScreen = ({ challengePost, navigation, route }) => {
 
           <TouchableOpacity
             activeOpacity={1}
+            disabled={isBtnActive.current}
             onPress={() => {
               _handleSubmit();
             }}
@@ -453,7 +458,7 @@ const AddChallengeListingScreen = ({ challengePost, navigation, route }) => {
                   if (obj?.thumbnail) {
                     updateStates("video", mediaTypeObj?.index, obj);
                   } else if (obj?.image) {
-                    updateStates("image", mediaTypeObj?.index, obj);
+                    updateStates("image", mediaTypeObj?.index, obj?.image);
                   }
                 },
               });

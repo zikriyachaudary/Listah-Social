@@ -82,7 +82,6 @@ const VideoCreateScreen = (props) => {
       cameraRef?.current?.startRecording({
         flash: flashMode,
         onRecordingFinished: async (video) => {
-          console.log("showVIDEO pAT - > ", video?.path);
           if (!video?.path) {
             return;
           }
@@ -93,7 +92,7 @@ const VideoCreateScreen = (props) => {
             .then(async (response) => {
               let obj = {
                 thumbnail: response?.path,
-                video: { video: { uri: video?.path } },
+                video: { uri: video?.path },
               };
               setMediaPreObj(obj);
             })
@@ -126,7 +125,7 @@ const VideoCreateScreen = (props) => {
         flash: flashMode,
       });
       if (photo?.path) {
-        setMediaPreObj({ image: photo });
+        setMediaPreObj({ image: photo?.path });
       }
     } catch (e) {
       console.log("Image click error ", e);
@@ -158,7 +157,6 @@ const VideoCreateScreen = (props) => {
       clearInterval(timerInterval);
     };
   }, [countdown, startInterval]);
-
   return (
     <View style={AppStyles.MainStyle}>
       <CustomHeader
@@ -170,14 +168,14 @@ const VideoCreateScreen = (props) => {
         logo={AppImages.Common.appLogo}
         mainStyle={{ backgroundColor: AppColors.blue.royalBlue }}
         rightTxt={"Save"}
-        isRightAction={mediaPreObj}
+        isRightAction={mediaPreObj?.thumbnail || mediaPreObj?.image}
         atRightBtn={async () => {
           if (props?.route?.params?.atBack && mediaPreObj) {
             let obj = { ...mediaPreObj };
             if (mediaPreObj?.thumbnail || mediaPreObj?.image) {
               dispatch(setIsAppLoader(true));
               await uploadThumnail(
-                mediaPreObj?.thumbnail || mediaPreObj?.image?.path,
+                mediaPreObj?.thumbnail || mediaPreObj?.image,
                 (url) => {
                   if (url) {
                     dispatch(setIsAppLoader(false));
@@ -190,7 +188,10 @@ const VideoCreateScreen = (props) => {
                 }
               );
             }
-            props?.route?.params?.atBack(obj);
+            setTimeout(() => {
+              props?.route?.params?.atBack(obj);
+              props?.navigation.goBack();
+            }, 2000);
           }
         }}
       />
@@ -234,12 +235,18 @@ const VideoCreateScreen = (props) => {
                 <LoadingImage
                   isDisable={mediaPreObj?.thumbnail}
                   source={{
-                    uri: mediaPreObj?.image || mediaPreObj?.thumbnail,
+                    uri: mediaPreObj?.image
+                      ? `file://${mediaPreObj?.image}`
+                      : mediaPreObj?.thumbnail,
                   }}
                   style={styles.img}
                 />
-
-                <Image source={AppImages.playbutton} style={styles.playIcon} />
+                {mediaPreObj?.thumbnail ? (
+                  <Image
+                    source={AppImages.playbutton}
+                    style={styles.playIcon}
+                  />
+                ) : null}
               </TouchableOpacity>
 
               <View style={{ alignItems: "center" }}>

@@ -28,41 +28,6 @@ import { AppStrings } from "../util/Strings";
 const MediaPickerModal = (props) => {
   const dispatch = useDispatch();
 
-  const mediaSelection = () => {
-    ImagePicker.openPicker({
-      multiple: false,
-      mediaType: props?.openMediaModal?.type,
-      compressImageQuality: 0.5,
-      durationLimit: 30,
-    })
-      .then((images) => {
-        let maxDuration = 30000;
-        let maxSize = 20000;
-        console.log("images----->", images);
-        if (images?.path && props?.openMediaModal?.type) {
-          if (props?.openMediaModal?.type == "video") {
-            let isValidVideo = images?.duration < maxDuration;
-            if (isValidVideo) {
-              props?.onMediaSelection(images);
-            } else {
-              props.onClose();
-              dispatch(
-                setShowToast("Selected video exceeds the maximum duration.")
-              );
-            }
-          } else {
-            let isValidPhoto = images?.size < maxSize;
-            if (isValidPhoto) {
-              props?.onMediaSelection(images);
-            } else {
-              props.onClose();
-              dispatch(setShowToast(AppStrings.Validation.maxImageSizeError));
-            }
-          }
-        }
-      })
-      .catch((e) => console.log("Err ", e));
-  };
   const pickImage = async (index) => {
     try {
       let options = {

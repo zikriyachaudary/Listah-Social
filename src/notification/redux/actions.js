@@ -16,7 +16,7 @@ export const getLoginUserNotificationCount = async (dispatch) => {
     await ProfilesCollection.doc(currentUser).get()
   ).data();
 
-  const notifications = currentUserProfile.notifications
+  const notifications = currentUserProfile?.notifications
     ? currentUserProfile.notifications
     : [];
   const populatedNotification = await Promise.all(

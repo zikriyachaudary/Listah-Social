@@ -54,9 +54,8 @@
 	</dict>
 	<key>NSCameraUsageDescription</key>
 	<string>ListaApp requires to access Camera for uploading photos for social purpose.</string>
-	<!-- optionally, if you want to record audio: -->
-<key>NSMicrophoneUsageDescription</key>
-<string>$(PRODUCT_NAME) needs access to your Microphone.</string>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>$(PRODUCT_NAME) needs access to your Microphone.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>ListaApp is requesting for location for better resuts.</string>
 	<key>NSPhotoLibraryUsageDescription</key>

@@ -132,19 +132,21 @@ const PostCreateScreen = ({
   const [toggleCheckBox, setToggleCheckBox] = useState(false);
 
   useEffect(() => {
-    if (isFocused && route?.params?.isEdit && route?.params?.data?.id) {
+    if (route?.params?.isEdit) {
       initialFun(route?.params?.data?.id);
     }
     return () => {
       clearStates();
     };
-  }, []);
+  }, [route?.params]);
 
   const initialFun = async (postId) => {
-    let data = null;
-    await fetchPostData(postId, (res) => {
-      data = res;
-    });
+    let data = route?.params?.data;
+    if (postId) {
+      await fetchPostData(postId, (res) => {
+        data = res;
+      });
+    }
     if (data) {
       setSelectedCategory(data?.category ? data?.category : "");
       if (data?.isNumberShowInItems) {
@@ -328,7 +330,8 @@ const PostCreateScreen = ({
     values["isNumberShowInItems"] = toggleCheckBox;
     values["category"] = selectedcategory;
     values["items"] = itemList?.length > 0 ? fetchItemList() : [];
-    setIsLoading(true);
+    // setIsLoading(true);
+    dispatch(setIsAppLoader(true));
     if (route.params?.isEdit && route?.params?.data?.author?.userId) {
       values["author"] = route?.params?.data?.author;
       values["id"] = route?.params?.id;
@@ -362,7 +365,8 @@ const PostCreateScreen = ({
     }
     setTimeout(() => {
       isBtnActive.current = false;
-      setIsLoading(false);
+      // setIsLoading(false);
+      dispatch(setIsAppLoader(false));
     }, 800);
   };
   const fetchItemList = () => {
@@ -441,7 +445,6 @@ const PostCreateScreen = ({
       ...previousObj,
       [`${type}`]: value,
     };
-    console.log("newObj------>", index);
     updatedArray[index] = newObj;
     setItemList(updatedArray);
   };
@@ -795,7 +798,7 @@ const PostCreateScreen = ({
                   if (obj?.thumbnail) {
                     updateStates("video", mediaTypeObj?.index, obj);
                   } else if (obj?.image) {
-                    updateStates("image", mediaTypeObj?.index, obj);
+                    updateStates("image", mediaTypeObj?.index, obj?.image);
                   }
                 },
               });
