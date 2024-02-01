@@ -39,6 +39,7 @@ const LoadingImage = (props) => {
         }}
       >
         <FastImage
+          resizeMode={props?.resizeMode}
           onLoadStart={() => setLoading(true)}
           onLoadEnd={() => setLoading(false)}
           onError={() => {

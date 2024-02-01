@@ -6,7 +6,6 @@ import {
   Platform,
   ScrollView,
   StyleSheet,
-  Text,
   TouchableOpacity,
   View,
 } from "react-native";
@@ -28,11 +27,13 @@ import VideoPlayerModal from "../../common/VideoPlayerModal";
 import { setIsAppLoader } from "../../redux/action/AppLogics";
 import ThreadManager from "../../ChatModule/ThreadManger";
 import LoadingImage from "../../common/LoadingImage";
+import Video from "react-native-video";
 
 const VideoCreateScreen = (props) => {
   const dispatch = useDispatch();
   const cameraRef = useRef({});
   const devices = useCameraDevices();
+  const [isPlaying, setIsPlaying] = useState(true);
   const [deviceDir, setDeviceDir] = useState("back");
   const device = devices[deviceDir];
   const [openVideoModal, setOpenVideoModal] = useState("");
@@ -201,80 +202,121 @@ const VideoCreateScreen = (props) => {
           behavior={Platform.OS === "ios" ? "padding" : "height"}
           keyboardVerticalOffset={Platform.OS === "ios" ? hv(35) : hv(30)}
         >
-          <ScrollView
-            contentContainerStyle={styles.containerStyle}
-            showsVerticalScrollIndicator={false}
-          >
-            {device && (
-              <Camera
-                ref={cameraRef}
-                style={StyleSheet.absoluteFill}
-                device={device}
-                isActive={true}
-                photo={recordingTypeIndex == 0}
-                video={recordingTypeIndex == 1}
-                audio={recordingTypeIndex == 1}
-                preset="medium"
-                zoom={device?.neutralZoom}
-              />
-            )}
-
-            <View style={styles.bottomCont}>
-              <TouchableOpacity
-                onPress={() => {
-                  if (mediaPreObj?.thumbnail) {
-                    setOpenVideoModal(
-                      mediaPreObj?.video?.video?.uri
-                        ? mediaPreObj?.video?.video?.uri
-                        : mediaPreObj?.video
-                    );
-                  }
-                }}
-                activeOpacity={1}
-              >
+          {mediaPreObj?.thumbnail || mediaPreObj?.image ? (
+            <>
+              {mediaPreObj?.image ? (
                 <LoadingImage
-                  isDisable={mediaPreObj?.thumbnail}
-                  source={{
-                    uri: mediaPreObj?.image
-                      ? `file://${mediaPreObj?.image}`
-                      : mediaPreObj?.thumbnail,
+                  isDisable={true}
+                  source={{ uri: `file://${mediaPreObj?.image}` }}
+                  style={{
+                    height: "98%",
+                    width: "98%",
                   }}
-                  style={styles.img}
+                  resizeMode={"contain"}
                 />
-                {mediaPreObj?.thumbnail ? (
-                  <Image
-                    source={AppImages.playbutton}
-                    style={styles.playIcon}
-                  />
-                ) : null}
-              </TouchableOpacity>
+              ) : null}
 
-              <View style={{ alignItems: "center" }}>
-                <VideoRecorderBtn
-                  isImage={recordingTypeIndex == 0}
-                  onImageClick={() => {
-                    if (timerValue > 0) {
-                      setCountdown(timerValue);
-                      setStartInterval(true);
-                    } else {
-                      onImageClick();
-                    }
-                  }}
-                  onVideRecordingStart={() => {
-                    if (timerValue > 0) {
-                      setCountdown(timerValue);
-                      setStartInterval(true);
-                    } else {
-                      handleStartRecordVideo();
-                    }
-                  }}
-                  onVideoRecordingEnd={handleStopRecordedVideo}
-                  isVideoRecording={isVideoRecording}
+              {mediaPreObj?.thumbnail &&
+              (mediaPreObj?.video?.video?.uri
+                ? mediaPreObj?.video?.video?.uri
+                : mediaPreObj?.video?.uri) ? (
+                <View style={styles.backgroundVideo}>
+                  <Video
+                    source={{
+                      uri: mediaPreObj?.video?.video?.uri
+                        ? mediaPreObj?.video?.video?.uri
+                        : mediaPreObj?.video?.uri,
+                    }}
+                    paused={!isPlaying}
+                    controls={true}
+                    style={styles.backgroundVideo}
+                    ignoreSilentSwitch="ignore"
+                    onLoadStart={() => {}}
+                    onLoad={() => {}}
+                    onError={(err) => {
+                      setIsPlaying(false);
+                    }}
+                    fullscreen={true}
+                  />
+                </View>
+              ) : null}
+            </>
+          ) : (
+            <ScrollView
+              contentContainerStyle={styles.containerStyle}
+              showsVerticalScrollIndicator={false}
+            >
+              {device && (
+                <Camera
+                  ref={cameraRef}
+                  style={StyleSheet.absoluteFill}
+                  device={device}
+                  isActive={true}
+                  photo={recordingTypeIndex == 0}
+                  video={recordingTypeIndex == 1}
+                  audio={recordingTypeIndex == 1}
+                  preset="medium"
+                  zoom={device?.neutralZoom}
                 />
+              )}
+
+              <View style={styles.bottomCont}>
+                <TouchableOpacity
+                  onPress={() => {
+                    if (mediaPreObj?.thumbnail) {
+                      setOpenVideoModal(
+                        mediaPreObj?.video?.video?.uri
+                          ? mediaPreObj?.video?.video?.uri
+                          : mediaPreObj?.video
+                      );
+                    }
+                  }}
+                  activeOpacity={1}
+                >
+                  <LoadingImage
+                    isDisable={mediaPreObj?.thumbnail}
+                    source={{
+                      uri: mediaPreObj?.image
+                        ? `file://${mediaPreObj?.image}`
+                        : mediaPreObj?.thumbnail,
+                    }}
+                    style={styles.img}
+                  />
+                  {mediaPreObj?.thumbnail ? (
+                    <Image
+                      source={AppImages.playbutton}
+                      style={styles.playIcon}
+                    />
+                  ) : null}
+                </TouchableOpacity>
+
+                <View style={{ alignItems: "center" }}>
+                  <VideoRecorderBtn
+                    isImage={recordingTypeIndex == 0}
+                    onImageClick={() => {
+                      if (timerValue > 0) {
+                        setCountdown(timerValue);
+                        setStartInterval(true);
+                      } else {
+                        onImageClick();
+                      }
+                    }}
+                    onVideRecordingStart={() => {
+                      if (timerValue > 0) {
+                        setCountdown(timerValue);
+                        setStartInterval(true);
+                      } else {
+                        handleStartRecordVideo();
+                      }
+                    }}
+                    onVideoRecordingEnd={handleStopRecordedVideo}
+                    isVideoRecording={isVideoRecording}
+                  />
+                </View>
+                <View style={{ marginHorizontal: normalized(30) }} />
               </View>
-              <View style={{ marginHorizontal: normalized(30) }} />
-            </View>
-          </ScrollView>
+            </ScrollView>
+          )}
         </KeyboardAvoidingView>
       )}
       {openVideoModal ? (
@@ -358,6 +400,14 @@ const styles = StyleSheet.create({
     position: "absolute",
     alignSelf: "center",
     top: normalized(20),
+  },
+  backgroundVideo: {
+    height: "100%",
+    width: "100%",
+    borderBottomLeftRadius: 10,
+    borderBottomRightRadius: 10,
+    backgroundColor: AppColors.black.black,
+    alignSelf: "center",
   },
 });
 export default VideoCreateScreen;

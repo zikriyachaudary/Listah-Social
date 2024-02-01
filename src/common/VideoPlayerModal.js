@@ -27,7 +27,6 @@ const VideoPlayerModal = (props) => {
   return (
     <Modal animationType="slide" transparent onRequestClose={props.onClose}>
       <SafeAreaView />
-
       <View style={styles.headerSection}>
         <View
           style={{

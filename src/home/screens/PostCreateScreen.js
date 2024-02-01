@@ -86,7 +86,6 @@ const PostCreateScreen = ({
   const [isLoading, setIsLoading] = useState(false);
   const toast = useToast();
   const isFocused = useIsFocused();
-  const formikRef = useRef();
   const isBtnActive = useRef(false);
   const [radioButtons, setRadioButtons] = useState([
     {
@@ -118,6 +117,7 @@ const PostCreateScreen = ({
       },
     ],
   });
+
   const [openMediaModal, setOpenMediaModal] = useState({
     value: false,
     data: null,
@@ -132,13 +132,14 @@ const PostCreateScreen = ({
   const [toggleCheckBox, setToggleCheckBox] = useState(false);
 
   useEffect(() => {
+    console.log("route?.params----", route?.params);
     if (route?.params?.isEdit) {
       initialFun(route?.params?.data?.id);
     }
     return () => {
       clearStates();
     };
-  }, [route?.params]);
+  }, [route?.params?.isEdit]);
 
   const initialFun = async (postId) => {
     let data = route?.params?.data;
@@ -363,6 +364,7 @@ const PostCreateScreen = ({
       dispatch(setPostRefresh(!selector.Home.isPostRefresh));
       navigation.goBack();
     }
+    clearStates();
     setTimeout(() => {
       isBtnActive.current = false;
       // setIsLoading(false);
@@ -752,7 +754,7 @@ const PostCreateScreen = ({
           atLeftBtn={() => {
             setAlertModal({ value: false, data: null, message: "" });
             dispatch(setPostRefresh(!selector.Home.isPostRefresh));
-            formikRef.current?.resetForm();
+            clearStates();
             navigation.goBack();
           }}
           leftBtnLabel={"No"}
