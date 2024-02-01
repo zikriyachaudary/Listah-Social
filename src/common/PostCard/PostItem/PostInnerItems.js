@@ -94,11 +94,13 @@ const PostInnerItems = ({ post, userPosts, profile, setOpenVideoModal }) => {
                       borderColor: AppColors.blue.royalBlue,
                     }}
                   />
-                ) : item?.videoObj?.thumbnail ? (
+                ) : item?.videoObj?.thumbnail || item?.video?.thumbnail ? (
                   <TouchableOpacity
                     onPress={() => {
                       if (setOpenVideoModal) {
-                        setOpenVideoModal(item?.videoObj?.video);
+                        setOpenVideoModal(
+                          item?.videoObj?.video || item?.video?.video
+                        );
                       }
                     }}
                   >
@@ -110,7 +112,10 @@ const PostInnerItems = ({ post, userPosts, profile, setOpenVideoModal }) => {
                         borderWidth: 1.4,
                         borderColor: AppColors.blue.royalBlue,
                       }}
-                      source={{ uri: item?.videoObj?.thumbnail }}
+                      source={{
+                        uri:
+                          item?.videoObj?.thumbnail || item?.video?.thumbnail,
+                      }}
                     />
                     <Image
                       source={AppImages.playbutton}
