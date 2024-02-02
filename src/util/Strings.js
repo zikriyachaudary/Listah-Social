@@ -48,6 +48,9 @@ export const AppStrings = {
     emailEmptyError: "Email can't be empty",
     otpCodeEmptyError: "OTP Code can't be empty",
     maxImageSizeError:
-      "The selected image size exceeds the maximum limit of 10MB.",
+      "The selected image size exceeds the maximum limit of 20MB.",
+    videoDurationError:
+      "Uploading Image size must be maximum 20MB and Video maximum duration must be 30s",
+    maxDur: "Video must be maximum duration 30s",
   },
 };

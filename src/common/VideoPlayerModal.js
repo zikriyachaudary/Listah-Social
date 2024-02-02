@@ -58,6 +58,7 @@ const VideoPlayerModal = (props) => {
                   <Video
                     source={{ uri: url }}
                     paused={!isPlaying}
+                    resizeMode="contain"
                     controls={true}
                     style={styles.backgroundVideo}
                     ignoreSilentSwitch="ignore"

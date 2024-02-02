@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { connect, useDispatch, useSelector } from "react-redux";
 import {
   ActivityIndicator,
+  Alert,
   BackHandler,
   Image,
   KeyboardAvoidingView,
@@ -28,6 +29,7 @@ import {
   setCreatePostFailError,
   setDraftPost,
   setIsAppLoader,
+  setShowToast,
 } from "../../redux/action/AppLogics";
 import AlertModal from "../../common/AlertModal";
 import { saveUserDraftPost } from "../../util/helperFun";
@@ -54,6 +56,7 @@ import VideoPlayerModal from "../../common/VideoPlayerModal";
 import ThreadManager from "../../ChatModule/ThreadManger";
 import MediaTypeSelection from "../../common/MediaTypeSelection";
 import { Routes } from "../../util/Route";
+import { AppStrings } from "../../util/Strings";
 
 /* =============================================================================
 <PostCreateScreen />
@@ -67,6 +70,8 @@ const PostCreateScreen = ({
 }) => {
   const { generateMultiplePushNotification, userSubscribed } =
     useNotificationManger();
+  const selector = useSelector((AppState) => AppState);
+
   const [openTypeModal, setOpenTypeModal] = useState({
     value: false,
     index: -1,
@@ -75,7 +80,6 @@ const PostCreateScreen = ({
   const [selectedcategory, setSelectedCategory] = useState("");
   const [categoryError, setCategoryError] = useState("");
   const dispatch = useDispatch();
-  const selector = useSelector((AppState) => AppState);
   const [itemList, setItemList] = useState([]);
   const [title, setTitle] = useState("");
   const title2 = useRef("");
@@ -83,9 +87,7 @@ const PostCreateScreen = ({
   const [des, setDes] = useState("");
   const des2 = useRef("");
   const [desError, setDesError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const toast = useToast();
-  const isFocused = useIsFocused();
   const isBtnActive = useRef(false);
   const [radioButtons, setRadioButtons] = useState([
     {
@@ -120,7 +122,6 @@ const PostCreateScreen = ({
 
   const [openMediaModal, setOpenMediaModal] = useState({
     value: false,
-    data: null,
     index: -1,
   });
   const [alertModal, setAlertModal] = useState({
@@ -132,7 +133,6 @@ const PostCreateScreen = ({
   const [toggleCheckBox, setToggleCheckBox] = useState(false);
 
   useEffect(() => {
-    console.log("route?.params----", route?.params);
     if (route?.params?.isEdit) {
       initialFun(route?.params?.data?.id);
     }
@@ -140,7 +140,25 @@ const PostCreateScreen = ({
       clearStates();
     };
   }, [route?.params?.isEdit]);
+  useEffect(() => {
+    const backAction = () => {
+      if (route?.params?.from !== "EditPost") {
+        fetchCurrentStates();
+      } else {
+        navigation?.goBack();
+      }
 
+      return true;
+    };
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      backAction
+    );
+    return () => {
+      backHandler.remove();
+      clearStates();
+    };
+  }, []);
   const initialFun = async (postId) => {
     let data = route?.params?.data;
     if (postId) {
@@ -177,7 +195,6 @@ const PostCreateScreen = ({
       setItemList(data?.items);
     }
   };
-
   const clearStates = () => {
     title2.current = "";
     des2.current = "";
@@ -186,25 +203,6 @@ const PostCreateScreen = ({
     setDes("");
     setSelectedCategory("");
   };
-  useEffect(() => {
-    const backAction = () => {
-      if (route?.params?.from !== "EditPost") {
-        fetchCurrentStates();
-      } else {
-        navigation?.goBack();
-      }
-
-      return true;
-    };
-    const backHandler = BackHandler.addEventListener(
-      "hardwareBackPress",
-      backAction
-    );
-    return () => {
-      backHandler.remove();
-      clearStates();
-    };
-  }, []);
   const fetchCurrentStates = () => {
     let obj = {
       ...initialState.current,
@@ -392,7 +390,6 @@ const PostCreateScreen = ({
     });
     return newArr;
   };
-
   const uploadThumnail = async (path, onComlpete) => {
     await ThreadManager.instance.uploadMedia(path, false, (url) => {
       if (url !== "error") {
@@ -514,9 +511,9 @@ const PostCreateScreen = ({
           />
 
           <View>
-            {itemList.length > 0
+            {itemList?.length > 0
               ? itemList.map((item, index) => {
-                  return (
+                  return !item ? null : (
                     <View
                       key={String(index)}
                       style={styles.dynamicFieldContainer}
@@ -531,8 +528,8 @@ const PostCreateScreen = ({
                                 setOpenVideoModal(
                                   item?.video?.video?.uri
                                     ? item?.video?.video?.uri
-                                    : el?.video?.uri
-                                    ? el?.video?.uri
+                                    : item?.video?.uri
+                                    ? item?.video?.uri
                                     : item?.videoObj?.video
                                 );
                               }}
@@ -554,7 +551,7 @@ const PostCreateScreen = ({
                             </TouchableOpacity>
                           ) : (
                             <LoadingImage
-                              isDisable={true}
+                              isDisable={false}
                               source={
                                 item?.image?.base64
                                   ? item?.image
@@ -625,7 +622,6 @@ const PostCreateScreen = ({
                   );
                 })
               : null}
-
             <View
               style={{
                 alignItems: "flex-start",
@@ -734,14 +730,7 @@ const PostCreateScreen = ({
               disabled={isBtnActive.current}
               style={styles.uploadBtnCont}
             >
-              {isLoading ? (
-                <ActivityIndicator
-                  style={styles.indicator}
-                  color={AppColors.white.white}
-                />
-              ) : (
-                <Text style={styles.uploadTxt}>Upload</Text>
-              )}
+              <Text style={styles.uploadTxt}>Upload</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
@@ -771,13 +760,12 @@ const PostCreateScreen = ({
             setOpenTypeModal({ value: false, index: -1 });
           }}
           atMediaTypeSelection={(value) => {
+            setOpenTypeModal({ value: false, index: -1 });
             setOpenMediaModal({
               value: true,
-              data: null,
               type: value,
               index: openTypeModal?.index,
             });
-            setOpenTypeModal({ value: false, index: -1 });
           }}
         />
       ) : null}
@@ -787,53 +775,51 @@ const PostCreateScreen = ({
           onClose={() => {
             setOpenMediaModal({
               value: false,
-              data: null,
+              type: "",
               index: -1,
             });
           }}
           onMediaSelection={(value) => {
-            let mediaTypeObj = openMediaModal;
             if (!value) {
-              navigation.navigate(Routes.Post.videoCreateScreen, {
-                isImage: mediaTypeObj?.type == "photo",
-                atBack: (obj) => {
-                  if (obj?.thumbnail) {
-                    updateStates("video", mediaTypeObj?.index, obj);
-                  } else if (obj?.image) {
-                    updateStates("image", mediaTypeObj?.index, obj?.image);
-                  }
-                },
+              setOpenMediaModal({
+                value: false,
+                type: "",
               });
-            } else {
-              let type = value?.type.includes("video") ? "video" : "image";
-              if (type == "video") {
-                dispatch(setIsAppLoader(true));
-                createThumbnail({
-                  url: value?.uri,
-                  timeStamp: 10000,
-                })
-                  .then(async (response) => {
-                    await uploadThumnail(response?.path, (thumbnailUrl) => {
-                      if (thumbnailUrl) {
-                        dispatch(setIsAppLoader(false));
-                        updateStates(type, mediaTypeObj?.index, {
-                          thumbnail: thumbnailUrl,
-                          video: value,
-                        });
-                      }
-                    });
-                  })
-                  .catch((err) => {
-                    dispatch(setIsAppLoader(false));
-                    console.log("printImgErr ", err);
-                  });
-              } else {
-                updateStates(type, mediaTypeObj?.index, value);
-              }
+              return;
             }
+            let mediaTypeObj = openMediaModal;
+            let type =
+              value?.type.includes("video") || mediaTypeObj?.type == "video"
+                ? "video"
+                : "image";
+            if (type == "video") {
+              dispatch(setIsAppLoader(true));
+              createThumbnail({
+                url: value?.uri,
+                timeStamp: 10000,
+              })
+                .then(async (response) => {
+                  await uploadThumnail(response?.path, (thumbnailUrl) => {
+                    if (thumbnailUrl) {
+                      dispatch(setIsAppLoader(false));
+                      updateStates(type, mediaTypeObj?.index, {
+                        thumbnail: thumbnailUrl,
+                        video: value,
+                      });
+                    }
+                  });
+                })
+                .catch((err) => {
+                  dispatch(setIsAppLoader(false));
+                  console.log("printImgErr ", err);
+                });
+            } else {
+              updateStates(type, mediaTypeObj?.index, value);
+            }
+
             setOpenMediaModal({
               value: false,
-              data: null,
+              type: "",
               index: -1,
             });
           }}

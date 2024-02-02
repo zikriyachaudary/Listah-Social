@@ -13,6 +13,5 @@ export const Routes = {
   },
   Post: {
     postDetail: "PostDetailScreen",
-    videoCreateScreen: "VideoCreateScreen",
   },
 };

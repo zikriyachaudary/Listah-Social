@@ -18,6 +18,7 @@ import {
   isSmallDevice,
   normalized,
 } from "../util/AppConstant";
+import { AppStrings } from "../util/Strings";
 
 const MediaTypeSelection = (props) => {
   return (
@@ -53,17 +54,25 @@ const MediaTypeSelection = (props) => {
                 activeOpacity={1}
                 style={styles.singlePicker}
               >
-                {/* <Image
-                  source={item.image}
-                  style={styles.pickerImg}
-                  resizeMode="contain"
-                /> */}
                 <Text style={styles.pickerText}>
                   {item?.text.toUpperCase()}
                 </Text>
               </TouchableOpacity>
             ))}
           </View>
+          <Text
+            style={{
+              marginHorizontal: normalized(20),
+              fontSize: normalized(13),
+              fontWeight: "400",
+              color: AppColors.black.black,
+            }}
+          >
+            Note:{" "}
+            <Text style={{ color: AppColors.grey.Analogous }}>
+              {AppStrings.Validation.videoDurationError}
+            </Text>
+          </Text>
         </View>
       </View>
     </Modal>
@@ -82,7 +91,7 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
   },
   mainContainer: {
-    height: isSmallDevice ? "35%" : "30%",
+    height: isSmallDevice ? "40%" : "35%",
     backgroundColor: AppColors.white.white,
     width: "100%",
     borderTopLeftRadius: 20,
@@ -117,9 +126,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     width: "80%",
-    height: ScreenSize.height < 680 ? hv(200) : hv(170),
-    marginTop: isSmallDevice ? hv(50) : hv(30),
+    height: ScreenSize.height < 680 ? hv(170) : hv(150),
+    marginTop: isSmallDevice ? hv(30) : hv(20),
     alignSelf: "center",
+    alignItems: "center",
   },
   singlePicker: {
     borderRadius: 15,

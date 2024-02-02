@@ -8,9 +8,9 @@ import {
   Image,
   TouchableOpacity,
   StatusBar,
+  Alert,
 } from "react-native";
-import { launchImageLibrary } from "react-native-image-picker";
-import ImagePicker from "react-native-image-crop-picker";
+import { launchImageLibrary, launchCamera } from "react-native-image-picker";
 import { useDispatch } from "react-redux";
 import {
   AppColors,
@@ -22,38 +22,43 @@ import {
   maxImageSizeInBytes,
   normalized,
 } from "../util/AppConstant";
-import { setShowToast } from "../redux/action/AppLogics";
+import { setIsAlertShow, setShowToast } from "../redux/action/AppLogics";
 import { AppStrings } from "../util/Strings";
+import Permissions, {
+  PERMISSIONS,
+  RESULTS,
+  openSettings,
+} from "react-native-permissions";
 
 const MediaPickerModal = (props) => {
   const dispatch = useDispatch();
-
   const pickImage = async (index) => {
     try {
-      let options = {
-        mediaType: props?.openMediaModal?.type,
-        quality: 0.7,
-        includeBase64: true,
-      };
-      props?.openMediaModal?.type == "video"
-        ? (options["maxDuration"] = 30)
-        : null;
-      const maxDuration = 30;
+      let options = {};
+      if (props?.openMediaModal?.type == "video") {
+        options = {
+          videoQuality: "high",
+          durationLimit: 5,
+          allowsEditing: true,
+        };
+      } else {
+        options = {
+          includeBase64: true,
+        };
+      }
+      options["mediaType"] = props?.openMediaModal?.type;
+      options["quality"] = 0.9;
 
+      const maxDuration = 30;
       if (index == 0) {
         launchImageLibrary(options, (response) => {
           if (response?.assets?.length > 0) {
             if (response?.assets[0]?.type?.includes("video")) {
-              if (
-                response?.assets[0]?.duration <= maxDuration &&
-                maxImageSizeInBytes
-              ) {
+              if (response?.assets[0]?.duration <= maxDuration) {
                 props?.onMediaSelection(response?.assets[0]);
               } else {
-                props.onClose();
-                dispatch(
-                  setShowToast("Selected video exceeds the maximum duration.")
-                );
+                props?.onClose();
+                dispatch(setShowToast(AppStrings.Validation.maxDur));
               }
             } else {
               if (response?.assets) {
@@ -70,7 +75,55 @@ const MediaPickerModal = (props) => {
           }
         });
       } else {
-        props?.onMediaSelection(null);
+        const Result = await Permissions.requestMultiple([
+          PERMISSIONS.ANDROID.CAMERA,
+          PERMISSIONS.ANDROID.RECORD_AUDIO,
+        ]);
+        const cameraResult = Result[PERMISSIONS.ANDROID.CAMERA];
+        const audioResult = Result[PERMISSIONS.ANDROID.RECORD_AUDIO];
+        if (cameraResult == RESULTS.BLOCKED || audioResult == RESULTS.BLOCKED) {
+          Alert.alert(
+            "Alert",
+            "You need to enable camera and voice permissions first. Do you want to enable them from settings now",
+            [
+              {
+                text: "Cancel",
+                onPress: () => console.log("Cancel Pressed"),
+                style: "cancel",
+              },
+              {
+                text: "OK",
+                onPress: () => {
+                  openSettings().catch((e) => console.log("some problem ", e));
+                },
+              },
+            ]
+          );
+        } else {
+          launchCamera(options, (response) => {
+            if (response?.assets?.length > 0) {
+              if (response?.assets[0]?.type?.includes("video")) {
+                if (response?.assets[0]?.duration <= maxDuration) {
+                  props?.onMediaSelection(response?.assets[0]);
+                } else {
+                  props?.onClose();
+                  dispatch(setShowToast(AppStrings.Validation.maxDur));
+                }
+              } else {
+                if (response?.assets) {
+                  if (response.assets[0].fileSize > maxImageSizeInBytes) {
+                    props.onClose();
+                    dispatch(
+                      setShowToast(AppStrings.Validation.maxImageSizeError)
+                    );
+                    return;
+                  }
+                  props?.onMediaSelection(response?.assets[0]);
+                }
+              }
+            }
+          });
+        }
       }
     } catch (e) {
       console.log("Pick Image err ", e);

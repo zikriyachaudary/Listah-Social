@@ -39,7 +39,6 @@ import { Routes } from "../util/Route";
 import PostDetailScreen from "../Post/Screens/PostDetailScreen";
 import ReportPost from "../home/screens/ReportPost";
 import ToastComp from "../common/ToastComp";
-import VideoCreateScreen from "../Post/Screens/VideoCreateScreen";
 const Stack = createNativeStackNavigator();
 
 /* =============================================================================
@@ -281,10 +280,6 @@ const AppNavigation = ({ changeAuthState, getProfile, authenticated }) => {
                 <Stack.Screen
                   name={Routes.Chat.chatScreen}
                   component={ChatScreen}
-                />
-                <Stack.Screen
-                  name={Routes.Post.videoCreateScreen}
-                  component={VideoCreateScreen}
                 />
 
                 <Stack.Screen name="ReportPost" component={ReportPost} />

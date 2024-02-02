@@ -102,7 +102,7 @@ const AddChallengeListingScreen = ({ challengePost, navigation, route }) => {
       }
     });
     setItemList(newArr);
-    if (newArr?.length < 10) {
+    if (newArr?.length <= 7) {
       setShowAddBtn(true);
     } else {
       setShowAddBtn(false);
@@ -217,8 +217,8 @@ const AddChallengeListingScreen = ({ challengePost, navigation, route }) => {
                             setOpenVideoModal(
                               item?.video?.video?.uri
                                 ? item?.video?.video?.uri
-                                  ? el?.video?.uri
-                                  : el?.video?.uri
+                                : item?.video?.uri
+                                ? item?.video?.uri
                                 : item?.videoObj?.video
                             );
                           }}
@@ -451,47 +451,46 @@ const AddChallengeListingScreen = ({ challengePost, navigation, route }) => {
           }}
           onMediaSelection={(value) => {
             if (!value) {
-              let mediaTypeObj = openMediaModal;
-              navigation.navigate(Routes.Post.videoCreateScreen, {
-                isImage: mediaTypeObj?.type == "photo",
-                atBack: (obj) => {
-                  if (obj?.thumbnail) {
-                    updateStates("video", mediaTypeObj?.index, obj);
-                  } else if (obj?.image) {
-                    updateStates("image", mediaTypeObj?.index, obj?.image);
-                  }
-                },
+              setOpenMediaModal({
+                value: false,
+                type: "",
               });
-            } else {
-              let type = value?.type.includes("video") ? "video" : "image";
-              if (type == "video") {
-                dispatch(setIsAppLoader(true));
-                createThumbnail({
-                  url: value?.uri,
-                  timeStamp: 10000,
-                })
-                  .then(async (response) => {
-                    await uploadThumnail(response?.path, (thumbnailUrl) => {
-                      if (thumbnailUrl) {
-                        dispatch(setIsAppLoader(false));
-                        updateStates(type, mediaTypeObj?.index, {
-                          thumbnail: thumbnailUrl,
-                          video: value,
-                        });
-                      }
-                    });
-                  })
-                  .catch((err) => {
-                    dispatch(setIsAppLoader(false));
-                    console.log("printImgErr ", err);
-                  });
-              } else {
-                updateStates(type, mediaTypeObj?.index, value);
-              }
+              return;
             }
+            let mediaTypeObj = openMediaModal;
+
+            let type =
+              value?.type.includes("video") || mediaTypeObj?.type == "video"
+                ? "video"
+                : "image";
+            if (type == "video") {
+              dispatch(setIsAppLoader(true));
+              createThumbnail({
+                url: value?.uri,
+                timeStamp: 10000,
+              })
+                .then(async (response) => {
+                  await uploadThumnail(response?.path, (thumbnailUrl) => {
+                    if (thumbnailUrl) {
+                      dispatch(setIsAppLoader(false));
+                      updateStates(type, mediaTypeObj?.index, {
+                        thumbnail: thumbnailUrl,
+                        video: value,
+                      });
+                    }
+                  });
+                })
+                .catch((err) => {
+                  dispatch(setIsAppLoader(false));
+                  console.log("printImgErr ", err);
+                });
+            } else {
+              updateStates(type, mediaTypeObj?.index, value);
+            }
+
             setOpenMediaModal({
               value: false,
-              data: null,
+              type: "",
               index: -1,
             });
           }}

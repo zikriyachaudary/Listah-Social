@@ -27,7 +27,15 @@ const CustomHeader = (props) => {
         />
       ) : null}
 
-      <View style={[styles.maincontainer, props?.mainStyle]}>
+      <View
+        style={[
+          {
+            ...styles.maincontainer,
+            height: normalized(props?.title ? 50 : props?.logo ? 65 : 55),
+          },
+          props?.mainStyle,
+        ]}
+      >
         <>
           {props?.atBackPress ? (
             <TouchableOpacity
@@ -40,6 +48,8 @@ const CustomHeader = (props) => {
                 height: hv(40),
                 justifyContent: "center",
                 alignItems: "center",
+                alignSelf: "flex-start",
+                marginTop: hv(10),
               }}
             >
               {props?.leftIcon ? (
@@ -72,6 +82,8 @@ const CustomHeader = (props) => {
                 flexDirection: "row",
                 justifyContent: "center",
                 alignItems: "center",
+                alignSelf: "flex-start",
+                marginTop: hv(10),
               }}
             >
               {props?.atRightFirstBtn ? (
@@ -158,9 +170,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     paddingHorizontal: AppHorizontalMargin,
-    alignItems: "center",
-    paddingTop: Platform.OS == "ios" ? hv(25) : hv(10),
-    marginBottom: normalized(-5),
+    alignItems: "flex-end",
+    height: normalized(65),
   },
   title: {
     marginTop: normalized(20),

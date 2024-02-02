@@ -3,7 +3,7 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 export const platformVersion = Platform.Version;
 
 export type ScreenProps = NativeStackScreenProps<any, any>;
-export const maxImageSizeInBytes = 30 * 1024 * 1024; // 10MB
+export const maxImageSizeInBytes = 20 * 1024 * 1024; // 20MB
 export const ScreenSize = Dimensions.get("window");
 const templateWidth = 375;
 const templateHeight = 812;

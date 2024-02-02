@@ -224,16 +224,7 @@ const HomeScreen = ({ posts, getProfile }) => {
         }}
       >
         <FastImage
-          // onLoadStart={() => setLoading(true)}
-          // onLoadEnd={() => setLoading(false)}
-          // onError={() => {
-          //   setLoading(false);
-          //   if (props.placeHolder) {
-          //     setSource(props.placeHolder);
-          //   }
-          // }}
           source={require("../../assets/images/edit-app-logo.jpeg")}
-          // <UploadIcon />
           style={{
             flex: 0.9,
           }}

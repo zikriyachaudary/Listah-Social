@@ -261,49 +261,44 @@ const SuggestionAddScreen = ({ route, navigation, suggestPost }) => {
             });
           }}
           onMediaSelection={(value) => {
-            let mediaTypeObj = openMediaModal;
             if (!value) {
-              navigation.navigate(Routes.Post.videoCreateScreen, {
-                isImage: mediaTypeObj?.type == "photo",
-                atBack: (obj) => {
-                  if (obj?.thumbnail) {
-                    setMediaObj(obj);
-                  } else if (obj?.image) {
-                    setMediaObj(obj?.image);
-                  }
-                },
-              });
-            } else {
               setOpenMediaModal({
                 value: false,
                 type: "",
               });
-              let type = value?.type.includes("video") ? "video" : "image";
-              if (type == "video") {
-                dispatch(setIsAppLoader(true));
-                createThumbnail({
-                  url: value?.uri,
-                  timeStamp: 10000,
-                })
-                  .then(async (response) => {
-                    await uploadThumnail(response?.path, (thumbnailUrl) => {
-                      if (thumbnailUrl) {
-                        dispatch(setIsAppLoader(false));
-                        setMediaObj({
-                          thumbnail: thumbnailUrl,
-                          video: value,
-                        });
-                      }
-                    });
-                  })
-                  .catch((err) => {
-                    dispatch(setIsAppLoader(false));
-                    console.log("printImgErr ", err);
-                  });
-              } else {
-                setMediaObj(value);
-              }
+              return;
             }
+            let mediaTypeObj = openMediaModal;
+
+            let type =
+              value?.type.includes("video") || mediaTypeObj?.type == "video"
+                ? "video"
+                : "image";
+            if (type == "video") {
+              dispatch(setIsAppLoader(true));
+              createThumbnail({
+                url: value?.uri,
+                timeStamp: 10000,
+              })
+                .then(async (response) => {
+                  await uploadThumnail(response?.path, (thumbnailUrl) => {
+                    if (thumbnailUrl) {
+                      dispatch(setIsAppLoader(false));
+                      setMediaObj({
+                        thumbnail: thumbnailUrl,
+                        video: value,
+                      });
+                    }
+                  });
+                })
+                .catch((err) => {
+                  dispatch(setIsAppLoader(false));
+                  console.log("printImgErr ", err);
+                });
+            } else {
+              setMediaObj(value);
+            }
+
             setOpenMediaModal({
               value: false,
               type: "",
