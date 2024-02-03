@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { connect, useDispatch, useSelector } from "react-redux";
 import {
-  ActivityIndicator,
   Alert,
   BackHandler,
   Image,
@@ -55,8 +54,6 @@ import MediaPickerModal from "../../common/MediaPickerModal";
 import VideoPlayerModal from "../../common/VideoPlayerModal";
 import ThreadManager from "../../ChatModule/ThreadManger";
 import MediaTypeSelection from "../../common/MediaTypeSelection";
-import { Routes } from "../../util/Route";
-import { AppStrings } from "../../util/Strings";
 
 /* =============================================================================
 <PostCreateScreen />
@@ -76,8 +73,10 @@ const PostCreateScreen = ({
     value: false,
     index: -1,
   });
+  const isFocused = useIsFocused();
   const [openVideoModal, setOpenVideoModal] = useState("");
   const [selectedcategory, setSelectedCategory] = useState("");
+  const selectedCatRef = useRef("");
   const [categoryError, setCategoryError] = useState("");
   const dispatch = useDispatch();
   const [itemList, setItemList] = useState([]);
@@ -110,15 +109,7 @@ const PostCreateScreen = ({
       },
     },
   ]);
-  const initialState = useRef({
-    items: [
-      {
-        name: "",
-        image: "",
-        description: "",
-      },
-    ],
-  });
+  const itemsList = useRef([]);
 
   const [openMediaModal, setOpenMediaModal] = useState({
     value: false,
@@ -131,15 +122,6 @@ const PostCreateScreen = ({
   });
   const [isShowAddBtn, setShowAddBtn] = useState(true);
   const [toggleCheckBox, setToggleCheckBox] = useState(false);
-
-  useEffect(() => {
-    if (route?.params?.isEdit) {
-      initialFun(route?.params?.data?.id);
-    }
-    return () => {
-      clearStates();
-    };
-  }, [route?.params?.isEdit]);
   useEffect(() => {
     const backAction = () => {
       if (route?.params?.from !== "EditPost") {
@@ -147,7 +129,6 @@ const PostCreateScreen = ({
       } else {
         navigation?.goBack();
       }
-
       return true;
     };
     const backHandler = BackHandler.addEventListener(
@@ -159,15 +140,27 @@ const PostCreateScreen = ({
       clearStates();
     };
   }, []);
+  useEffect(() => {
+    if (route?.params?.isEdit && isFocused) {
+      initialFun(route?.params?.data?.id);
+    }
+    return () => {
+      clearStates();
+    };
+  }, [isFocused]);
+
   const initialFun = async (postId) => {
     let data = route?.params?.data;
     if (postId) {
+      dispatch(setIsAppLoader(true));
       await fetchPostData(postId, (res) => {
         data = res;
       });
+      dispatch(setIsAppLoader(false));
     }
     if (data) {
       setSelectedCategory(data?.category ? data?.category : "");
+      selectedCatRef.current = data?.category ? data?.category : "";
       if (data?.isNumberShowInItems) {
         setToggleCheckBox(true);
       }
@@ -193,24 +186,38 @@ const PostCreateScreen = ({
       setDes(data?.description ? data?.description : "");
       des2.current = data?.description ? data?.description : "";
       setItemList(data?.items);
+      itemsList.current = data?.items;
     }
   };
   const clearStates = () => {
     title2.current = "";
     des2.current = "";
     setItemList([]);
+    itemsList.current = [];
     setTitle("");
     setDes("");
     setSelectedCategory("");
+    selectedCatRef.current = "";
   };
   const fetchCurrentStates = () => {
     let obj = {
-      ...initialState.current,
+      items: itemsList.current,
       title: title2.current,
       description: des2.current,
       isNumberShowInItems: toggleCheckBox,
       order: radioButtons.find((item) => item.selected).id,
+      category: selectedCatRef.current,
     };
+    if (
+      !obj?.category &&
+      !obj?.description &&
+      !obj?.isNumberShowInItems &&
+      obj?.items?.length == 0 &&
+      !obj?.title
+    ) {
+      navigation?.goBack();
+      return;
+    }
     if (route?.params?.isEdit && route?.params?.data) {
       if (
         JSON.stringify(route?.params?.data) ===
@@ -233,21 +240,12 @@ const PostCreateScreen = ({
         isOpenAlert = true;
       } else if (obj?.description?.length > 0) {
         isOpenAlert = true;
-      } else if (
-        obj?.items[0]?.name?.length > 0 ||
-        obj?.items[0]?.description?.length > 0 ||
-        obj?.items[0]?.image !== ""
-      ) {
-        isOpenAlert = true;
-      } else if (
-        initialState.current?.items?.length == 0 &&
-        (initialState.current?.items[0]?.description?.length > 0 ||
-          initialState.current?.items[0]?.title?.length > 0)
-      ) {
-        isOpenAlert = true;
       } else if (obj?.isNumberShowInItems) {
         isOpenAlert = true;
+      } else if (obj?.items?.length > 0) {
+        isOpenAlert = true;
       }
+
       if (isOpenAlert) {
         setAlertModal({
           value: true,
@@ -423,8 +421,6 @@ const PostCreateScreen = ({
     dispatch(setDraftPost(draftArr));
     await saveUserDraftPost(draftArr);
     dispatch(setCreatePostFailError(""));
-
-    setAlertModal({ value: false, data: null, message: "" });
     toast.show(
       route?.params?.isEdit
         ? "Post update in your draft list"
@@ -445,6 +441,7 @@ const PostCreateScreen = ({
       [`${type}`]: value,
     };
     updatedArray[index] = newObj;
+    itemsList.current = updatedArray;
     setItemList(updatedArray);
   };
   return (
@@ -503,6 +500,7 @@ const PostCreateScreen = ({
             placeHolder={"Select Category"}
             atSelect={(val) => {
               setSelectedCategory(val?.name);
+              selectedCatRef.current = val?.name;
               setCategoryError("");
             }}
             selected={selectedcategory?.name || selectedcategory}
@@ -741,15 +739,17 @@ const PostCreateScreen = ({
           visible={alertModal?.value}
           multipleBtn={true}
           atLeftBtn={() => {
+            clearStates();
             setAlertModal({ value: false, data: null, message: "" });
             dispatch(setPostRefresh(!selector.Home.isPostRefresh));
-            clearStates();
             navigation.goBack();
           }}
           leftBtnLabel={"No"}
           rightBtnLabel={"Yes"}
           onPress={() => {
-            updateDraftFun(alertModal?.data);
+            let obj = alertModal?.data;
+            updateDraftFun(obj);
+            setAlertModal({ value: false, data: null, message: "" });
           }}
           message={alertModal?.message}
         />

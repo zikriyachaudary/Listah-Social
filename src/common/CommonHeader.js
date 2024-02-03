@@ -2,6 +2,7 @@ import React from "react";
 import {
   Image,
   Platform,
+  SafeAreaView,
   StatusBar,
   StyleSheet,
   Text,
@@ -19,11 +20,16 @@ const CustomHeader = (props) => {
   return (
     <>
       {props?.isStatusBar ? (
-        <StatusBar
-          animated={true}
-          backgroundColor={AppColors.blue.lightNavy}
-          barStyle={"light-content"}
-          showHideTransition={"fade"}
+        // <StatusBar
+        //   animated={true}
+        //   backgroundColor={AppColors.blue.lightNavy}
+        //   barStyle={"light-content"}
+        //   showHideTransition={"fade"}
+        // />
+        <SafeAreaView
+          style={{
+            backgroundColor: AppColors.blue.royalBlue,
+          }}
         />
       ) : null}
 
@@ -31,7 +37,7 @@ const CustomHeader = (props) => {
         style={[
           {
             ...styles.maincontainer,
-            height: normalized(props?.title ? 50 : props?.logo ? 65 : 55),
+            height: normalized(props?.title ? 50 : 55),
           },
           props?.mainStyle,
         ]}
@@ -171,14 +177,13 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingHorizontal: AppHorizontalMargin,
     alignItems: "flex-end",
-    height: normalized(65),
   },
   title: {
     marginTop: normalized(20),
     marginStart: normalized(10),
     color: AppColors.white.white,
-    fontSize: normalized(18),
-    fontWeight: "500",
+    fontSize: normalized(17),
+    fontWeight: "400",
     maxWidth: "70%",
     height: normalized(45),
   },
@@ -200,7 +205,7 @@ const styles = StyleSheet.create({
   },
   logoImage: {
     marginTop: 10,
-    height: normalized(75),
+    height: normalized(60),
     width: normalized(80),
   },
 });
