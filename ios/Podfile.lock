@@ -796,7 +796,7 @@ PODS:
     - Firebase/CoreOnly (= 8.12.1)
     - Firebase/Messaging (= 8.12.1)
     - React-Core
-  - react-native-image-picker (4.8.5):
+  - react-native-image-picker (5.7.0):
     - React-Core
   - react-native-image-resizer (1.4.5):
     - React-Core
@@ -1307,7 +1307,7 @@ SPEC CHECKSUMS:
   react-native-create-thumbnail: e022bcdcba8a0b4529a50d3fa1a832ec921be39d
   react-native-document-picker: b4f4a23b73f864ce17965b284c0757648993805b
   react-native-firebase-push-notifications: d22be1ca0f5ae40f35d196e2f3dd461c21385e2e
-  react-native-image-picker: cd420f97f6ed6ff74fc4686d27dbcfdbd051db91
+  react-native-image-picker: 3269f75c251cdcd61ab51b911dd30d6fff8c6169
   react-native-image-resizer: d9fb629a867335bdc13230ac2a58702bb8c8828f
   react-native-pager-view: da490aa1f902c9a5aeecf0909cc975ad0e92e53e
   react-native-pdf: 79aa75e39a80c1d45ffe58aa500f3cf08f267a2e

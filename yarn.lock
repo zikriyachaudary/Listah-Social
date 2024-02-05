@@ -6796,10 +6796,10 @@ react-native-image-pan-zoom@^2.1.12:
   resolved "https://registry.yarnpkg.com/react-native-image-pan-zoom/-/react-native-image-pan-zoom-2.1.12.tgz#eb98bf56fb5610379bdbfdb63219cc1baca98fd2"
   integrity sha512-BF66XeP6dzuANsPmmFsJshM2Jyh/Mo1t8FsGc1L9Q9/sVP8MJULDabB1hms+eAoqgtyhMr5BuXV3E1hJ5U5H6Q==
 
-react-native-image-picker@~4.8.4:
-  version "4.8.5"
-  resolved "https://registry.yarnpkg.com/react-native-image-picker/-/react-native-image-picker-4.8.5.tgz#5e5a0af56a13957cadfa1f8ce349d036d62e1499"
-  integrity sha512-+pQxkjO8cKv4RKTHOFS0fSHQ11HkWgb+imUPSOS8mwoChkR33aSuzV/6P4t9JCJgsus4qLAlB6BUosdIxw7GTA==
+react-native-image-picker@5.7.0:
+  version "5.7.0"
+  resolved "https://registry.yarnpkg.com/react-native-image-picker/-/react-native-image-picker-5.7.0.tgz#3c146550bc89daddfca2fe123aaa0c753b58a5e2"
+  integrity sha512-LGBrFQzKEAt/u4z+IcY7COZA7N6lCeLQ2dMu1PubK10+d9YBRS8n/ABNj48CJhEpUhcRPt7H3iWbwIuOlcZrDA==
 
 react-native-image-resizer@~1.4.5:
   version "1.4.5"
@@ -8541,6 +8541,7 @@ which@^2.0.1, which@^2.0.2:
     isexe "^2.0.0"
 
 "wrap-ansi-cjs@npm:wrap-ansi@^7.0.0", wrap-ansi@^7.0.0:
+  name wrap-ansi-cjs
   version "7.0.0"
   resolved "https://registry.yarnpkg.com/wrap-ansi/-/wrap-ansi-7.0.0.tgz#67e145cff510a6a6984bdf1152911d69d2eb9e43"
   integrity sha512-YVGIj2kamLSTxw6NsZjoBxfSwsn0ycdesmc4p+Q21c5zPuZ1pl+NfxVdxPtdHvmNVOQ6XSYG4AUtyt/Fi7D16Q==
