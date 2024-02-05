@@ -2,6 +2,7 @@ import React from "react";
 import {
   Image,
   Platform,
+  SafeAreaView,
   StatusBar,
   StyleSheet,
   Text,
@@ -19,15 +20,28 @@ const CustomHeader = (props) => {
   return (
     <>
       {props?.isStatusBar ? (
-        <StatusBar
-          animated={true}
-          backgroundColor={AppColors.blue.lightNavy}
-          barStyle={"light-content"}
-          showHideTransition={"fade"}
+        // <StatusBar
+        //   animated={true}
+        //   backgroundColor={AppColors.blue.lightNavy}
+        //   barStyle={"light-content"}
+        //   showHideTransition={"fade"}
+        // />
+        <SafeAreaView
+          style={{
+            backgroundColor: AppColors.blue.royalBlue,
+          }}
         />
       ) : null}
 
-      <View style={[styles.maincontainer, props?.mainStyle]}>
+      <View
+        style={[
+          {
+            ...styles.maincontainer,
+            height: normalized(props?.title ? 50 : 55),
+          },
+          props?.mainStyle,
+        ]}
+      >
         <>
           {props?.atBackPress ? (
             <TouchableOpacity
@@ -40,6 +54,8 @@ const CustomHeader = (props) => {
                 height: hv(40),
                 justifyContent: "center",
                 alignItems: "center",
+                alignSelf: "flex-start",
+                marginTop: hv(10),
               }}
             >
               {props?.leftIcon ? (
@@ -72,6 +88,8 @@ const CustomHeader = (props) => {
                 flexDirection: "row",
                 justifyContent: "center",
                 alignItems: "center",
+                alignSelf: "flex-start",
+                marginTop: hv(10),
               }}
             >
               {props?.atRightFirstBtn ? (
@@ -126,7 +144,7 @@ const CustomHeader = (props) => {
                         alignItems: "center",
                       }
                     : {
-                        backgroundColor: AppColors.blue.light,
+                        backgroundColor: AppColors.blue.royalBlue,
                         height: normalized(40),
                         width: normalized(80),
                         borderRadius: normalized(8),
@@ -158,16 +176,14 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     paddingHorizontal: AppHorizontalMargin,
-    alignItems: "center",
-    paddingTop: Platform.OS == "ios" ? hv(25) : hv(10),
-    marginBottom: normalized(-5),
+    alignItems: "flex-end",
   },
   title: {
-    marginTop: 10,
+    marginTop: normalized(20),
     marginStart: normalized(10),
     color: AppColors.white.white,
-    fontSize: normalized(18),
-    fontWeight: "500",
+    fontSize: normalized(17),
+    fontWeight: "400",
     maxWidth: "70%",
     height: normalized(45),
   },
@@ -189,7 +205,7 @@ const styles = StyleSheet.create({
   },
   logoImage: {
     marginTop: 10,
-    height: normalized(75),
+    height: normalized(60),
     width: normalized(80),
   },
 });

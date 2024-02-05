@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import { connect, useDispatch, useSelector } from "react-redux";
 import {
-  ActivityIndicator,
+  Alert,
   BackHandler,
+  Image,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -10,6 +11,7 @@ import {
   Text,
   TouchableOpacity,
 } from "react-native";
+import { createThumbnail } from "react-native-create-thumbnail";
 import DeleteIcon from "../../assets/icons/edit-trash-icon.svg";
 import AddIcon from "../../assets/icons/edit-plus-square.svg";
 import { useToast } from "react-native-toast-notifications";
@@ -18,12 +20,15 @@ import { updatePost as updatePostAction } from "../redux/actions";
 import { createAnnouncementPost as createAnnouncementPostAction } from "../redux/actions";
 import { RadioGroup } from "react-native-radio-buttons-group";
 import CheckBox from "@react-native-community/checkbox";
+import UploadIcon from "../../assets/icons/edit-upload-icon.svg";
 import { setPostRefresh } from "../redux/appLogics";
 import { makeid } from "../../util/functions";
 import {
   setAllUserFCMToken,
   setCreatePostFailError,
   setDraftPost,
+  setIsAppLoader,
+  setShowToast,
 } from "../../redux/action/AppLogics";
 import AlertModal from "../../common/AlertModal";
 import { saveUserDraftPost } from "../../util/helperFun";
@@ -44,7 +49,11 @@ import { fetchPostData } from "../../network/Services/ProfileServices";
 import LoadingImage from "../../common/LoadingImage";
 import { View } from "react-native";
 import { AppStyles } from "../../util/AppStyles";
-import { ImagePickerButton, TextInput } from "../../common";
+import { TextInput } from "../../common";
+import MediaPickerModal from "../../common/MediaPickerModal";
+import VideoPlayerModal from "../../common/VideoPlayerModal";
+import ThreadManager from "../../ChatModule/ThreadManger";
+import MediaTypeSelection from "../../common/MediaTypeSelection";
 
 /* =============================================================================
 <PostCreateScreen />
@@ -58,10 +67,18 @@ const PostCreateScreen = ({
 }) => {
   const { generateMultiplePushNotification, userSubscribed } =
     useNotificationManger();
+  const selector = useSelector((AppState) => AppState);
+
+  const [openTypeModal, setOpenTypeModal] = useState({
+    value: false,
+    index: -1,
+  });
+  const isFocused = useIsFocused();
+  const [openVideoModal, setOpenVideoModal] = useState("");
   const [selectedcategory, setSelectedCategory] = useState("");
+  const selectedCatRef = useRef("");
   const [categoryError, setCategoryError] = useState("");
   const dispatch = useDispatch();
-  const selector = useSelector((AppState) => AppState);
   const [itemList, setItemList] = useState([]);
   const [title, setTitle] = useState("");
   const title2 = useRef("");
@@ -69,10 +86,7 @@ const PostCreateScreen = ({
   const [des, setDes] = useState("");
   const des2 = useRef("");
   const [desError, setDesError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const toast = useToast();
-  const isFocused = useIsFocused();
-  const formikRef = useRef();
   const isBtnActive = useRef(false);
   const [radioButtons, setRadioButtons] = useState([
     {
@@ -95,16 +109,12 @@ const PostCreateScreen = ({
       },
     },
   ]);
-  const initialState = useRef({
-    items: [
-      {
-        name: "",
-        image: "",
-        description: "",
-      },
-    ],
-  });
+  const itemsList = useRef([]);
 
+  const [openMediaModal, setOpenMediaModal] = useState({
+    value: false,
+    index: -1,
+  });
   const [alertModal, setAlertModal] = useState({
     value: false,
     data: null,
@@ -112,105 +122,6 @@ const PostCreateScreen = ({
   });
   const [isShowAddBtn, setShowAddBtn] = useState(true);
   const [toggleCheckBox, setToggleCheckBox] = useState(false);
-
-  useEffect(() => {
-    if (isFocused && route?.params?.isEdit) {
-      initialFun(route?.params?.data?.id);
-    }
-    return () => {
-      clearStates();
-    };
-  }, [isFocused]);
-
-  const initialFun = async (postId) => {
-    let data = null;
-    console.log("fetchId -- > ", postId)
-    await fetchPostData(Number(postId), async (res) => {
-      if (res) {
-        data = res;
-
-        if (data) {
-          setSelectedCategory(data?.category ? data?.category : "");
-          if (data?.isNumberShowInItems) {
-            setToggleCheckBox(true);
-          }
-          if (data?.order == "2") {
-            setRadioButtons([
-              {
-                id: "1", // acts as primary key, should be unique and non-empty string
-                label: "Ascending List",
-                value: "ascendinglist",
-                borderColor: "#6d14c4",
-              },
-              {
-                id: "2",
-                label: "Descending List",
-                value: "descendinglist",
-                borderColor: "#6d14c4",
-                selected: true,
-              },
-            ]);
-          }
-          setTitle(data?.title ? data?.title : "");
-          title2.current = data?.title ? data?.title : "";
-          setDes(data?.description ? data?.description : "");
-          des2.current = data?.description ? data?.description : "";
-          setItemList(data?.items);
-        }
-      } else {
-        const sendPostId = "" + postId
-        console.log("enterrrrrr ", res, sendPostId)
-        await fetchPostData(sendPostId, (res) => {
-          console.log("resres ", res)
-
-          if (res) {
-            data = res;
-          }
-
-          if (data) {
-            setSelectedCategory(data?.category ? data?.category : "");
-            if (data?.isNumberShowInItems) {
-              setToggleCheckBox(true);
-            }
-            if (data?.order == "2") {
-              setRadioButtons([
-                {
-                  id: "1", // acts as primary key, should be unique and non-empty string
-                  label: "Ascending List",
-                  value: "ascendinglist",
-                  borderColor: "#6d14c4",
-                },
-                {
-                  id: "2",
-                  label: "Descending List",
-                  value: "descendinglist",
-                  borderColor: "#6d14c4",
-                  selected: true,
-                },
-              ]);
-            }
-            setTitle(data?.title ? data?.title : "");
-            title2.current = data?.title ? data?.title : "";
-            setDes(data?.description ? data?.description : "");
-            des2.current = data?.description ? data?.description : "";
-            setItemList(data?.items);
-          }
-        });
-      }
-    });
-    console.log("data -- > ", data)
-
-
-  };
-
-  const clearStates = () => {
-    title2.current = "";
-    des2.current = "";
-    setItemList([]);
-    setTitle("");
-    setDes("");
-    setSelectedCategory("");
-  };
   useEffect(() => {
     const backAction = () => {
       if (route?.params?.from !== "EditPost") {
@@ -218,7 +129,6 @@ const PostCreateScreen = ({
       } else {
         navigation?.goBack();
       }
-
       return true;
     };
     const backHandler = BackHandler.addEventListener(
@@ -230,14 +140,84 @@ const PostCreateScreen = ({
       clearStates();
     };
   }, []);
+  useEffect(() => {
+    if (route?.params?.isEdit && isFocused) {
+      initialFun(route?.params?.data?.id);
+    }
+    return () => {
+      clearStates();
+    };
+  }, [isFocused]);
+
+  const initialFun = async (postId) => {
+    let data = route?.params?.data;
+    if (postId) {
+      dispatch(setIsAppLoader(true));
+      await fetchPostData(postId, (res) => {
+        data = res;
+      });
+      dispatch(setIsAppLoader(false));
+    }
+    if (data) {
+      setSelectedCategory(data?.category ? data?.category : "");
+      selectedCatRef.current = data?.category ? data?.category : "";
+      if (data?.isNumberShowInItems) {
+        setToggleCheckBox(true);
+      }
+      if (data?.order == "2") {
+        setRadioButtons([
+          {
+            id: "1", // acts as primary key, should be unique and non-empty string
+            label: "Ascending List",
+            value: "ascendinglist",
+            borderColor: "#6d14c4",
+          },
+          {
+            id: "2",
+            label: "Descending List",
+            value: "descendinglist",
+            borderColor: "#6d14c4",
+            selected: true,
+          },
+        ]);
+      }
+      setTitle(data?.title ? data?.title : "");
+      title2.current = data?.title ? data?.title : "";
+      setDes(data?.description ? data?.description : "");
+      des2.current = data?.description ? data?.description : "";
+      setItemList(data?.items);
+      itemsList.current = data?.items;
+    }
+  };
+  const clearStates = () => {
+    title2.current = "";
+    des2.current = "";
+    setItemList([]);
+    itemsList.current = [];
+    setTitle("");
+    setDes("");
+    setSelectedCategory("");
+    selectedCatRef.current = "";
+  };
   const fetchCurrentStates = () => {
     let obj = {
-      ...initialState.current,
+      items: itemsList.current,
       title: title2.current,
       description: des2.current,
       isNumberShowInItems: toggleCheckBox,
       order: radioButtons.find((item) => item.selected).id,
+      category: selectedCatRef.current,
     };
+    if (
+      !obj?.category &&
+      !obj?.description &&
+      !obj?.isNumberShowInItems &&
+      obj?.items?.length == 0 &&
+      !obj?.title
+    ) {
+      navigation?.goBack();
+      return;
+    }
     if (route?.params?.isEdit && route?.params?.data) {
       if (
         JSON.stringify(route?.params?.data) ===
@@ -260,21 +240,12 @@ const PostCreateScreen = ({
         isOpenAlert = true;
       } else if (obj?.description?.length > 0) {
         isOpenAlert = true;
-      } else if (
-        obj?.items[0]?.name?.length > 0 ||
-        obj?.items[0]?.description?.length > 0 ||
-        obj?.items[0]?.image !== ""
-      ) {
-        isOpenAlert = true;
-      } else if (
-        initialState.current?.items?.length == 0 &&
-        (initialState.current?.items[0]?.description?.length > 0 ||
-          initialState.current?.items[0]?.title?.length > 0)
-      ) {
-        isOpenAlert = true;
       } else if (obj?.isNumberShowInItems) {
         isOpenAlert = true;
+      } else if (obj?.items?.length > 0) {
+        isOpenAlert = true;
       }
+
       if (isOpenAlert) {
         setAlertModal({
           value: true,
@@ -288,7 +259,7 @@ const PostCreateScreen = ({
   };
   const _handleAdd = () => {
     let newArr = [...itemList];
-    if (newArr?.length >= 10) {
+    if (newArr?.length >= 7) {
       setShowAddBtn(false);
     } else {
       newArr.push({
@@ -317,6 +288,7 @@ const PostCreateScreen = ({
   const _handleSubmit = async () => {
     isBtnActive.current = true;
     if (selectedcategory == "") {
+      isBtnActive.current = false;
       setCategoryError("Please select Category");
     }
     if (title == "") {
@@ -355,7 +327,8 @@ const PostCreateScreen = ({
     values["isNumberShowInItems"] = toggleCheckBox;
     values["category"] = selectedcategory;
     values["items"] = itemList?.length > 0 ? fetchItemList() : [];
-    setIsLoading(true);
+    // setIsLoading(true);
+    dispatch(setIsAppLoader(true));
     if (route.params?.isEdit && route?.params?.data?.author?.userId) {
       values["author"] = route?.params?.data?.author;
       values["id"] = route?.params?.id;
@@ -387,22 +360,43 @@ const PostCreateScreen = ({
       dispatch(setPostRefresh(!selector.Home.isPostRefresh));
       navigation.goBack();
     }
+    clearStates();
     setTimeout(() => {
       isBtnActive.current = false;
-      setIsLoading(false);
+      // setIsLoading(false);
+      dispatch(setIsAppLoader(false));
     }, 800);
   };
   const fetchItemList = () => {
     let newArr = [];
     itemList.map((el, i) => {
-      newArr.push({
-        id: i,
-        name: el?.name,
-        description: el?.description,
-        image: el?.image,
-      });
+      if (el?.video?.video?.uri || el?.video?.uri || el?.videoObj) {
+        newArr.push({
+          id: i,
+          name: el?.name,
+          description: el?.description,
+          videoObj: el?.video || el?.videoObj,
+        });
+      } else {
+        newArr.push({
+          id: i,
+          name: el?.name,
+          description: el?.description,
+          image: el?.image,
+        });
+      }
     });
     return newArr;
+  };
+  const uploadThumnail = async (path, onComlpete) => {
+    await ThreadManager.instance.uploadMedia(path, false, (url) => {
+      if (url !== "error") {
+        onComlpete(url);
+      } else {
+        dispatch(setIsAppLoader(false));
+        Alert.alert("", "Error while uploading media");
+      }
+    });
   };
   const updateDraftFun = async (obj) => {
     let draftArr;
@@ -427,8 +421,6 @@ const PostCreateScreen = ({
     dispatch(setDraftPost(draftArr));
     await saveUserDraftPost(draftArr);
     dispatch(setCreatePostFailError(""));
-
-    setAlertModal({ value: false, data: null, message: "" });
     toast.show(
       route?.params?.isEdit
         ? "Post update in your draft list"
@@ -443,16 +435,17 @@ const PostCreateScreen = ({
   const updateStates = (type, index, value) => {
     const updatedArray = [...itemList];
     let previousObj = updatedArray[index];
-    let newObj = {
+    let newObj = {};
+    newObj = {
       ...previousObj,
       [`${type}`]: value,
     };
     updatedArray[index] = newObj;
+    itemsList.current = updatedArray;
     setItemList(updatedArray);
   };
   return (
     <View style={AppStyles.MainStyle}>
-      {/* <SafeAreaView /> */}
       <CustomHeader
         isStatusBar={true}
         atBackPress={() => {
@@ -507,6 +500,7 @@ const PostCreateScreen = ({
             placeHolder={"Select Category"}
             atSelect={(val) => {
               setSelectedCategory(val?.name);
+              selectedCatRef.current = val?.name;
               setCategoryError("");
             }}
             selected={selectedcategory?.name || selectedcategory}
@@ -515,75 +509,117 @@ const PostCreateScreen = ({
           />
 
           <View>
-            {itemList.length > 0
-              ? itemList.map((item, index) => (
-                <View key={index} style={styles.dynamicFieldContainer}>
-                  {item?.image && item.image !== "a" ? (
-                    <LoadingImage
-                      isDisable={true}
-                      source={
-                        item?.image?.base64
-                          ? item?.image
-                          : { uri: item?.image }
-                      }
-                      style={styles.img}
-                    />
-                  ) : (
-                    <ImagePickerButton
-                      btnSize="small"
-                      style={styles.img}
-                      onImageSelect={(img) => {
-                        updateStates("image", index, img);
-                      }}
-                    />
-                  )}
-
+            {itemList?.length > 0
+              ? itemList.map((item, index) => {
+                return !item ? null : (
                   <View
-                    style={{
-                      width: "70%",
-                      height: normalized(135),
-                      marginVertical: normalized(10),
-                    }}
+                    key={String(index)}
+                    style={styles.dynamicFieldContainer}
                   >
-                    <TextInput
-                      value={item?.name}
-                      inputStyle={styles.input}
-                      placeholder="Enter name..."
-                      containerStyle={styles.inputContainer}
-                      errorText={
-                        item?.name?.length == 0 ? "!Empty Field" : null
-                      }
-                      onChange={(val) => {
-                        updateStates("name", index, val);
+                    {(item?.image && item.image !== "a") ||
+                      item?.video?.thumbnail ||
+                      item?.videoObj?.thumbnail ? (
+                      <>
+                        {item?.video || item?.videoObj ? (
+                          <TouchableOpacity
+                            onPress={() => {
+                              setOpenVideoModal(
+                                item?.video?.video?.uri
+                                  ? item?.video?.video?.uri
+                                  : item?.video?.uri
+                                    ? item?.video?.uri
+                                    : item?.videoObj?.video
+                              );
+                            }}
+                          >
+                            <LoadingImage
+                              isDisable={true}
+                              source={{
+                                uri:
+                                  item?.video?.thumbnail ||
+                                  item?.videoObj?.thumbnail,
+                              }}
+                              style={styles.img}
+                            />
+
+                            <Image
+                              source={AppImages.playbutton}
+                              style={styles.playIcon}
+                            />
+                          </TouchableOpacity>
+                        ) : (
+                          <LoadingImage
+                            isDisable={false}
+                            source={
+                              item?.image?.base64
+                                ? item?.image
+                                : item?.video?.thumbnail
+                                  ? { uri: item?.video?.thumbnail }
+                                  : { uri: item?.image }
+                            }
+                            style={styles.img}
+                          />
+                        )}
+                      </>
+                    ) : (
+                      <TouchableOpacity
+                        style={styles.unSelectedPic}
+                        onPress={() => {
+                          setOpenTypeModal({ value: true, index: index });
+                        }}
+                      >
+                        <UploadIcon />
+                      </TouchableOpacity>
+                    )}
+
+                    <View
+                      style={{
+                        width: "70%",
+                        height: normalized(135),
+                        marginVertical: normalized(10),
                       }}
-                    />
-                    <TextInput
-                      value={item?.description}
-                      inputStyle={styles.input}
-                      placeholder="Enter description..."
-                      containerStyle={styles.inputContainer}
-                      errorText={
-                        item?.description?.length == 0 ? "!Empty Field" : null
-                      }
-                      onChange={(des) => {
-                        updateStates("description", index, des);
+                    >
+                      <TextInput
+                        value={item?.name}
+                        inputStyle={styles.input}
+                        placeholder="Enter name..."
+                        containerStyle={styles.inputContainer}
+                        errorText={
+                          item?.name?.length == 0 ? "!Empty Field" : null
+                        }
+                        onChange={(val) => {
+                          updateStates("name", index, val);
+                        }}
+                      />
+                      <TextInput
+                        value={item?.description}
+                        inputStyle={styles.input}
+                        placeholder="Enter description..."
+                        containerStyle={styles.inputContainer}
+                        errorText={
+                          item?.description?.length == 0
+                            ? "!Empty Field"
+                            : null
+                        }
+                        onChange={(des) => {
+                          updateStates("description", index, des);
+                        }}
+                      />
+                    </View>
+
+                    <TouchableOpacity
+                      center
+                      style={styles.deleteBtn}
+                      onPress={() => {
+                        _handleRemove(index);
                       }}
-                    />
+                    >
+                      <DeleteIcon />
+                    </TouchableOpacity>
                   </View>
-
-                  <TouchableOpacity
-                    center
-                    style={styles.deleteBtn}
-                    onPress={() => {
-                      _handleRemove(index);
-                    }}
-                  >
-                    <DeleteIcon />
-                  </TouchableOpacity>
-                </View>
-              ))
+                );
+              })
               : null}
-
             <View
               style={{
                 alignItems: "flex-start",
@@ -692,14 +728,7 @@ const PostCreateScreen = ({
               disabled={isBtnActive.current}
               style={styles.uploadBtnCont}
             >
-              {isLoading ? (
-                <ActivityIndicator
-                  style={styles.indicator}
-                  color={AppColors.white.white}
-                />
-              ) : (
-                <Text style={styles.uploadTxt}>Upload</Text>
-              )}
+              <Text style={styles.uploadTxt}>Upload</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
@@ -710,17 +739,98 @@ const PostCreateScreen = ({
           visible={alertModal?.value}
           multipleBtn={true}
           atLeftBtn={() => {
+            clearStates();
             setAlertModal({ value: false, data: null, message: "" });
             dispatch(setPostRefresh(!selector.Home.isPostRefresh));
-            formikRef.current?.resetForm();
             navigation.goBack();
           }}
           leftBtnLabel={"No"}
           rightBtnLabel={"Yes"}
           onPress={() => {
-            updateDraftFun(alertModal?.data);
+            let obj = alertModal?.data;
+            updateDraftFun(obj);
+            setAlertModal({ value: false, data: null, message: "" });
           }}
           message={alertModal?.message}
+        />
+      ) : null}
+      {openTypeModal?.value ? (
+        <MediaTypeSelection
+          onClose={() => {
+            setOpenTypeModal({ value: false, index: -1 });
+          }}
+          atMediaTypeSelection={(value) => {
+            setOpenTypeModal({ value: false, index: -1 });
+            setOpenMediaModal({
+              value: true,
+              type: value,
+              index: openTypeModal?.index,
+            });
+          }}
+        />
+      ) : null}
+      {openMediaModal?.value ? (
+        <MediaPickerModal
+          openMediaModal={openMediaModal}
+          onClose={() => {
+            setOpenMediaModal({
+              value: false,
+              type: "",
+              index: -1,
+            });
+          }}
+          onMediaSelection={(value) => {
+            if (!value) {
+              setOpenMediaModal({
+                value: false,
+                type: "",
+              });
+              return;
+            }
+            let mediaTypeObj = openMediaModal;
+            let type =
+              value?.type.includes("video") || mediaTypeObj?.type == "video"
+                ? "video"
+                : "image";
+            if (type == "video") {
+              dispatch(setIsAppLoader(true));
+              createThumbnail({
+                url: value?.uri,
+                timeStamp: 10000,
+              })
+                .then(async (response) => {
+                  await uploadThumnail(response?.path, (thumbnailUrl) => {
+                    if (thumbnailUrl) {
+                      dispatch(setIsAppLoader(false));
+                      updateStates(type, mediaTypeObj?.index, {
+                        thumbnail: thumbnailUrl,
+                        video: value,
+                      });
+                    }
+                  });
+                })
+                .catch((err) => {
+                  dispatch(setIsAppLoader(false));
+                  console.log("printImgErr ", err);
+                });
+            } else {
+              updateStates(type, mediaTypeObj?.index, value);
+            }
+
+            setOpenMediaModal({
+              value: false,
+              type: "",
+              index: -1,
+            });
+          }}
+        />
+      ) : null}
+      {openVideoModal ? (
+        <VideoPlayerModal
+          item={{ url: openVideoModal }}
+          onClose={() => {
+            setOpenVideoModal("");
+          }}
         />
       ) : null}
     </View>
@@ -767,13 +877,13 @@ const styles = StyleSheet.create({
     alignSelf: "center",
   },
   img: {
-    width: normalized(40),
-    height: normalized(40),
-    borderRadius: normalized(40 / 2),
+    width: normalized(50),
+    height: normalized(50),
+    borderRadius: normalized(50 / 2),
     marginVertical: 0,
     justifyContent: "center",
     alignItems: "center",
-    marginHorizontal: normalized(5),
+    marginHorizontal: normalized(3),
   },
   deleteBtn: {
     padding: normalized(5),
@@ -798,6 +908,22 @@ const styles = StyleSheet.create({
     fontSize: normalized(16),
     color: AppColors.white.white,
     fontWeight: "600",
+  },
+  unSelectedPic: {
+    borderColor: AppColors.blue.navy,
+    borderWidth: 1,
+    borderRadius: normalized(50 / 2),
+    height: normalized(50),
+    width: normalized(50),
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  playIcon: {
+    height: normalized(15),
+    width: normalized(15),
+    position: "absolute",
+    alignSelf: "center",
+    top: normalized(20),
   },
 });
 

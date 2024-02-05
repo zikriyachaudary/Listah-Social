@@ -40,4 +40,17 @@ export const AppStrings = {
   Network: {
     somethingWrong: "Something went wrong",
   },
+  Validation: {
+    fieldsEmptyError: "Please fill the fields properly",
+    invalidEmailError: "Email is invalid",
+    passwordLengthError: "Password should not be less than 8 characters.",
+    passwordNotMatchError: "Passwords does not match",
+    emailEmptyError: "Email can't be empty",
+    otpCodeEmptyError: "OTP Code can't be empty",
+    maxImageSizeError:
+      "The selected image size exceeds the maximum limit of 20MB.",
+    videoDurationError:
+      "Uploading Image size must be maximum 20MB and Video maximum duration must be 30s",
+    maxDur: "Video must be maximum duration 30s",
+  },
 };

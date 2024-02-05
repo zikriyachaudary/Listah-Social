@@ -595,7 +595,6 @@ class ThreadManager {
   uploadMedia = async (uri, videoType, onComplete) => {
     let filename = this.makeid(6) + uri.substring(uri.lastIndexOf("/") + 1);
     let uploadUri = Platform.OS === "ios" ? uri.replace("file://", "") : uri;
-
     if (videoType && uploadUri.includes("mov")) {
       let fileArr = filename.split(".");
       const ext = fileArr[fileArr.length - 1];

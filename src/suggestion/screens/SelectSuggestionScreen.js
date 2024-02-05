@@ -26,7 +26,6 @@ const SelectSuggestionScreen = ({ mpost, navigation, route }) => {
   const authorId = post?.author?.userId;
   const postId = post?.id;
   const postTitle = post?.title;
-  console.log("post-------->", post);
   useEffect(() => {
     // console.log("printPost999 - > ", post, authorId);
   }, []);

@@ -11,10 +11,11 @@ import {
   deleteDiscoveryPost,
 } from "../../discover/redux/actions";
 import * as constants from "./constants";
-import { useDispatch } from "react-redux";
 import { CHALLENGE_REQUEST } from "../../suggestion/redux/constants";
-import { setCreatePostFailError } from "../../redux/action/AppLogics";
-import moment from "moment";
+import {
+  setCreatePostFailError,
+  setIsAppLoader,
+} from "../../redux/action/AppLogics";
 import ThreadManager from "../../ChatModule/ThreadManger";
 
 const PostsCollection = FireStore().collection("posts");
@@ -539,7 +540,6 @@ export const createAnnouncementPost =
       } = postContent;
       const postId = Date.now();
       const authorId = FireAuth().currentUser.uid;
-
       const post = {
         id: postId?.toString(),
         title,
@@ -559,11 +559,23 @@ export const createAnnouncementPost =
       if (items) {
         post.items = await Promise.all(
           items.map(async (item, index) => {
-            let uploadImgUrl = "";
-
-            if (item.image && item.image.uri != "") {
+            let uploadMediaUrl = "";
+            if (
+              (typeof item?.image == "string" &&
+                item?.image.includes("https")) ||
+              (typeof item?.videoObj?.video == "string" &&
+                item?.videoObj?.video.includes("https"))
+            ) {
+              console.log("return--->");
+              return {
+                ...item,
+                id: index,
+              };
+            }
+            if (item?.image && item?.image?.uri != "") {
+              console.log("image------>");
               const compressedImage = await ImageResizer.createResizedImage(
-                item.image.uri,
+                item?.image?.uri,
                 1000,
                 1000,
                 "PNG",
@@ -574,15 +586,41 @@ export const createAnnouncementPost =
                 .ref("post_media")
                 .child(item.image.fileName);
               await storageRef.putFile(compressedImage.uri);
-              uploadImgUrl = await storageRef.getDownloadURL();
-            }
+              uploadMediaUrl = await storageRef.getDownloadURL();
 
-            return {
-              id: index,
-              name: item.name,
-              image: uploadImgUrl,
-              description: item.description,
-            };
+              return {
+                id: index,
+                name: item?.name,
+                image: uploadMediaUrl,
+                description: item?.description,
+              };
+            } else if (item?.videoObj && item?.videoObj?.video?.uri) {
+              let filename =
+                ThreadManager.instance.makeid(6) +
+                item?.videoObj?.video?.uri.substring(
+                  item?.videoObj?.video?.uri.lastIndexOf("/") + 1
+                );
+              let uploadUri = item?.videoObj?.video?.uri.replace("file://", "");
+
+              if (uploadUri.includes("mov")) {
+                let fileArr = filename.split(".");
+                const ext = fileArr[fileArr.length - 1];
+                if (ext.toLowerCase() == "mov") {
+                  filename = filename.replace(/mov/g, "mp4");
+                }
+              }
+              const storageRef = FireStorage()
+                .ref("post_media")
+                .child(filename);
+              await storageRef.putFile(uploadUri);
+              uploadMediaUrl = await storageRef.getDownloadURL();
+              return {
+                id: index,
+                name: item?.name,
+                videoObj: { ...item?.videoObj, video: uploadMediaUrl },
+                description: item?.description,
+              };
+            }
           })
         );
       }
@@ -645,7 +683,7 @@ export const savePostInDb = async (postId) => {
   };
   console.log("showAlready - > ", currentUserId, savePostsObj);
   await SavePostCollection.doc(`${currentUserId}`).set(savePostsObj);
-  console.log("done - >< ", messageDisplay);
+
   return messageDisplay;
 };
 
@@ -678,11 +716,22 @@ export const createPost = (postContent) => async (dispatch) => {
     if (items) {
       post.items = await Promise.all(
         items.map(async (item, index) => {
-          let uploadImgUrl = "";
-
-          if (item.image && item.image.uri != "") {
+          let uploadMediaUrl = "";
+          if (
+            (typeof item?.image == "string" && item?.image.includes("https")) ||
+            (typeof item?.videoObj?.video == "string" &&
+              item?.videoObj?.video.includes("https"))
+          ) {
+            console.log("return--->");
+            return {
+              ...item,
+              id: index,
+            };
+          }
+          if (item?.image && item?.image?.uri != "") {
+            console.log("image------>");
             const compressedImage = await ImageResizer.createResizedImage(
-              item.image.uri,
+              item?.image?.uri,
               1000,
               1000,
               "PNG",
@@ -693,19 +742,42 @@ export const createPost = (postContent) => async (dispatch) => {
               .ref("post_media")
               .child(item.image.fileName);
             await storageRef.putFile(compressedImage.uri);
-            uploadImgUrl = await storageRef.getDownloadURL();
-          }
+            uploadMediaUrl = await storageRef.getDownloadURL();
 
-          return {
-            id: index,
-            name: item.name,
-            image: uploadImgUrl,
-            description: item.description,
-          };
+            return {
+              id: index,
+              name: item?.name,
+              image: uploadMediaUrl,
+              description: item?.description,
+            };
+          } else if (item?.videoObj && item?.videoObj?.video?.uri) {
+            let filename =
+              ThreadManager.instance.makeid(6) +
+              item?.videoObj?.video?.uri.substring(
+                item?.videoObj?.video?.uri.lastIndexOf("/") + 1
+              );
+            let uploadUri = item?.videoObj?.video?.uri.replace("file://", "");
+
+            if (uploadUri.includes("mov")) {
+              let fileArr = filename.split(".");
+              const ext = fileArr[fileArr.length - 1];
+              if (ext.toLowerCase() == "mov") {
+                filename = filename.replace(/mov/g, "mp4");
+              }
+            }
+            const storageRef = FireStorage().ref("post_media").child(filename);
+            await storageRef.putFile(uploadUri);
+            uploadMediaUrl = await storageRef.getDownloadURL();
+            return {
+              id: index,
+              name: item?.name,
+              videoObj: { ...item?.videoObj, video: uploadMediaUrl },
+              description: item?.description,
+            };
+          }
         })
       );
     }
-
     await PostsCollection.doc(`${postId}`).set(post);
     const createdPost = await (await PostsCollection.doc(postId).get()).data();
     const postAuthor = await (
@@ -760,10 +832,23 @@ export const challengePost =
       if (items) {
         challengePost.items = await Promise.all(
           items.map(async (item, index) => {
-            let uploadImgUrl = "";
-            if (item.image && item.image.uri != "") {
+            let uploadMediaUrl = "";
+            if (
+              (typeof item?.image == "string" &&
+                item?.image.includes("https")) ||
+              (typeof item?.videoObj?.video == "string" &&
+                item?.videoObj?.video.includes("https"))
+            ) {
+              console.log("return--->");
+              return {
+                ...item,
+                id: index,
+              };
+            }
+            if (item?.image && item?.image?.uri != "") {
+              console.log("image------>");
               const compressedImage = await ImageResizer.createResizedImage(
-                item.image.uri,
+                item?.image?.uri,
                 1000,
                 1000,
                 "PNG",
@@ -774,15 +859,41 @@ export const challengePost =
                 .ref("post_media")
                 .child(item.image.fileName);
               await storageRef.putFile(compressedImage.uri);
-              uploadImgUrl = await storageRef.getDownloadURL();
-            }
+              uploadMediaUrl = await storageRef.getDownloadURL();
 
-            return {
-              id: index,
-              name: item.name,
-              image: uploadImgUrl,
-              description: item.description,
-            };
+              return {
+                id: index,
+                name: item?.name,
+                image: uploadMediaUrl,
+                description: item?.description,
+              };
+            } else if (item?.videoObj && item?.videoObj?.video?.uri) {
+              let filename =
+                ThreadManager.instance.makeid(6) +
+                item?.videoObj?.video?.uri.substring(
+                  item?.videoObj?.video?.uri.lastIndexOf("/") + 1
+                );
+              let uploadUri = item?.videoObj?.video?.uri.replace("file://", "");
+
+              if (uploadUri.includes("mov")) {
+                let fileArr = filename.split(".");
+                const ext = fileArr[fileArr.length - 1];
+                if (ext.toLowerCase() == "mov") {
+                  filename = filename.replace(/mov/g, "mp4");
+                }
+              }
+              const storageRef = FireStorage()
+                .ref("post_media")
+                .child(filename);
+              await storageRef.putFile(uploadUri);
+              uploadMediaUrl = await storageRef.getDownloadURL();
+              return {
+                id: index,
+                name: item?.name,
+                videoObj: { ...item?.videoObj, video: uploadMediaUrl },
+                description: item?.description,
+              };
+            }
           })
         );
       }
@@ -813,7 +924,6 @@ export const challengePost =
       const postAuthor = await (
         await ProfilesCollection.doc(postAuthorId?.toString()).get()
       ).data();
-      //start from there
       const populatedPost = {
         ...updatedPost,
         author: {
@@ -848,7 +958,6 @@ export const acceptRejectChallenge = async (post, request) => {
     createdAt: FireStore.FieldValue.serverTimestamp(),
     challengeRequest: request,
   };
-  console.log("postCreateRequest - ? ", uploadedChallengePost);
   await PostsCollection.doc(post.id).update(uploadedChallengePost);
 };
 
@@ -865,25 +974,62 @@ export const updatePost = (changes) => async (dispatch) => {
     if (post?.items) {
       post.items = await Promise.all(
         post?.items.map(async (item, index) => {
-          if (typeof item.image === "object") {
+          let uploadMediaUrl = "";
+          if (
+            (typeof item?.image == "string" && item?.image.includes("https")) ||
+            (typeof item?.videoObj?.video == "string" &&
+              item?.videoObj?.video.includes("https"))
+          ) {
+            console.log("return--->");
+            return {
+              ...item,
+              id: index,
+            };
+          }
+          if (item?.image && item?.image?.uri != "") {
+            const compressedImage = await ImageResizer.createResizedImage(
+              item?.image?.uri,
+              1000,
+              1000,
+              "PNG",
+              100,
+              0
+            );
             const storageRef = FireStorage()
               .ref("post_media")
               .child(item.image.fileName);
-            await storageRef.putFile(item.image.uri);
-            const uploadImgUrl = await storageRef.getDownloadURL();
+            await storageRef.putFile(compressedImage.uri);
+            uploadMediaUrl = await storageRef.getDownloadURL();
 
             return {
               id: index,
-              name: item.name,
-              image: uploadImgUrl,
-              description: item.description,
+              name: item?.name,
+              image: uploadMediaUrl,
+              description: item?.description,
             };
-          } else {
+          } else if (item?.videoObj && item?.videoObj?.video?.uri) {
+            let filename =
+              ThreadManager.instance.makeid(6) +
+              item?.videoObj?.video?.uri.substring(
+                item?.videoObj?.video?.uri.lastIndexOf("/") + 1
+              );
+            let uploadUri = item?.videoObj?.video?.uri.replace("file://", "");
+
+            if (uploadUri.includes("mov")) {
+              let fileArr = filename.split(".");
+              const ext = fileArr[fileArr.length - 1];
+              if (ext.toLowerCase() == "mov") {
+                filename = filename.replace(/mov/g, "mp4");
+              }
+            }
+            const storageRef = FireStorage().ref("post_media").child(filename);
+            await storageRef.putFile(uploadUri);
+            uploadMediaUrl = await storageRef.getDownloadURL();
             return {
               id: index,
-              name: item.name,
-              image: item?.image,
-              description: item.description,
+              name: item?.name,
+              videoObj: { ...item?.videoObj, video: uploadMediaUrl },
+              description: item?.description,
             };
           }
         })

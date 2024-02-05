@@ -10,6 +10,7 @@ import {
   SET_IS_UN_READED,
   SET_PUSH_NOTI,
   SET_SHOW_SPLASH,
+  SET_SHOW_TOAST,
   SET_THREAD_LIST,
   SET_UPDATE_FB_TOKEN,
 } from "./types";
@@ -76,5 +77,10 @@ export const setThreadList = (data) => ({
 
 export const setIsHideTabBar = (data) => ({
   type: SET_HIDE_TAB,
+  data: data,
+});
+
+export const setShowToast = (data) => ({
+  type: SET_SHOW_TOAST,
   data: data,
 });

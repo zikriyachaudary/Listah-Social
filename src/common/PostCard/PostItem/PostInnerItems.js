@@ -1,21 +1,18 @@
 import React, { useEffect, useState } from "react";
-import {
-  ActivityIndicator,
-  Image,
-  StyleSheet,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-} from "react-native";
-import Avatar from "../../Avatar";
+import { Image, StyleSheet, TouchableOpacity } from "react-native";
 import Text from "../../Text";
 import View from "../../View";
 import * as Colors from "../../../config/colors";
 import LoadingImage from "../../LoadingImage";
-import Touchable from "../../Touchable";
 import { getProfile } from "../../../profile/redux/selectors";
 import { connect } from "react-redux";
-import { AppColors, hv, normalized } from "../../../util/AppConstant";
-const PostInnerItems = ({ post, userPosts, profile }) => {
+import {
+  AppColors,
+  AppImages,
+  hv,
+  normalized,
+} from "../../../util/AppConstant";
+const PostInnerItems = ({ post, userPosts, profile, setOpenVideoModal }) => {
   const [showMore, setShowMore] = useState(false);
 
   const [postItems, setPostItems] = useState(
@@ -96,6 +93,40 @@ const PostInnerItems = ({ post, userPosts, profile }) => {
                       borderColor: AppColors.blue.royalBlue,
                     }}
                   />
+                ) : item?.videoObj?.thumbnail || item?.video?.thumbnail ? (
+                  <TouchableOpacity
+                    onPress={() => {
+                      if (setOpenVideoModal) {
+                        setOpenVideoModal(
+                          item?.videoObj?.video || item?.video?.video
+                        );
+                      }
+                    }}
+                  >
+                    <Image
+                      style={{
+                        width: normalized(50),
+                        height: normalized(50),
+                        borderRadius: 2,
+                        borderWidth: 1.4,
+                        borderColor: AppColors.blue.royalBlue,
+                      }}
+                      source={{
+                        uri:
+                          item?.videoObj?.thumbnail || item?.video?.thumbnail,
+                      }}
+                    />
+                    <Image
+                      source={AppImages.playbutton}
+                      style={{
+                        height: normalized(15),
+                        width: normalized(15),
+                        position: "absolute",
+                        alignSelf: "center",
+                        top: normalized(20),
+                      }}
+                    />
+                  </TouchableOpacity>
                 ) : null}
 
                 <Text center xs light style={styles.descriptionTxt}>

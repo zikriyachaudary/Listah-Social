@@ -1,12 +1,9 @@
+
 require_relative '../node_modules/react-native/scripts/react_native_pods'
 require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
-
-
 $FirebaseSDKVersion = '8.12.1'
 platform :ios, '13.0'
-
 install! 'cocoapods', :deterministic_uuids => false
-
 production = ENV["PRODUCTION"] == "1"
 
 target 'ListaApp' do
@@ -14,10 +11,17 @@ target 'ListaApp' do
   config = use_native_modules!
   $static_framework += [
     'Permission-Notifications',
+    'Permission-Microphone',
+    'Permission-Camera',
+    'Permission-PhotoLibrary',
   ]
 
-  # Flags change depending on the env values.
-  # flags = get_default_flags()
+  permissions_path = '../node_modules/react-native-permissions/ios'
+  pod 'Permission-Camera', :path => "#{permissions_path}/Camera"
+  pod 'Permission-PhotoLibrary', :path => "#{permissions_path}/PhotoLibrary"
+  pod 'Permission-Microphone', :path => "#{permissions_path}/Microphone"
+  pod 'Permission-Notifications', :path => "#{permissions_path}/Notifications"
+  pod 'RNPermissions', :path => '../node_modules/react-native-permissions'
 
   use_react_native!(
     :path => config[:reactNativePath],
@@ -29,17 +33,33 @@ target 'ListaApp' do
     # # An absolute path to your application root.
     # :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
-
+  
   use_flipper!()
-
   target 'ListaAppTests' do
     inherit! :complete
     # Pods for testing
   end
 
   post_install do |installer|
+
+  Pod::Installer::Xcode::TargetValidator.send(:define_method, :verify_no_static_framework_transitive_dependencies) {}
+  installer.pod_targets.each do |pod|
+    if pod.name.eql?('RNPermissions') || pod.name.start_with?('Permission-')
+      def pod.build_type;
+        # Uncomment the line corresponding to your CocoaPods version
+        Pod::BuildType.static_library # >= 1.9
+        # Pod::Target::BuildType.static_library # < 1.9
+      end
+    end
+  end
+
     installer.pods_project.targets.each do |target|
       target.build_configurations.each do |config|
+        config.build_settings['HEADER_SEARCH_PATHS'] ||= '$(inherited) '
+        config.build_settings['HEADER_SEARCH_PATHS'] << '"${PODS_ROOT}/../../node_modules/react-native/ReactCommon" '
+        if target.name === "RNReanimated"
+        config.build_settings['CLANG_CXX_LANGUAGE_STANDARD'] = 'c++17'
+        end
         config.build_settings['ENABLE_BITCODE'] = 'NO'
         config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
       end
@@ -47,7 +67,4 @@ target 'ListaApp' do
     react_native_post_install(installer)
     __apply_Xcode_12_5_M1_post_install_workaround(installer)
   end
-
-
-
 end

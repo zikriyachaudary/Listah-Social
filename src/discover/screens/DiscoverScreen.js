@@ -30,6 +30,7 @@ import {
   refreshLikedPosts as refreshLikedPostsAction,
 } from "../redux/actions";
 import { blockUsers } from "../../home/redux/actions";
+import VideoPlayerModal from "../../common/VideoPlayerModal";
 
 /* =============================================================================
 <DiscoverScreen />
@@ -40,6 +41,7 @@ const DiscoverScreen = ({ likedPosts, getLikedPosts, refreshLikedPosts }) => {
   const isFocused = useIsFocused();
   const [likePosts, setLikePost] = useState(likedPosts);
   const [toggleCheckBox, setToggleCheckBox] = useState(false);
+  const [openVideoModal, setOpenVideoModal] = useState("");
   const [reportPostModal, setReportPostModal] = useState(true);
   const navigation = useNavigation();
   const selector = useSelector((AppState) => AppState);
@@ -97,12 +99,12 @@ const DiscoverScreen = ({ likedPosts, getLikedPosts, refreshLikedPosts }) => {
       postRefresh={() => {
         console.log("called from like");
         _handleRefresh();
-        // setLoaderVisible(true)
-        // getMyUserHomePosts()
       }}
       postDel={() => {
-        // getMyUserHomePosts()
         getLikedPosts();
+      }}
+      openVideoModal={(uri) => {
+        setOpenVideoModal(uri);
       }}
       postReport={async (isReportCount) => {
         if (isReportCount == 2) {
@@ -187,6 +189,15 @@ const DiscoverScreen = ({ likedPosts, getLikedPosts, refreshLikedPosts }) => {
         onRefresh={_handleRefresh}
         onEndReached={_handleEndReach}
       />
+
+      {openVideoModal ? (
+        <VideoPlayerModal
+          item={{ url: openVideoModal }}
+          onClose={() => {
+            setOpenVideoModal("");
+          }}
+        />
+      ) : null}
     </Container>
   );
 };

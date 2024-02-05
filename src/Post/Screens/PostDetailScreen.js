@@ -8,8 +8,10 @@ import { PostItem } from "../../common";
 import { blockUsers } from "../../home/redux/actions";
 import { useDispatch, useSelector } from "react-redux";
 import { setIsAppLoader } from "../../redux/action/AppLogics";
+import VideoPlayerModal from "../../common/VideoPlayerModal";
 
 const PostDetailScreen = (props) => {
+  const [openVideoModal, setOpenVideoModal] = useState("");
   const dispatch = useDispatch();
   const selector = useSelector((AppState) => AppState);
   const { fetchPostDetail } = useNotificationManger();
@@ -58,6 +60,9 @@ const PostDetailScreen = (props) => {
               <PostItem
                 id={item?.id}
                 post={item}
+                openVideoModal={(uri) => {
+                  setOpenVideoModal(uri);
+                }}
                 postIndex={index}
                 showIndex={false}
                 postRefresh={() => {}}
@@ -95,6 +100,14 @@ const PostDetailScreen = (props) => {
             Post not Found!
           </Text>
         </View>
+      ) : null}
+      {openVideoModal ? (
+        <VideoPlayerModal
+          item={{ url: openVideoModal }}
+          onClose={() => {
+            setOpenVideoModal("");
+          }}
+        />
       ) : null}
     </View>
   );
