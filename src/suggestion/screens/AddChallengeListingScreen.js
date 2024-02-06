@@ -210,7 +210,46 @@ const AddChallengeListingScreen = ({ challengePost, navigation, route }) => {
                   {(item?.image && item?.image !== "a") ||
                   item?.video?.thumbnail ||
                   item?.videoObj?.thumbnail ? (
-                    <>
+                    <View
+                      style={{
+                        height: normalized(65),
+                        width: normalized(60),
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <TouchableOpacity
+                        activeOpacity={1}
+                        onPress={() => {
+                          if (
+                            item?.video?.thumbnail ||
+                            item?.videoObj?.thumbnail
+                          ) {
+                            updateStates(
+                              item?.video?.thumbnail ? "video" : "videoObj",
+                              index,
+                              null
+                            );
+                          } else {
+                            updateStates("image", index, "");
+                          }
+                        }}
+                        style={{
+                          position: "absolute",
+                          top: 0,
+                          right: 0,
+                          padding: normalized(4),
+                          zIndex: 1,
+                        }}
+                      >
+                        <Image
+                          source={AppImages.Common.crossIcon}
+                          style={{
+                            height: normalized(18),
+                            width: normalized(18),
+                          }}
+                        />
+                      </TouchableOpacity>
                       {item?.video || item?.videoObj ? (
                         <TouchableOpacity
                           onPress={() => {
@@ -252,7 +291,7 @@ const AddChallengeListingScreen = ({ challengePost, navigation, route }) => {
                           style={styles.img}
                         />
                       )}
-                    </>
+                    </View>
                   ) : (
                     <TouchableOpacity
                       style={styles.unSelectedPic}

@@ -173,7 +173,35 @@ const SuggestionAddScreen = ({ route, navigation, suggestPost }) => {
           mediaObj?.image ||
           mediaObj?.thumbnail ||
           typeof mediaObj == "string" ? (
-            <>
+            <View
+              style={{
+                height: normalized(70),
+                width: normalized(60),
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <TouchableOpacity
+                activeOpacity={1}
+                onPress={() => {
+                  setMediaObj(null);
+                }}
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  right: 0,
+                  padding: normalized(4),
+                  zIndex: 1,
+                }}
+              >
+                <Image
+                  source={AppImages.Common.crossIcon}
+                  style={{
+                    height: normalized(18),
+                    width: normalized(18),
+                  }}
+                />
+              </TouchableOpacity>
               {mediaObj?.thumbnail ? (
                 <TouchableOpacity
                   onPress={() => {
@@ -205,7 +233,7 @@ const SuggestionAddScreen = ({ route, navigation, suggestPost }) => {
                   style={styles.img}
                 />
               )}
-            </>
+            </View>
           ) : (
             <TouchableOpacity
               style={styles.unSelectedPic}

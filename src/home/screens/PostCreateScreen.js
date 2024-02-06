@@ -511,114 +511,153 @@ const PostCreateScreen = ({
           <View>
             {itemList?.length > 0
               ? itemList.map((item, index) => {
-                return !item ? null : (
-                  <View
-                    key={String(index)}
-                    style={styles.dynamicFieldContainer}
-                  >
-                    {(item?.image && item.image !== "a") ||
+                  return !item ? null : (
+                    <View
+                      key={String(index)}
+                      style={styles.dynamicFieldContainer}
+                    >
+                      {(item?.image && item.image !== "a") ||
                       item?.video?.thumbnail ||
                       item?.videoObj?.thumbnail ? (
-                      <>
-                        {item?.video || item?.videoObj ? (
+                        <View
+                          style={{
+                            height: normalized(70),
+                            width: normalized(60),
+                            justifyContent: "center",
+                            alignItems: "center",
+                          }}
+                        >
                           <TouchableOpacity
+                            activeOpacity={1}
                             onPress={() => {
-                              setOpenVideoModal(
-                                item?.video?.video?.uri
-                                  ? item?.video?.video?.uri
-                                  : item?.video?.uri
-                                    ? item?.video?.uri
-                                    : item?.videoObj?.video
-                              );
+                              if (
+                                item?.video?.thumbnail ||
+                                item?.videoObj?.thumbnail
+                              ) {
+                                updateStates(
+                                  item?.video?.thumbnail ? "video" : "videoObj",
+                                  index,
+                                  null
+                                );
+                              } else {
+                                updateStates("image", index, "");
+                              }
+                            }}
+                            style={{
+                              position: "absolute",
+                              top: 0,
+                              right: 0,
+                              padding: normalized(4),
+                              zIndex: 1,
                             }}
                           >
-                            <LoadingImage
-                              isDisable={true}
-                              source={{
-                                uri:
-                                  item?.video?.thumbnail ||
-                                  item?.videoObj?.thumbnail,
-                              }}
-                              style={styles.img}
-                            />
-
                             <Image
-                              source={AppImages.playbutton}
-                              style={styles.playIcon}
+                              source={AppImages.Common.crossIcon}
+                              style={{
+                                height: normalized(18),
+                                width: normalized(18),
+                              }}
                             />
                           </TouchableOpacity>
-                        ) : (
-                          <LoadingImage
-                            isDisable={false}
-                            source={
-                              item?.image?.base64
-                                ? item?.image
-                                : item?.video?.thumbnail
+                          {item?.video || item?.videoObj ? (
+                            <TouchableOpacity
+                              onPress={() => {
+                                setOpenVideoModal(
+                                  item?.video?.video?.uri
+                                    ? item?.video?.video?.uri
+                                    : item?.video?.uri
+                                    ? item?.video?.uri
+                                    : item?.videoObj?.video
+                                );
+                              }}
+                            >
+                              <LoadingImage
+                                isDisable={true}
+                                source={{
+                                  uri:
+                                    item?.video?.thumbnail ||
+                                    item?.videoObj?.thumbnail,
+                                }}
+                                style={styles.img}
+                              />
+
+                              <Image
+                                source={AppImages.playbutton}
+                                style={styles.playIcon}
+                              />
+                            </TouchableOpacity>
+                          ) : (
+                            <LoadingImage
+                              isDisable={false}
+                              source={
+                                item?.image?.base64
+                                  ? item?.image
+                                  : item?.video?.thumbnail
                                   ? { uri: item?.video?.thumbnail }
                                   : { uri: item?.image }
-                            }
-                            style={styles.img}
-                          />
-                        )}
-                      </>
-                    ) : (
-                      <TouchableOpacity
-                        style={styles.unSelectedPic}
-                        onPress={() => {
-                          setOpenTypeModal({ value: true, index: index });
+                              }
+                              style={styles.img}
+                            />
+                          )}
+                        </View>
+                      ) : (
+                        <TouchableOpacity
+                          style={styles.unSelectedPic}
+                          onPress={() => {
+                            setOpenTypeModal({ value: true, index: index });
+                          }}
+                        >
+                          <UploadIcon />
+                        </TouchableOpacity>
+                      )}
+
+                      <View
+                        style={{
+                          width: "70%",
+                          height: normalized(135),
+                          marginVertical: normalized(10),
                         }}
                       >
-                        <UploadIcon />
+                        <TextInput
+                          value={item?.name}
+                          inputStyle={styles.input}
+                          placeholder="Enter name..."
+                          containerStyle={styles.inputContainer}
+                          errorText={
+                            item?.name?.length == 0 ? "!Empty Field" : null
+                          }
+                          onChange={(val) => {
+                            updateStates("name", index, val);
+                          }}
+                        />
+                        <TextInput
+                          value={item?.description}
+                          inputStyle={styles.input}
+                          placeholder="Enter description..."
+                          containerStyle={styles.inputContainer}
+                          errorText={
+                            item?.description?.length == 0
+                              ? "!Empty Field"
+                              : null
+                          }
+                          onChange={(des) => {
+                            updateStates("description", index, des);
+                          }}
+                        />
+                      </View>
+
+                      <TouchableOpacity
+                        center
+                        style={styles.deleteBtn}
+                        onPress={() => {
+                          _handleRemove(index);
+                        }}
+                      >
+                        <DeleteIcon />
                       </TouchableOpacity>
-                    )}
-
-                    <View
-                      style={{
-                        width: "70%",
-                        height: normalized(135),
-                        marginVertical: normalized(10),
-                      }}
-                    >
-                      <TextInput
-                        value={item?.name}
-                        inputStyle={styles.input}
-                        placeholder="Enter name..."
-                        containerStyle={styles.inputContainer}
-                        errorText={
-                          item?.name?.length == 0 ? "!Empty Field" : null
-                        }
-                        onChange={(val) => {
-                          updateStates("name", index, val);
-                        }}
-                      />
-                      <TextInput
-                        value={item?.description}
-                        inputStyle={styles.input}
-                        placeholder="Enter description..."
-                        containerStyle={styles.inputContainer}
-                        errorText={
-                          item?.description?.length == 0
-                            ? "!Empty Field"
-                            : null
-                        }
-                        onChange={(des) => {
-                          updateStates("description", index, des);
-                        }}
-                      />
                     </View>
-
-                    <TouchableOpacity
-                      center
-                      style={styles.deleteBtn}
-                      onPress={() => {
-                        _handleRemove(index);
-                      }}
-                    >
-                      <DeleteIcon />
-                    </TouchableOpacity>
-                  </View>
-                );
-              })
+                  );
+                })
               : null}
             <View
               style={{
