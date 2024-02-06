@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
   StatusBar,
   Alert,
+  Platform,
 } from "react-native";
 import { launchImageLibrary, launchCamera } from "react-native-image-picker";
 import { useDispatch } from "react-redux";
@@ -38,7 +39,7 @@ const MediaPickerModal = (props) => {
       if (props?.openMediaModal?.type == "video") {
         options = {
           videoQuality: "high",
-          durationLimit: 5,
+          durationLimit: Platform.OS == 'ios' ? 30 : 30000,
           allowsEditing: true,
         };
       } else {
@@ -49,7 +50,7 @@ const MediaPickerModal = (props) => {
       options["mediaType"] = props?.openMediaModal?.type;
       options["quality"] = 0.9;
 
-      const maxDuration = 30;
+      let maxDuration = 30;
       if (index == 0) {
         launchImageLibrary(options, (response) => {
           if (response?.assets?.length > 0) {
@@ -102,6 +103,7 @@ const MediaPickerModal = (props) => {
         } else {
           launchCamera(options, (response) => {
             if (response?.assets?.length > 0) {
+              console.log('response?.assets------->', response?.assets);
               if (response?.assets[0]?.type?.includes("video")) {
                 maxDuration = response?.assets[0]?.duration > 1000 ? 30000 : 30;
                 if (response?.assets[0]?.duration <= maxDuration) {

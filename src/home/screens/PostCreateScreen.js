@@ -780,6 +780,7 @@ const PostCreateScreen = ({
             });
           }}
           onMediaSelection={(value) => {
+            console.log('value------>', value);
             if (!value) {
               setOpenMediaModal({
                 value: false,
