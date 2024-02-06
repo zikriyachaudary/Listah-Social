@@ -103,6 +103,7 @@ const MediaPickerModal = (props) => {
           launchCamera(options, (response) => {
             if (response?.assets?.length > 0) {
               if (response?.assets[0]?.type?.includes("video")) {
+                maxDuration = response?.assets[0]?.duration > 1000 ? 30000 : 30;
                 if (response?.assets[0]?.duration <= maxDuration) {
                   props?.onMediaSelection(response?.assets[0]);
                 } else {
