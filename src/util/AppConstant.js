@@ -150,6 +150,7 @@ export const AppImages = {
     cross: require("../assets/images/Common/cross.png"),
     arrowDown: require("../assets/images/Common/arrowDown.png"),
     listahIcon: require("../assets/images/Common/listahIcon.jpeg"),
+    crossIcon: require("../assets/images/Common/crossIcon.png"),
   },
   profile: {
     logout: require("../assets/images/logout.png"),

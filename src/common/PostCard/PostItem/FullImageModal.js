@@ -1,28 +1,16 @@
 import React, { useEffect, useState } from "react";
 import Modal from "react-native-modal";
-import {
-  StyleSheet,
-  FlatList,
-  Alert,
-  SafeAreaView,
-  ActivityIndicator,
-} from "react-native";
+import { StyleSheet, SafeAreaView } from "react-native";
 import Card from "../../Card";
 import ChevronLeftIcon from "../../../assets/icons/edit-chevron-left.svg";
 import Touchable from "../../Touchable";
-import Avatar from "../../Avatar";
-import Text from "../../Text";
-import * as Colors from "../../../config/colors";
-import { getUserProfilesById } from "../../../home/redux/actions";
 import View from "../../View";
 import LoadingImage from "../../LoadingImage";
 
 const FullImageModal = ({ visible, onClose, userImage }) => {
-  const [usersImage, setUsersImage] = useState(userImage);
+  const [usersImage] = useState(userImage);
 
-  useEffect(() => {
-    console.log(" ------ ", userImage);
-  }, []);
+  useEffect(() => {}, []);
   return (
     <SafeAreaView>
       <Modal
