@@ -39,7 +39,7 @@ const MediaPickerModal = (props) => {
       if (props?.openMediaModal?.type == "video") {
         options = {
           videoQuality: "high",
-          durationLimit: Platform.OS == 'ios' ? 30 : 30000,
+          durationLimit: Platform.OS == "ios" ? 30 : 30000,
           allowsEditing: true,
         };
       } else {
@@ -50,11 +50,12 @@ const MediaPickerModal = (props) => {
       options["mediaType"] = props?.openMediaModal?.type;
       options["quality"] = 0.9;
 
-      let maxDuration = 30;
+      let maxDuration = Platform.OS == "ios" ? 30 : 30000;
       if (index == 0) {
         launchImageLibrary(options, (response) => {
           if (response?.assets?.length > 0) {
             if (response?.assets[0]?.type?.includes("video")) {
+              console.log("response?.assets[0]---->", response?.assets[0]);
               if (response?.assets[0]?.duration <= maxDuration) {
                 props?.onMediaSelection(response?.assets[0]);
               } else {
@@ -103,7 +104,7 @@ const MediaPickerModal = (props) => {
         } else {
           launchCamera(options, (response) => {
             if (response?.assets?.length > 0) {
-              console.log('response?.assets------->', response?.assets);
+              console.log("response?.assets------->", response?.assets);
               if (response?.assets[0]?.type?.includes("video")) {
                 maxDuration = response?.assets[0]?.duration > 1000 ? 30000 : 30;
                 if (response?.assets[0]?.duration <= maxDuration) {
