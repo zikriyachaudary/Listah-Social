@@ -127,7 +127,6 @@ def enableHermes = project.ext.react.get("enableHermes", false);
 def nativeArchitectures = project.getProperties().get("reactNativeDebugArchitectures")
 
 android {
-
     ndkVersion rootProject.ext.ndkVersion
     compileSdkVersion rootProject.ext.compileSdkVersion
     packagingOptions {
@@ -136,12 +135,16 @@ android {
         pickFirst 'lib/armeabi-v7a/libc++_shared.so'
         pickFirst 'lib/arm64-v8a/libc++_shared.so'
     }
+    aaptOptions {  
+        cruncherEnabled = false  
+    }
+
     defaultConfig {
         applicationId "com.listaapp"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 26
-        versionName "1.2.5"
+        versionCode 27
+        versionName "1.2.6"
         // Here i added the Camera of React native
         missingDimensionStrategy 'react-native-camera', 'general' // <-- insert this line
         missingDimensionStrategy "store", "play"

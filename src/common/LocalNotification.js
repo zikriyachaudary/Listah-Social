@@ -59,7 +59,7 @@ const LocalNotification = (props) => {
             borderRadius: normalized(6),
             backgroundColor: "black",
           }}
-          source={AppImages.appIcon}
+          source={AppImages.Common.appLogo}
         />
         <View
           style={{
