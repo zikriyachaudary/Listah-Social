@@ -146,7 +146,9 @@ const LoginScreen = ({ navigation, loading, login }) => {
             <Button
               loading={loading}
               title="Sign in"
-              onPress={checkValidation}
+              onPress={() => {
+                checkValidation();
+              }}
             />
 
             <Text style={styles.bottomTxt}>

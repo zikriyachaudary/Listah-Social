@@ -19,15 +19,18 @@ const useNotificationManger = (props) => {
     await firestore()
       .collection(Collections.NOTIFICATION)
       .onSnapshot((snapDocs) => {
-        userList = snapDocs.docs.map((doc) => {
-          if (doc?._data?.userId !== currentUid) {
-            return {
-              fcmToken: doc?._data?.fcmToken,
-              userId: doc?._data?.userId,
-            };
-          }
-          return doc.data();
-        });
+        if (snapDocs) {
+          userList = snapDocs?.docs?.map((doc) => {
+            if (doc?._data?.userId !== currentUid) {
+              return {
+                fcmToken: doc?._data?.fcmToken,
+                userId: doc?._data?.userId,
+              };
+            }
+            return doc.data();
+          });
+        }
+
         onComplete(userList);
       });
   };

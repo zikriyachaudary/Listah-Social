@@ -84,8 +84,9 @@ export const register = (info) => async (dispatch) => {
       displayName: username,
       photoURL: profileImage,
     });
-    const profileDoc = await ProfileCollection.doc(auth().currentUser.uid);
 
+    const profileDoc = await ProfileCollection.doc(auth().currentUser.uid);
+    console.log("profileDoc------->", profileDoc);
     const profile = {
       userId: auth().currentUser.uid,
       email,
@@ -96,6 +97,7 @@ export const register = (info) => async (dispatch) => {
       followers: [],
       notifications: [],
     };
+    console.log("profile------->", profile);
 
     await profileDoc.set(profile);
     const currentUser = auth().currentUser.toJSON();
@@ -117,7 +119,6 @@ export const logout = () => async (dispatch) => {
     dispatch({ type: constants.LOGOUT.REQUEST });
 
     const user = auth().currentUser;
-
     if (user) {
       await auth().signOut();
     }

@@ -69,7 +69,6 @@ const AppNavigation = ({ changeAuthState, getProfile, authenticated }) => {
         removeOnNotificationOpened = notifications.onNotificationOpened(
           (notification) => {
             if (notification?._data) {
-              console.log("onNotificationOpened------->");
               // dispatch(setPushNotifi(notification));
               setTimeout(() => {
                 openDetail(notification);
@@ -87,7 +86,6 @@ const AppNavigation = ({ changeAuthState, getProfile, authenticated }) => {
         );
         removeOnNotification = notifications.onNotification((notification) => {
           if (notification?._data) {
-            console.log("onNotification0------>");
             dispatch(setPushNotifi(notification));
             let userId = userCompleteObj.current?.uid
               ? userCompleteObj.current?.uid
@@ -100,14 +98,14 @@ const AppNavigation = ({ changeAuthState, getProfile, authenticated }) => {
           }
         });
         ////////////
+        ThreadManager.instance.setupRedux(selector?.sliceReducer, dispatch);
+        user?.uid ? setChat(user?.uid) : null;
       }
       setInitializing(false);
       SplashScreen.hide();
       setTimeout(() => {
         setShowSplash(false);
       }, 3000);
-      ThreadManager.instance.setupRedux(selector?.sliceReducer, dispatch);
-      user?.uid ? setChat(user?.uid) : null;
       return () => {
         ThreadManager.instance.removeThreadObserver();
       };
@@ -156,14 +154,16 @@ const AppNavigation = ({ changeAuthState, getProfile, authenticated }) => {
         userId: userCompleteObj.current?.uid,
       });
     }
-    await userSubscribed(userCompleteObj.current?.uid, (res) => {
-      if (res?.length > 0) {
-        let filterUser = res.filter(
-          (mitem) => mitem.userId !== userCompleteObj.current?.uid
-        );
-        dispatch(setAllUserFCMToken(filterUser));
-      }
-    });
+    if (userCompleteObj.current?.uid) {
+      await userSubscribed(userCompleteObj.current?.uid, (res) => {
+        if (res?.length > 0) {
+          let filterUser = res.filter(
+            (mitem) => mitem.userId !== userCompleteObj.current?.uid
+          );
+          dispatch(setAllUserFCMToken(filterUser));
+        }
+      });
+    }
   };
   const getPermissionsForNotification = async () => {
     const isPermission = await hasPermission();

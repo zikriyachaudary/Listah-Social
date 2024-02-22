@@ -143,8 +143,8 @@ android {
         applicationId "com.listaapp"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 27
-        versionName "1.2.6"
+        versionCode 28
+        versionName "1.2.7"
         // Here i added the Camera of React native
         missingDimensionStrategy 'react-native-camera', 'general' // <-- insert this line
         missingDimensionStrategy "store", "play"

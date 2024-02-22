@@ -54,7 +54,6 @@ const ProfileScreen = ({ profile, getProfile, logout, deleteUserAccount }) => {
     if (isFocused && selector?.Auth?.user?.uid) {
       fetchReqStatus(selector?.Auth?.user?.uid);
     }
-    // console.log("profileID -- > " , JSON.stringify(profile.userId))
   }, [isFocused]);
 
   const _handleLogout = async () => {

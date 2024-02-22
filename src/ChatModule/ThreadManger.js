@@ -55,16 +55,18 @@ class ThreadManager {
       .where("users", "array-contains", userId)
       .onSnapshot((snapshot) => {
         var newDocs = [];
-        snapshot.docChanges().forEach((change) => {
-          if (change.type === "added") {
-          }
-          if (change.type === "modified") {
-            newDocs.push(change.doc.data());
-          }
-          if (change.type === "removed") {
-          }
-          this.updateList(newDocs);
-        });
+        if (snapshot) {
+          snapshot.docChanges().forEach((change) => {
+            if (change.type === "added") {
+            }
+            if (change.type === "modified") {
+              newDocs.push(change.doc.data());
+            }
+            if (change.type === "removed") {
+            }
+            this.updateList(newDocs);
+          });
+        }
       });
   };
 
@@ -98,21 +100,25 @@ class ThreadManager {
       .where("user", "==", userId)
       .onSnapshot((snapshot) => {
         var newDocs = [];
-        snapshot.docChanges().forEach((change) => {
-          if (change.type === "added") {
-            if (this.checkThreadExist(change.doc.data()["channel"]) == false) {
-              newDocs.push(change.doc.data());
+        if (snapshot) {
+          snapshot?.docChanges()?.forEach((change) => {
+            if (change.type === "added") {
+              if (
+                this.checkThreadExist(change.doc.data()["channel"]) == false
+              ) {
+                newDocs.push(change.doc.data());
+              }
             }
-          }
-          if (change.type === "modified") {
-          }
-          if (change.type === "removed") {
-            this.removeThreadObj(change.doc.data()["channel"]);
-          }
-        });
-        newDocs.map((doc) => {
-          this.addNewThread(doc);
-        });
+            if (change.type === "modified") {
+            }
+            if (change.type === "removed") {
+              this.removeThreadObj(change.doc.data()["channel"]);
+            }
+          });
+          newDocs.map((doc) => {
+            this.addNewThread(doc);
+          });
+        }
       });
   };
   //at reciver read Message clear Count Fun
@@ -163,7 +169,7 @@ class ThreadManager {
     );
     var userFilter = channelFilter.where("user", "!=", findedDoc["user"]);
     userFilter.get().then((snapDoc) => {
-      if (snapDoc.docs.length > 0) {
+      if (snapDoc?.docs?.length > 0) {
         let firstDoc = snapDoc.docs[0].data();
         firestore()
           .collection(CHANNEL_COLLECTION)
@@ -182,6 +188,7 @@ class ThreadManager {
   };
   // remove Thread Observer at App close and Other State's
   removeThreadObserver = () => {
+    console.log("removeThreadObserver------>", removeThreadObserver);
     if (this.threadSubscriber) {
       this.threadSubscriber();
       this.participantSubscriber();
@@ -297,7 +304,7 @@ class ThreadManager {
       .where("user", "==", userId)
       .get()
       .then((snapDoc) => {
-        if (snapDoc.docs.length > 0) {
+        if (snapDoc?.docs?.length > 0) {
           var promiseList = [];
           this.threadList = [];
           for (let i = 0; i < snapDoc.docs.length; i++) {
@@ -465,7 +472,7 @@ class ThreadManager {
       .get()
       .then((snapShot) => {
         var messagesList = [];
-        snapShot.docs.forEach((doc) => {
+        snapShot?.docs?.forEach((doc) => {
           messagesList.push(doc.data());
         });
         onMessageUpdates(messagesList);
@@ -585,7 +592,7 @@ class ThreadManager {
       .where("messageId", "==", messageId)
       .get()
       .then((snapDoc) => {
-        if (snapDoc.docs.length > 0) {
+        if (snapDoc?.docs?.length > 0) {
           onComplete(snapDoc.docs[0]?._data?.lastMessageSeeners);
         }
       });
