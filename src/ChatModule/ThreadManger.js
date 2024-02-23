@@ -188,7 +188,6 @@ class ThreadManager {
   };
   // remove Thread Observer at App close and Other State's
   removeThreadObserver = () => {
-    console.log("removeThreadObserver------>", removeThreadObserver);
     if (this.threadSubscriber) {
       this.threadSubscriber();
       this.participantSubscriber();
