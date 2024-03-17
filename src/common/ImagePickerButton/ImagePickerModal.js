@@ -8,11 +8,15 @@ import Text from "../Text";
 import Touchable from "../Touchable";
 import GalleryIcon from "../../assets/icons/edit-gallery.svg";
 import CameraIcon from "../../assets/icons/edit-camera.svg";
+import { Theme_Mode } from "../../util/Strings";
+import { darkModeColors, lightModeColors } from "../../util/AppConstant";
+import { useSelector } from "react-redux";
 
 /* =============================================================================
 <ImagePickerModal />
 ============================================================================= */
 const ImagePickerModal = ({ visible, onClose, onAdd }) => {
+  const themeType = useSelector((AppState) => AppState.sliceReducer.themeType);
   const _handleOpenCameraPress = async () => {
     try {
       const result = await launchCamera({
@@ -47,21 +51,49 @@ const ImagePickerModal = ({ visible, onClose, onAdd }) => {
 
   return (
     <Modal
-      style={styles.container}
+      style={{
+        ...styles.container,
+      }}
       isVisible={visible}
       backdropOpacity={0.2}
       onBackButtonPress={onClose}
       onBackdropPress={onClose}
     >
-      <Card style={styles.card}>
+      <Card
+        style={{
+          ...styles.card,
+          backgroundColor:
+            themeType == Theme_Mode.isDark
+              ? darkModeColors.background
+              : lightModeColors.background,
+        }}
+      >
         <Touchable
           android_ripple={{ color: "#999" }}
           horizontal
           style={styles.item}
           onPress={_handleOpenCameraPress}
         >
-          <CameraIcon />
-          <Text style={styles.txt}>Open Camera</Text>
+          <CameraIcon
+            width={20}
+            height={20}
+            stroke={
+              themeType == Theme_Mode.isDark
+                ? darkModeColors.text
+                : lightModeColors.text
+            }
+          />
+          <Text
+            style={{
+              ...styles.txt,
+              color:
+                themeType == Theme_Mode.isDark
+                  ? darkModeColors.text
+                  : lightModeColors.text,
+            }}
+          >
+            Open Camera
+          </Text>
         </Touchable>
         <Touchable
           android_ripple={{ color: "#999" }}
@@ -69,8 +101,26 @@ const ImagePickerModal = ({ visible, onClose, onAdd }) => {
           style={styles.item}
           onPress={_handleOpenGalleryPress}
         >
-          <GalleryIcon />
-          <Text style={styles.txt}>Upload from gallery</Text>
+          <GalleryIcon
+            width={20}
+            height={20}
+            stroke={
+              themeType == Theme_Mode.isDark
+                ? darkModeColors.text
+                : lightModeColors.text
+            }
+          />
+          <Text
+            style={{
+              ...styles.txt,
+              color:
+                themeType == Theme_Mode.isDark
+                  ? darkModeColors.text
+                  : lightModeColors.text,
+            }}
+          >
+            Upload from gallery
+          </Text>
         </Touchable>
       </Card>
     </Modal>

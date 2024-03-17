@@ -17,9 +17,6 @@ import Touchable from "../../../Touchable";
 import * as Colors from "../../../../config/colors";
 import LikeInActiveIcon from "../../../../assets/icons/edit-like-icon.svg";
 import LikeActiveIcon from "../../../../assets/icons/edit-like-icon-active.svg";
-import EditIcon from "../../../../assets/icons/edit-icon.svg";
-import DeleteIcon from "../../../../assets/icons/delete-ic.svg";
-import ReplyIcon from "../../../../assets/icons/reply-icon.svg";
 import FireAuth from "@react-native-firebase/auth";
 import {
   deletePostComment,
@@ -27,13 +24,14 @@ import {
 } from "../../../../home/redux/actions";
 import { updateHomeData } from "../../../../home/redux/appLogics";
 import SubCommentItem, { ShowMoreSubCommentView } from "./SubCommentItem";
+import { Theme_Mode } from "../../../../util/Strings";
+import { darkModeColors, lightModeColors } from "../../../../util/AppConstant";
 
 /* =============================================================================
  PostCommentItem />
 ============================================================================= */
 let isEditDeleteOrLike = false;
 const PostCommentItem = ({
-  key,
   comment,
   commentID,
   postID,
@@ -41,14 +39,10 @@ const PostCommentItem = ({
   profile,
   author,
   likedUsers,
-  postRefresh,
-  postAutor,
-  onClose,
-  onEditComment,
   deleteComment,
   onReplyComment,
-  onLikeClicked,
 }) => {
+  const themeType = useSelector((AppState) => AppState.sliceReducer.themeType);
   const [user, setUser] = useState();
   const username = user?.username;
   const profileImage = user?.profileImage;
@@ -77,7 +71,6 @@ const PostCommentItem = ({
     }
 
     return () => {
-      console.log("commentModalDisappear");
       if (isEditDeleteOrLike) {
         dispatch(updateHomeData(!selector.Home.updateHomeData));
       }
@@ -93,11 +86,8 @@ const PostCommentItem = ({
     setLiked((prev) => !prev);
 
     await likeUnlikePostComments(postID, commentID);
-    // postRefresh()
-    // await onLikeClicked()
     const currentUser = FireAuth().currentUser.uid;
     const isLiked = likedUserList.filter((id) => id == currentUser);
-    console.log("islikedUser - > ", isLiked);
     if (isLiked.length > 0) {
       let removeUserFromLikedList = likedUserList.filter(
         (item) => item != currentUser
@@ -105,7 +95,6 @@ const PostCommentItem = ({
       setLikedUserList(removeUserFromLikedList);
     } else {
       let addUserInLikedList = [...likedUserList, currentUser];
-      console.log("addUserLike - > ", addUserInLikedList);
       setLikedUserList(addUserInLikedList);
     }
 
@@ -144,56 +133,32 @@ const PostCommentItem = ({
     );
   };
 
-  const renderItem = (item, index) => {
-    return (
-      <View
-        style={{
-          flexDirection: "row",
-          marginHorizontal: 40,
-        }}
-      >
-        <View
-          style={{
-            flex: 1,
-            width: 0.6,
-            backgroundColor: "gray",
-          }}
-        />
-
-        <View
-          style={{
-            width: "100%",
-            margin: 30,
-          }}
-        ></View>
-      </View>
-    );
-  };
-
   return (
     <View>
-      <View style={styles.container}>
+      <View
+        style={{
+          ...styles.container,
+          backgroundColor:
+            themeType == Theme_Mode.isDark
+              ? darkModeColors.background
+              : lightModeColors.background,
+        }}
+      >
         <View horizontal>
           <Avatar size={45} url={{ uri: `${profileImage}` }} />
           <View flex style={styles.txtContainer}>
-            <Text sm>{username}</Text>
+            <Text
+              sm
+              style={{
+                color:
+                  themeType == Theme_Mode.isDark
+                    ? darkModeColors.text
+                    : lightModeColors.text,
+              }}
+            >
+              {username}
+            </Text>
             <Text medium>{text}</Text>
-            {/* {showAndEditIcon && (
-              <>
-                <Touchable
-                  horizontal
-                  onPress={() => {
-                    console.log("clickkkk");
-                    onEditComment();
-                  }}
-                >
-                  <Text style={{
-                    color: "purple",
-                    fontSize: 10,
-                  }}>Edited</Text>
-                </Touchable>
-                </>
-              )} */}
           </View>
 
           <Touchable
@@ -209,25 +174,6 @@ const PostCommentItem = ({
             ) : (
               <LikeInActiveIcon />
             )}
-            {/* {loading ? (
-                <ActivityIndicator color={Colors.primary} />
-              ) : liked ? (
-                <Image
-                  style={{
-                    width: 24,
-                    height: 24,
-                  }}
-                  source={require("../../../../assets/icons/heart-ic-fill.png")}
-                />
-              ) : (
-                <Image
-                  style={{
-                    width: 24,
-                    height: 24,
-                  }}
-                  source={require("../../../../assets/icons/heart-ic-unfill.png")}
-                />
-              )} */}
           </Touchable>
         </View>
         <View
@@ -239,20 +185,7 @@ const PostCommentItem = ({
           }}
         >
           {likedUserList.length > 0 && (
-            <Touchable
-              horizontal
-              style={styles.btn}
-              onPress={() => {
-                // _likeUnLikePostComments();
-              }}
-            >
-              {/* {loading ? (
-                  <ActivityIndicator color={Colors.primary} />
-                ) : liked ? (
-                  <LikeActiveIcon />
-                ) : (
-                  <LikeInActiveIcon />
-                )} */}
+            <Touchable horizontal style={styles.btn} onPress={() => {}}>
               <Text
                 style={{
                   color: "gray",
@@ -269,7 +202,6 @@ const PostCommentItem = ({
             horizontal
             style={styles.btn}
             onPress={() => {
-              // _deleteComment()
               onReplyComment();
             }}
           >
@@ -282,13 +214,6 @@ const PostCommentItem = ({
             >
               Reply
             </Text>
-            {/* <Image
-                style={{
-                  width: 24,
-                  height: 24,
-                }}
-                source={require("../../../../assets/images/reply-ic.png")}
-              /> */}
           </Touchable>
 
           {showAndEditIcon && (

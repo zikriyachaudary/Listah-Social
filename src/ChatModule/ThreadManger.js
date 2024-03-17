@@ -487,6 +487,9 @@ class ThreadManager {
       .collection(THREAD_COLLECITON)
       .onSnapshot((snapDocs) => {
         var docsList = [];
+        if (!snapDocs?.docChanges) {
+          return;
+        }
         snapDocs.docChanges().forEach((change) => {
           if (change.type == "added") {
             docsList.push({

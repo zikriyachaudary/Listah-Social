@@ -66,6 +66,17 @@ export const EmailValidator = (email) => {
   return validEmailRegex.test(email);
 };
 
+export const lightModeColors = {
+  text: "#222",
+  textAccent: "#444",
+  background: "#fff",
+};
+export const darkModeColors = {
+  text: "#fff",
+  textAccent: "#ccc",
+  background: "#222",
+};
+
 export const AppColors = {
   blue: {
     navy: "#6d14c4",
@@ -75,7 +86,6 @@ export const AppColors = {
     lightBlue: "#dce9f7",
   },
   gradient: {
-    dark: "#0f0e24",
     light: "#6d14c4",
   },
   white: {
@@ -83,7 +93,6 @@ export const AppColors = {
     light: "#fbfbfb",
     simpleLight: "#EEEEEE",
     sky: "#fbfcff",
-    simpleDark: "#e7eef5",
     lightSky: "#F9FBFC",
     skyBlue: "#E8EEF5",
   },
@@ -94,10 +103,6 @@ export const AppColors = {
     shadow: "rgba(0,0,0, 0.4)",
     transparentColor: "rgba(0,0,0,0.5)",
     lightBlack: "#4B4B4B",
-  },
-  orange: {
-    creamy: "#f7f2e8",
-    lightOrange: "#f5ecd8",
   },
   grey: {
     lightGrey: "#eeeeee",
@@ -110,17 +115,11 @@ export const AppColors = {
     dark: "#AC3049",
     light: "#e6406a",
   },
-  yellow: {
-    dark: "#D4A33C",
-    light: "#D3A23B",
-  },
   green: {
     lightGreen: "#EFF3F2",
     primaryLight: "#76E2C6",
-    primaryLightButton: "#57dbba",
   },
 };
-export const colorsList = [AppColors.gradient.dark, AppColors.gradient.light];
 
 export const AppImages = {
   appIcon: require("../assets/images/appIcon.png"),
@@ -156,6 +155,7 @@ export const AppImages = {
     logout: require("../assets/images/logout.png"),
     delete: require("../assets/images/delete.png"),
     savePosts: require("../assets/images/Auth/save-posts.png"),
+    darkThemeIcon: require("../assets/images/darkThemeIcon.png"),
   },
   Auth: {
     backIcon: require("../assets/images/Auth/backIcon.png"),
@@ -180,6 +180,20 @@ export const AppImages = {
     chatStartIcon: require("../assets/images/Chat/chatStartIcon.png"),
   },
 };
+
+export const initial_Theme_Mode = [
+  {
+    id: 1,
+    title: "Light Mode",
+    isSelected: false,
+  },
+  { id: 2, title: "Dark Mode", isSelected: false },
+  {
+    id: 3,
+    title: "Phone Mode",
+    isSelected: false,
+  },
+];
 
 export const topicsDummyData = [
   {

@@ -11,13 +11,20 @@ import NotificationsListEmpty from "../components/NotificationsListEmpty";
 import { getNotifications as selectNotifications } from "../redux/selectors";
 import { getNotifications as getNotificationsAction } from "../redux/actions";
 import useNotificationManger from "../../hooks/useNotificationManger";
-import { AppColors, normalized } from "../../util/AppConstant";
+import {
+  AppColors,
+  darkModeColors,
+  lightModeColors,
+  normalized,
+} from "../../util/AppConstant";
 import CustomHeader from "../../common/CommonHeader";
+import { Theme_Mode } from "../../util/Strings";
 
 /* =============================================================================
 <NotificationScreen />
 ============================================================================= */
 const NotificationScreen = ({ notifications, getNotifications }) => {
+  const themeType = useSelector((AppState) => AppState.sliceReducer.themeType);
   const isFocused = useIsFocused();
   const insets = useSafeAreaInsets();
   const styles = getStyles(insets);
@@ -32,6 +39,7 @@ const NotificationScreen = ({ notifications, getNotifications }) => {
       setIsLoader(true);
       setMessageIsRead();
       fetchNotificationList((response) => {
+        console.log("response---->", response);
         if (response?.length > 0) {
           setNotificationList(response);
         } else {
@@ -45,7 +53,14 @@ const NotificationScreen = ({ notifications, getNotifications }) => {
   }, [isFocused]);
 
   return (
-    <Container>
+    <Container
+      style={{
+        backgroundColor:
+          themeType == Theme_Mode.isDark
+            ? darkModeColors.background
+            : lightModeColors.background,
+      }}
+    >
       <CustomHeader
         isStatusBar={true}
         title={"Notifications"}

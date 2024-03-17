@@ -27,11 +27,21 @@ import * as Colors from "../../config/colors";
 
 import { suggestPost as suggestPostAction } from "../redux/actions";
 import useNotificationManger from "../../hooks/useNotificationManger";
-import { Notification_Messages, Notification_Types } from "../../util/Strings";
+import {
+  Notification_Messages,
+  Notification_Types,
+  Theme_Mode,
+} from "../../util/Strings";
 import VideoPlayerModal from "../../common/VideoPlayerModal";
 import { setIsAppLoader } from "../../redux/action/AppLogics";
 import LoadingImage from "../../common/LoadingImage";
-import { AppColors, AppImages, normalized } from "../../util/AppConstant";
+import {
+  AppColors,
+  AppImages,
+  darkModeColors,
+  lightModeColors,
+  normalized,
+} from "../../util/AppConstant";
 import MediaTypeSelection from "../../common/MediaTypeSelection";
 import MediaPickerModal from "../../common/MediaPickerModal";
 import ThreadManager from "../../ChatModule/ThreadManger";
@@ -42,6 +52,7 @@ import { Routes } from "../../util/Route";
 <SuggestionChangeScreen />
 ============================================================================= */
 const SuggestionChangeScreen = ({ route, navigation, suggestPost }) => {
+  const themeType = useSelector((AppState) => AppState.sliceReducer.themeType);
   const dispatch = useDispatch();
   const [openTypeModal, setOpenTypeModal] = useState(false);
   const [openVideoModal, setOpenVideoModal] = useState("");
@@ -175,11 +186,39 @@ const SuggestionChangeScreen = ({ route, navigation, suggestPost }) => {
     });
   };
   return (
-    <Container>
+    <Container
+      style={{
+        backgroundColor:
+          themeType == Theme_Mode.isDark
+            ? darkModeColors.background
+            : lightModeColors.background,
+      }}
+    >
       <StackHeader title={`What would you like to${"\n"}suggest?`} />
-      <Content>
+      <Content
+        containerStyle={{
+          backgroundColor:
+            themeType == Theme_Mode.isDark
+              ? darkModeColors.background
+              : lightModeColors.background,
+        }}
+        contentContainerStyle={{
+          backgroundColor:
+            themeType == Theme_Mode.isDark
+              ? darkModeColors.background
+              : lightModeColors.background,
+        }}
+      >
         <View horizontal style={styles.item}>
-          <View style={styles.indexCounter}>
+          <View
+            style={{
+              ...styles.indexCounter,
+              borderColor:
+                themeType == Theme_Mode.isDark
+                  ? darkModeColors.text
+                  : lightModeColors.text,
+            }}
+          >
             <Text sm bold primary>
               {item?.id === 0 ? 1 : item?.id + 1}
             </Text>
@@ -204,7 +243,16 @@ const SuggestionChangeScreen = ({ route, navigation, suggestPost }) => {
                 style={styles.img}
               />
 
-              <Image source={AppImages.playbutton} style={styles.playIcon} />
+              <Image
+                source={AppImages.playbutton}
+                style={{
+                  ...styles.playIcon,
+                  tintColor:
+                    themeType == Theme_Mode.isDark
+                      ? darkModeColors.text
+                      : lightModeColors.text,
+                }}
+              />
             </TouchableOpacity>
           ) : (
             <LoadingImage
@@ -213,10 +261,28 @@ const SuggestionChangeScreen = ({ route, navigation, suggestPost }) => {
               style={styles.img}
             />
           )}
-          <Text sm medium>
+          <Text
+            sm
+            medium
+            style={{
+              color:
+                themeType == Theme_Mode.isDark
+                  ? darkModeColors.text
+                  : lightModeColors.text,
+            }}
+          >
             {item?.name}
           </Text>
-          <Text sm light>
+          <Text
+            sm
+            light
+            style={{
+              color:
+                themeType == Theme_Mode.isDark
+                  ? darkModeColors.text
+                  : lightModeColors.text,
+            }}
+          >
             {item?.description}
           </Text>
         </View>
@@ -300,15 +366,39 @@ const SuggestionChangeScreen = ({ route, navigation, suggestPost }) => {
             </TouchableOpacity>
           )}
           <TextInput
+            contentContainerStyle={{
+              backgroundColor:
+                themeType == Theme_Mode.isDark
+                  ? darkModeColors.background
+                  : lightModeColors.background,
+            }}
+            inputStyle={{
+              ...styles.input,
+              color:
+                themeType == Theme_Mode.isDark
+                  ? darkModeColors.text
+                  : lightModeColors.text,
+            }}
             value={name}
-            inputStyle={styles.input}
             placeholder="Enter name..."
             containerStyle={styles.inputContainer}
             onChange={setName}
           />
           <TextInput
+            contentContainerStyle={{
+              backgroundColor:
+                themeType == Theme_Mode.isDark
+                  ? darkModeColors.background
+                  : lightModeColors.background,
+            }}
+            inputStyle={{
+              ...styles.input,
+              color:
+                themeType == Theme_Mode.isDark
+                  ? darkModeColors.text
+                  : lightModeColors.text,
+            }}
             value={description}
-            inputStyle={styles.input}
             placeholder="Enter description..."
             containerStyle={styles.inputContainer}
             onChange={setDescription}
@@ -428,16 +518,7 @@ const styles = StyleSheet.create({
     width: "100%",
     borderRadius: 20,
   },
-  indexCounter: {
-    width: 30,
-    height: 30,
-    borderWidth: 2,
-    paddingTop: 2,
-    marginRight: 5,
-    borderRadius: 30 / 2,
-    alignItems: "center",
-    justifyContent: "center",
-  },
+
   inputContainer: {
     flex: 1,
     marginTop: 0,

@@ -10,28 +10,52 @@ import {
 import {
   AppColors,
   AppImages,
+  darkModeColors,
   hv,
   isLargeWidth,
+  lightModeColors,
   normalized,
 } from "../../util/AppConstant";
+import { useSelector } from "react-redux";
+import { Theme_Mode } from "../../util/Strings";
 
 const ChatBar = (props) => {
+  const themeType = useSelector((AppState) => AppState.sliceReducer.themeType);
+
   return (
     <View
       style={[
         styles.container,
         {
           alignItems: props?.value.length > 23 ? "flex-start" : "center",
-          backgroundColor: props?.isDisable ? "#EFF3F7" : AppColors.white.white,
+          backgroundColor: props?.isDisable
+            ? "#EFF3F7"
+            : themeType == Theme_Mode.isDark
+            ? darkModeColors.background
+            : lightModeColors.background,
         },
       ]}
     >
-      <View style={styles.messageCon}>
+      <View
+        style={{
+          ...styles.messageCon,
+          backgroundColor:
+            themeType == Theme_Mode.isDark
+              ? darkModeColors.background
+              : lightModeColors.background,
+        }}
+      >
         <TextInput
           editable={!props?.isDisable}
           value={props?.value}
           onChangeText={props?.onChangeText}
-          style={styles.textInput}
+          style={{
+            ...styles.textInput,
+            color:
+              themeType == Theme_Mode.isDark
+                ? darkModeColors.text
+                : lightModeColors.text,
+          }}
           placeholder={"Type Message"}
           placeholderTextColor={AppColors.black.lightBlack}
           multiline={true}
@@ -48,7 +72,15 @@ const ChatBar = (props) => {
           <Image
             resizeMode="contain"
             source={AppImages.Chat.Attachment}
-            style={{ width: 14, height: 22, marginTop: 5 }}
+            style={{
+              width: 14,
+              height: 22,
+              marginTop: 5,
+              tintColor:
+                themeType == Theme_Mode.isDark
+                  ? darkModeColors.text
+                  : lightModeColors.text,
+            }}
           />
         </TouchableOpacity>
       </View>

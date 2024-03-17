@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { connect } from "react-redux";
+import { connect, useSelector } from "react-redux";
 import {
   Alert,
   Image,
@@ -28,13 +28,16 @@ import {
   AppHorizontalMargin,
   AppImages,
   EmailValidator,
+  darkModeColors,
   hv,
+  lightModeColors,
   normalized,
 } from "../../util/AppConstant";
-import { Button, ImagePickerButton, StackHeader } from "../../common";
+import { Button, StackHeader } from "../../common";
 import ImagePickerModal from "../../common/ImagePickerButton/ImagePickerModal";
 import FastImage from "react-native-fast-image";
 import TextInputComponent from "../../common/TextInputComponent";
+import { Theme_Mode } from "../../util/Strings";
 
 /* =============================================================================
 <RegisterScreen />
@@ -43,6 +46,8 @@ const regex =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/;
 
 const RegisterScreen = ({ register, navigation }) => {
+  const themeType = useSelector((AppState) => AppState.sliceReducer.themeType);
+
   const [modal, setModal] = useState(false);
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -135,7 +140,11 @@ const RegisterScreen = ({ register, navigation }) => {
       >
         <RNView
           style={{
-            flex: 1,
+            ...AppStyles.MainStyle,
+            backgroundColor:
+              themeType == Theme_Mode.isDark
+                ? darkModeColors.background
+                : lightModeColors.background,
           }}
         >
           <SafeAreaView />
@@ -151,42 +160,21 @@ const RegisterScreen = ({ register, navigation }) => {
               }}
             >
               <ChevronLeftIcon />
-
               <ScrollView>
                 <RNView>
                   <Text
                     style={{
                       marginVertical: 25,
+                      color:
+                        themeType == Theme_Mode.isDark
+                          ? darkModeColors.text
+                          : lightModeColors.text,
                     }}
                   >
                     {
                       "Terms and Condition\n\nWelcome to Listah!\nI accept all these terms and condition.\nThese terms and conditions outline the rules and regulations for the use of Listah.\nNo objectionable content will be tolerated.\nBy using this app we assume you accept these terms and conditions. Do not continue to use Listah if you do not agree to take all of the terms and conditions stated on this page. The following terminology applies to these Terms and Conditions, Privacy Statement and Disclaimer Notice and all Agreements: Client, You and Your refers to you, the person log on this website and compliant to the Company’s terms and conditions. The Company, Ourselves, We, Our and Us, refers to our Company. Party, Parties, or Us, refers to both the Client and ourselves. All terms refer to the offer, acceptance and consideration of payment necessary to undertake the process of our assistance to the Client in the most appropriate manner for the express purpose of meeting the Client’s needs in respect of provision of the Company’s stated services, in accordance with and subject to, prevailing law of Netherlands. Any use of the above terminology or other words in the singular, plural, capitalization and/or he/she or they, are taken as interchangeable and therefore as referring to same. Our Terms and Conditions were created with the help of the App Terms and Conditions Generator from App-Privacy-Policy.com"
                     }
                   </Text>
-
-                  {/* <RNView
-                    style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                    }}
-                  >
-                    <CheckBox
-                      value={toggleCheckBox}
-                      onValueChange={(newValue) => {
-                        setShhowModal(false);
-                        console.log("showNewValue - > ", newValue);
-                        setToggleCheckBox(newValue);
-                      }}
-                    />
-                    <Text
-                      style={{
-                        fontSize: 16,
-                        marginStart: 15,
-                      }}
-                    >
-                      Agree
-                    </Text>
-                  </RNView> */}
                 </RNView>
               </ScrollView>
             </TouchableOpacity>
@@ -197,7 +185,15 @@ const RegisterScreen = ({ register, navigation }) => {
   };
 
   return (
-    <View style={AppStyles.MainStyle}>
+    <View
+      style={{
+        ...AppStyles.MainStyle,
+        backgroundColor:
+          themeType == Theme_Mode.isDark
+            ? darkModeColors.background
+            : lightModeColors.background,
+      }}
+    >
       <StackHeader
         title="Create Account"
         left={
@@ -302,7 +298,15 @@ const RegisterScreen = ({ register, navigation }) => {
                 }}
               />
             </TouchableWithoutFeedback>
-            <Text style={styles.termsTxt}>
+            <Text
+              style={{
+                ...styles.termsTxt,
+                color:
+                  themeType == Theme_Mode.isDark
+                    ? darkModeColors.text
+                    : lightModeColors.text,
+              }}
+            >
               Yes I agree to{" "}
               <Text
                 style={{ ...styles.termsTxt, color: AppColors.blue.navy }}
@@ -329,7 +333,15 @@ const RegisterScreen = ({ register, navigation }) => {
             <View style={{ marginVertical: normalized(10) }} />
           )}
           <Button title="Sign up" loading={loading} onPress={checkValidation} />
-          <Text style={styles.bottomTxt}>
+          <Text
+            style={{
+              ...styles.bottomTxt,
+              color:
+                themeType == Theme_Mode.isDark
+                  ? darkModeColors.text
+                  : lightModeColors.text,
+            }}
+          >
             Already have an account?{" "}
             <Text
               onPress={() => {

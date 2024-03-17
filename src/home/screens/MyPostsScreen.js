@@ -23,9 +23,14 @@ import {
   unFollowUser as unFollowUserAction,
   followUser as followUserAction,
 } from "../../following/redux/actions";
-import { AppStrings, Notification_Types } from "../../util/Strings";
+import { AppStrings, Notification_Types, Theme_Mode } from "../../util/Strings";
 import useNotificationManger from "../../hooks/useNotificationManger";
-import { AppColors, AppImages, normalized } from "../../util/AppConstant";
+import {
+  AppColors,
+  AppImages,
+  darkModeColors,
+  normalized,
+} from "../../util/AppConstant";
 import FastImage from "react-native-fast-image";
 import { Routes } from "../../util/Route";
 import ThreadManager from "../../ChatModule/ThreadManger";
@@ -42,6 +47,7 @@ import VideoPlayerModal from "../../common/VideoPlayerModal";
 
 ============================================================================= */
 const MyPostsScreen = ({ profile, route, unFollowUser, followUser }) => {
+  const themeType = useSelector((AppState) => AppState.sliceReducer.themeType);
   const [loading, setLoading] = useState(false);
   const isFocused = useIsFocused();
   const [openVideoModal, setOpenVideoModal] = useState("");
@@ -205,7 +211,14 @@ const MyPostsScreen = ({ profile, route, unFollowUser, followUser }) => {
     }
   };
   return (
-    <Container>
+    <Container
+      style={{
+        backgroundColor:
+          themeType == Theme_Mode.isDark
+            ? darkModeColors.background
+            : AppColors.white.simpleLight,
+      }}
+    >
       {profile?.userId !== route?.params?.userId && userProfileInfo?.userId ? (
         <StackHeader
           title={
@@ -286,12 +299,28 @@ const MyPostsScreen = ({ profile, route, unFollowUser, followUser }) => {
               }}
             >
               <View style={styles.topPostsContainer}>
-                <Text style={{ color: "black", fontSize: 11 }} bold>
+                <Text
+                  style={{
+                    color:
+                      themeType == Theme_Mode.isDark
+                        ? AppColors.white.white
+                        : AppColors.black.black,
+                    fontSize: 11,
+                  }}
+                  bold
+                >
                   Post
                 </Text>
 
                 <Text
-                  style={{ color: "black", fontSize: 10, marginTop: 3 }}
+                  style={{
+                    color:
+                      themeType == Theme_Mode.isDark
+                        ? AppColors.white.white
+                        : AppColors.black.black,
+                    fontSize: 10,
+                    marginTop: 3,
+                  }}
                   bold
                 >
                   {userPosts.length}
@@ -307,11 +336,27 @@ const MyPostsScreen = ({ profile, route, unFollowUser, followUser }) => {
                 }}
               >
                 <View style={styles.topPostsContainer}>
-                  <Text style={{ color: "black", fontSize: 11 }} bold>
+                  <Text
+                    style={{
+                      color:
+                        themeType == Theme_Mode.isDark
+                          ? AppColors.white.white
+                          : AppColors.black.black,
+                      fontSize: 11,
+                    }}
+                    bold
+                  >
                     Followers
                   </Text>
                   <Text
-                    style={{ color: "black", fontSize: 10, marginTop: 3 }}
+                    style={{
+                      color:
+                        themeType == Theme_Mode.isDark
+                          ? AppColors.white.white
+                          : AppColors.black.black,
+                      fontSize: 10,
+                      marginTop: 3,
+                    }}
                     bold
                   >
                     {userProfileInfo.followers.length}
@@ -328,11 +373,27 @@ const MyPostsScreen = ({ profile, route, unFollowUser, followUser }) => {
                   }}
                 >
                   <View style={styles.topPostsContainer}>
-                    <Text style={{ color: "black", fontSize: 11 }} bold>
+                    <Text
+                      style={{
+                        color:
+                          themeType == Theme_Mode.isDark
+                            ? AppColors.white.white
+                            : AppColors.black.black,
+                        fontSize: 11,
+                      }}
+                      bold
+                    >
                       Following
                     </Text>
                     <Text
-                      style={{ color: "black", fontSize: 10, marginTop: 3 }}
+                      style={{
+                        color:
+                          themeType == Theme_Mode.isDark
+                            ? AppColors.white.white
+                            : AppColors.black.black,
+                        fontSize: 10,
+                        marginTop: 3,
+                      }}
                       bold
                     >
                       {userProfileInfo.followings.length}

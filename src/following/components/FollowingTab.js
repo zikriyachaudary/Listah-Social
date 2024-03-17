@@ -4,16 +4,29 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { View, Touchable, Text } from "../../common";
 import * as Colors from "../../config/colors";
+import { useSelector } from "react-redux";
+import { Theme_Mode } from "../../util/Strings";
+import { darkModeColors, lightModeColors } from "../../util/AppConstant";
 
 /* =============================================================================
 <FollowingTab />
 ============================================================================= */
 const FollowingTab = ({ navigationState, jumpTo }) => {
+  const themeType = useSelector((AppState) => AppState.sliceReducer.themeType);
+
   const insets = useSafeAreaInsets();
   const styles = getStyles(insets);
 
   return (
-    <View style={styles.container}>
+    <View
+      style={{
+        ...styles.container,
+        backgroundColor:
+          themeType == Theme_Mode.isDark
+            ? darkModeColors.background
+            : lightModeColors.background,
+      }}
+    >
       {navigationState.routes.map((route, index) => (
         <Touchable
           key={index}
@@ -31,7 +44,14 @@ const FollowingTab = ({ navigationState, jumpTo }) => {
             <Text
               lg
               defaultMessage={route.title}
-              style={[index === navigationState.index && styles.textActive]}
+              style={{
+                color:
+                  index === navigationState.index
+                    ? Colors.primary
+                    : themeType == Theme_Mode.isDark
+                    ? darkModeColors.text
+                    : lightModeColors.text,
+              }}
             >
               {route.title}
             </Text>

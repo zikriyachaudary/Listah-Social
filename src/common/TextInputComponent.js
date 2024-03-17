@@ -7,9 +7,19 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { AppColors, AppImages, normalized } from "../util/AppConstant";
+import {
+  AppColors,
+  AppImages,
+  darkModeColors,
+  lightModeColors,
+  normalized,
+} from "../util/AppConstant";
+import { useSelector } from "react-redux";
+import { Theme_Mode } from "../util/Strings";
 
 const TextInputComponent = (props) => {
+  const themeType = useSelector((AppState) => AppState.sliceReducer.themeType);
+
   const [secureEntry, setSecureEntry] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
   return (
@@ -42,7 +52,16 @@ const TextInputComponent = (props) => {
           }
           placeholderTextColor={AppColors.grey.dark}
           placeholder={props?.placeholder}
-          style={[styles.txtInput, props.textInputStyle]}
+          style={[
+            styles.txtInput,
+            props.textInputStyle,
+            {
+              color:
+                themeType == Theme_Mode.isDark
+                  ? darkModeColors.text
+                  : lightModeColors.text,
+            },
+          ]}
           multiline={props?.isMultiLine}
           value={props?.value?.toString()}
           onChangeText={(val) => {

@@ -9,21 +9,28 @@ import {
 
 import { Touchable, View } from "../../common";
 import LoadingImage from "../../common/LoadingImage";
-import { Notification_Types } from "../../util/Strings";
-import { AppColors, normalized } from "../../util/AppConstant";
+import { Notification_Types, Theme_Mode } from "../../util/Strings";
+import {
+  AppColors,
+  darkModeColors,
+  lightModeColors,
+  normalized,
+} from "../../util/AppConstant";
 import { Routes } from "../../util/Route";
 import PostDetailScreen from "../../Post/Screens/PostDetailScreen";
+import { useSelector } from "react-redux";
 
 /* =============================================================================
 <NotificationListItem />
 ============================================================================= */
 const NotificationListItem = ({ notification }) => {
+  const themeType = useSelector((AppState) => AppState.sliceReducer.themeType);
+
   const navigation = useNavigation();
   const type = notification?.type;
 
   const _handleSuggestionPress = () => {
     if (notification.payload) {
-      console.log("print -- > ", notification);
       navigation.navigate("SuggestionStack", {
         screen: "SuggestionApprove",
         params: { suggestion: notification.payload },
@@ -98,8 +105,14 @@ const NotificationListItem = ({ notification }) => {
           _handleSuggestionPress();
         }
       }}
+      style={{
+        backgroundColor:
+          themeType == Theme_Mode.isDark
+            ? darkModeColors.background
+            : lightModeColors.background,
+      }}
     >
-      <View horizontal style={styles.container}>
+      <View horizontal style={{ ...styles.container }}>
         <LoadingImage
           source={{ uri: `${notification?.sender?.image}` }}
           style={{
@@ -118,7 +131,10 @@ const NotificationListItem = ({ notification }) => {
                   flex: 1,
                   flexWrap: "wrap",
                   marginStart: 8,
-                  color: AppColors.black.black,
+                  color:
+                    themeType == Theme_Mode.isDark
+                      ? darkModeColors.text
+                      : lightModeColors.text,
                   fontSize: normalized(14),
                 }}
               >
@@ -133,7 +149,10 @@ const NotificationListItem = ({ notification }) => {
             style={{
               width: normalized(290),
               marginStart: 8,
-              color: AppColors.black.black,
+              color:
+                themeType == Theme_Mode.isDark
+                  ? darkModeColors.text
+                  : lightModeColors.text,
             }}
             numberOfLines={1}
           >

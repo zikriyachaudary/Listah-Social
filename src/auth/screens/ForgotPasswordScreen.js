@@ -9,7 +9,7 @@ import {
   Text,
   View,
 } from "react-native";
-import { connect } from "react-redux";
+import { connect, useSelector } from "react-redux";
 
 import { Button, StackHeader } from "../../common";
 
@@ -21,15 +21,20 @@ import {
   AppHorizontalMargin,
   AppImages,
   EmailValidator,
+  darkModeColors,
   hv,
+  lightModeColors,
   normalized,
 } from "../../util/AppConstant";
 import TextInputComponent from "../../common/TextInputComponent";
+import { Theme_Mode } from "../../util/Strings";
 
 /* =============================================================================
 <ForgotPasswordScreen />
 ============================================================================= */
 const ForgotPasswordScreen = ({ loading, forgotPassword, navigation }) => {
+  const themeType = useSelector((AppState) => AppState.sliceReducer.themeType);
+
   const [email, setEmail] = useState("");
   const [emailErrorMsg, setEmailErrorMsg] = useState("");
 
@@ -49,7 +54,15 @@ const ForgotPasswordScreen = ({ loading, forgotPassword, navigation }) => {
   };
 
   return (
-    <View style={AppStyles.MainStyle}>
+    <View
+      style={{
+        ...AppStyles.MainStyle,
+        backgroundColor:
+          themeType == Theme_Mode.isDark
+            ? darkModeColors.background
+            : lightModeColors.background,
+      }}
+    >
       <StackHeader
         title=" "
         left={

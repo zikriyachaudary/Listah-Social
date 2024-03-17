@@ -1,6 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
 import { connect, useDispatch, useSelector } from "react-redux";
-import { Platform, SafeAreaView, ActivityIndicator } from "react-native";
+import {
+  Platform,
+  SafeAreaView,
+  ActivityIndicator,
+  useColorScheme,
+  Appearance,
+} from "react-native";
 import FirebaseAuth from "@react-native-firebase/auth";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -9,14 +15,18 @@ import { View, Text } from "../common";
 import HomeTab from "./HomeTab/index";
 import AuthStack from "../auth/screens/AuthStack";
 import SuggestionStack from "../suggestion/screens/SuggestionStack";
-import * as Colors from "../config/colors";
 import SplashScreen from "react-native-splash-screen";
 import { getUser } from "../auth/redux/selectors";
 import { getProfile as getProfileAction } from "../profile/redux/actions";
 import { changeAuthState as changeAuthStateAction } from "../auth/redux/actions";
 import FullImageModal from "../common/PostCard/PostItem/FullImageModal";
 import { showFullImage } from "../home/redux/appLogics";
-import { getUserDraftPost, setUpChat } from "../util/helperFun";
+import {
+  getThemeType,
+  getUserDraftPost,
+  saveThemeType,
+  setUpChat,
+} from "../util/helperFun";
 import ChatListingScreen from "../Chat/Screens/ChatListingScreen";
 import ChatScreen from "../Chat/Screens/ChatScreen";
 
@@ -26,11 +36,12 @@ import {
   setIsAlertShow,
   setPushNotifi,
   setCategoriesInRed,
+  setThemeType,
 } from "../redux/action/AppLogics";
 import AlertModal from "../common/AlertModal";
 import LocalNotification from "../common/LocalNotification";
 import useNotificationManger from "../hooks/useNotificationManger";
-import { Notification_Types } from "../util/Strings";
+import { Notification_Types, Theme_Mode, Theme_Types } from "../util/Strings";
 import { navigate, navigationRef } from "./RootNavigation";
 import { fetchCategoriesList } from "../network/Services/ProfileServices";
 import RNSplashScreen from "../auth/screens/SplashScreen";
@@ -53,7 +64,53 @@ const AppNavigation = ({ changeAuthState, getProfile, authenticated }) => {
   const selector = useSelector((AppState) => AppState);
 
   const dispatch = useDispatch();
-  // firebase user state check
+
+  useEffect(() => {
+    const loadTheme = async () => {
+      let subscribeThemeListener;
+      let themeType = await getThemeType();
+      if (!themeType) {
+        const isDark = Appearance.getColorScheme() === "dark";
+        saveThemeType(
+          isDark ? Theme_Types.deviceDarkMode : Theme_Types.deviceLightMode
+        );
+        dispatch(setThemeType(isDark ? Theme_Mode.isDark : Theme_Mode.isLight));
+      }
+      if (
+        themeType === Theme_Types.appDarkMode ||
+        themeType === Theme_Types.appLightMode
+      ) {
+        saveThemeType(themeType);
+        dispatch(
+          setThemeType(
+            themeType === Theme_Types.appDarkMode
+              ? Theme_Mode.isDark
+              : Theme_Mode.isLight
+          )
+        );
+      } else {
+        subscribeThemeListener = Appearance.addChangeListener(
+          ({ colorScheme }) => {
+            if (colorScheme === "light") {
+              saveThemeType(Theme_Types.deviceLightMode);
+              dispatch(setThemeType(Theme_Mode.isLight));
+            } else {
+              saveThemeType(Theme_Types.deviceDarkMode);
+              dispatch(setThemeType(Theme_Mode.isDark));
+            }
+          }
+        );
+      }
+      return () => {
+        subscribeThemeListener.remove()
+          ? subscribeThemeListener.remove()
+          : null;
+      };
+    };
+
+    loadTheme();
+  }, []);
+
   useEffect(() => {
     let removeOnNotificationOpened;
     let removeOnNotification;
@@ -120,6 +177,7 @@ const AppNavigation = ({ changeAuthState, getProfile, authenticated }) => {
         : null;
     };
   }, []);
+
   const setChat = async (userId) => {
     if (userId) {
       await setUpChat(userId, async (result) => {
@@ -184,7 +242,6 @@ const AppNavigation = ({ changeAuthState, getProfile, authenticated }) => {
   const getInitialNotification = async () => {
     const notification = await notifications.getInitialNotification();
     if (notification?.notification?._data) {
-      console.log("getInitialNotification----->");
       // dispatch(setPushNotifi(notification?.notification));
       setTimeout(() => {
         openDetail(notification?.notification);
@@ -244,14 +301,9 @@ const AppNavigation = ({ changeAuthState, getProfile, authenticated }) => {
   if (initializing) {
     return null;
   }
-  return (
-    <NavigationContainer theme={THEME} ref={navigationRef}>
-      {/* <StatusBar
-        // translucent
-        backgroundColor={AppColors.blue.navy}
-        // barStyle="dark-content"
-      /> */}
 
+  return (
+    <NavigationContainer ref={navigationRef}>
       <Stack.Navigator
         screenOptions={{
           headerShown: false,
@@ -281,7 +333,6 @@ const AppNavigation = ({ changeAuthState, getProfile, authenticated }) => {
                   name={Routes.Chat.chatScreen}
                   component={ChatScreen}
                 />
-
                 <Stack.Screen name="ReportPost" component={ReportPost} />
               </>
             ) : (
@@ -294,7 +345,7 @@ const AppNavigation = ({ changeAuthState, getProfile, authenticated }) => {
       {selector?.sliceReducer?.isLoaderStart ? (
         <View
           style={{
-            backgroundColor: "rgba(0,0,0, 0.2)",
+            backgroundColor: "rgba(0,0,0, 0.3)",
             justifyContent: "center",
             alignItems: "center",
             position: "absolute",
@@ -367,16 +418,6 @@ const AppNavigation = ({ changeAuthState, getProfile, authenticated }) => {
   );
 };
 
-const THEME = {
-  dark: false,
-  colors: {
-    primary: Colors.primary,
-    background: Colors.white,
-    text: Colors.black,
-    border: Colors.outline,
-    notification: Colors.accent,
-  },
-};
 const mapStateToProps = (state) => ({
   authenticated: !!getUser(state),
 });

@@ -14,8 +14,14 @@ import * as Colors from "../../../config/colors";
 import LoadingImage from "../../../common/LoadingImage";
 import { useNavigation } from "@react-navigation/native";
 import useNotificationManger from "../../../hooks/useNotificationManger";
-import { Notification_Types } from "../../../util/Strings";
-import { AppColors, AppImages, normalized } from "../../../util/AppConstant";
+import { Notification_Types, Theme_Mode } from "../../../util/Strings";
+import {
+  AppColors,
+  AppImages,
+  darkModeColors,
+  lightModeColors,
+  normalized,
+} from "../../../util/AppConstant";
 import FastImage from "react-native-fast-image";
 
 /* =============================================================================
@@ -27,6 +33,7 @@ const AllUsersListItem = ({
   unFollowUser,
   followUser,
 }) => {
+  const themeType = useSelector((AppState) => AppState.sliceReducer.themeType);
   const { followNUnFollowUser } = useNotificationManger();
   const [loading, setLoading] = useState(false);
   const userId = user?.userId;
@@ -34,7 +41,6 @@ const AllUsersListItem = ({
   const userProfileImage = user?.profileImage;
   const dispatch = useDispatch();
   const selector = useSelector((AppState) => AppState);
-  // const isFollowed = userFollowings?.find((user) => user?.userId === userId);
   const [isFollowed, setIsFollowed] = useState(false);
   useEffect(() => {
     setIsFollowed(userFollowings?.find((user) => user?.userId === userId));
@@ -121,7 +127,16 @@ const AllUsersListItem = ({
             </View>
 
             <View style={{ width: "55%", marginStart: normalized(10) }}>
-              <Text style={styles.userNameText} numberOfLines={2}>
+              <Text
+                style={{
+                  ...styles.userNameText,
+                  color:
+                    themeType == Theme_Mode.isDark
+                      ? darkModeColors.text
+                      : lightModeColors.text,
+                }}
+                numberOfLines={2}
+              >
                 {userName}
               </Text>
             </View>

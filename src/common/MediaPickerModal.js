@@ -12,19 +12,21 @@ import {
   Platform,
 } from "react-native";
 import { launchImageLibrary, launchCamera } from "react-native-image-picker";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   AppColors,
   AppImages,
   ScreenSize,
+  darkModeColors,
   hv,
   imagePickerConstants,
   isSmallDevice,
+  lightModeColors,
   maxImageSizeInBytes,
   normalized,
 } from "../util/AppConstant";
 import { setIsAlertShow, setShowToast } from "../redux/action/AppLogics";
-import { AppStrings } from "../util/Strings";
+import { AppStrings, Theme_Mode } from "../util/Strings";
 import Permissions, {
   PERMISSIONS,
   RESULTS,
@@ -32,6 +34,7 @@ import Permissions, {
 } from "react-native-permissions";
 
 const MediaPickerModal = (props) => {
+  const themeType = useSelector((AppState) => AppState.sliceReducer.themeType);
   const dispatch = useDispatch();
   const pickImage = async (index) => {
     try {
@@ -55,7 +58,6 @@ const MediaPickerModal = (props) => {
         launchImageLibrary(options, (response) => {
           if (response?.assets?.length > 0) {
             if (response?.assets[0]?.type?.includes("video")) {
-              console.log("response?.assets[0]---->", response?.assets[0]);
               if (response?.assets[0]?.duration <= maxDuration) {
                 props?.onMediaSelection(response?.assets[0]);
               } else {
@@ -104,7 +106,6 @@ const MediaPickerModal = (props) => {
         } else {
           launchCamera(options, (response) => {
             if (response?.assets?.length > 0) {
-              console.log("response?.assets------->", response?.assets);
               if (response?.assets[0]?.type?.includes("video")) {
                 maxDuration = response?.assets[0]?.duration > 1000 ? 30000 : 30;
                 if (response?.assets[0]?.duration <= maxDuration) {
@@ -144,15 +145,39 @@ const MediaPickerModal = (props) => {
         <TouchableWithoutFeedback onPress={props.onClose}>
           <View style={styles.transparentBg} />
         </TouchableWithoutFeedback>
-        <View style={styles.mainContainer}>
+        <View
+          style={{
+            ...styles.mainContainer,
+            backgroundColor:
+              themeType == Theme_Mode.isDark
+                ? darkModeColors.background
+                : lightModeColors.background,
+          }}
+        >
           <View style={styles.headerRow}>
-            <Text style={styles.headingText}>Upload Media</Text>
+            <Text
+              style={{
+                ...styles.headingText,
+                color:
+                  themeType == Theme_Mode.isDark
+                    ? darkModeColors.text
+                    : lightModeColors.text,
+              }}
+            >
+              Upload Media
+            </Text>
             <TouchableWithoutFeedback onPress={props.onClose}>
               <View style={styles.crossView}>
                 <Image
                   source={AppImages.Common.cross}
                   resizeMode="contain"
-                  style={styles.crossImg}
+                  style={{
+                    ...styles.crossImg,
+                    tintColor:
+                      themeType == Theme_Mode.isDark
+                        ? darkModeColors.text
+                        : lightModeColors.text,
+                  }}
                 />
               </View>
             </TouchableWithoutFeedback>
@@ -169,10 +194,26 @@ const MediaPickerModal = (props) => {
               >
                 <Image
                   source={item.image}
-                  style={styles.pickerImg}
+                  style={{
+                    ...styles.pickerImg,
+                    tintColor:
+                      themeType == Theme_Mode.isDark
+                        ? darkModeColors.text
+                        : lightModeColors.text,
+                  }}
                   resizeMode="contain"
                 />
-                <Text style={styles.pickerText}>{item.text}</Text>
+                <Text
+                  style={{
+                    ...styles.pickerText,
+                    color:
+                      themeType == Theme_Mode.isDark
+                        ? darkModeColors.text
+                        : lightModeColors.text,
+                  }}
+                >
+                  {item.text}
+                </Text>
               </TouchableOpacity>
             ))}
           </View>

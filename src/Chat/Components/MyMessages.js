@@ -2,12 +2,22 @@ import moment from "moment";
 import React, { useEffect, useState } from "react";
 import { Text, View, Linking, StyleSheet, Image } from "react-native";
 import Hyperlink from "react-native-hyperlink";
-import { AppColors, AppImages, hv, normalized } from "../../util/AppConstant";
+import {
+  AppColors,
+  AppImages,
+  darkModeColors,
+  hv,
+  lightModeColors,
+  normalized,
+} from "../../util/AppConstant";
 import SingleVideoItem from "./SingleVideoItem";
 import SingleImageItem from "./SingleImageItem";
 import SingleDocItem from "./SingleDocItem";
+import { useSelector } from "react-redux";
+import { Theme_Mode } from "../../util/Strings";
 
 const MyMessage = ({ item, onPdf, onImage, playVideo }) => {
+  const themeType = useSelector((AppState) => AppState.sliceReducer.themeType);
   const [messageRead, setMessageRead] = useState(false);
   useEffect(() => {
     checkMessageRead();
@@ -43,7 +53,7 @@ const MyMessage = ({ item, onPdf, onImage, playVideo }) => {
     }
 
     return (
-      <View style={styles.messageCon}>
+      <View style={{ ...styles.messageCon }}>
         <Hyperlink
           linkStyle={{ color: "#2980b9", fontSize: normalized(16) }}
           onPress={(url, text) => {
@@ -68,7 +78,17 @@ const MyMessage = ({ item, onPdf, onImage, playVideo }) => {
             }
           }}
         >
-          <Text style={styles.message}>{item.content}</Text>
+          <Text
+            style={{
+              ...styles.message,
+              color:
+                themeType == Theme_Mode.isDark
+                  ? darkModeColors.text
+                  : lightModeColors.text,
+            }}
+          >
+            {item.content}
+          </Text>
         </Hyperlink>
       </View>
     );

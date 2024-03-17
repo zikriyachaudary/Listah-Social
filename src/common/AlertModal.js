@@ -1,13 +1,48 @@
 import React from "react";
 import { Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useSelector } from "react-redux";
+import { Theme_Mode } from "../util/Strings";
+import {
+  darkModeColors,
+  lightModeColors,
+  normalized,
+} from "../util/AppConstant";
 
 export default function AlertModal(props) {
+  const themeType = useSelector((AppState) => AppState.sliceReducer.themeType);
+
   return (
     <Modal animationType={"slide"} visible={props?.visible} transparent={true}>
-      <View style={styles.container}>
-        <View style={styles.alertBox}>
+      <View
+        style={{
+          ...styles.container,
+          backgroundColor:
+            themeType == Theme_Mode.isDark
+              ? "rgba(0,0,0,0.6)"
+              : "rgba(0,0,0,0.3)",
+        }}
+      >
+        <View
+          style={{
+            ...styles.alertBox,
+            backgroundColor:
+              themeType == Theme_Mode.isDark
+                ? darkModeColors.background
+                : lightModeColors.background,
+          }}
+        >
           <Text style={styles.title}>Alert</Text>
-          <Text style={styles.label}>{props?.message}</Text>
+          <Text
+            style={{
+              ...styles.label,
+              color:
+                themeType == Theme_Mode.isDark
+                  ? darkModeColors.text
+                  : lightModeColors.text,
+            }}
+          >
+            {props?.message}
+          </Text>
           {props?.multipleBtn ? (
             <View
               style={{
@@ -82,7 +117,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   title: {
-    fontSize: 18,
+    fontSize: normalized(20),
     color: "#6d14c4",
     marginBottom: 20,
     fontWeight: "500",

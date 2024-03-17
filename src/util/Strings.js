@@ -14,6 +14,18 @@ export const RequestStatus = {
   rejected: "Rejected",
 };
 
+export const Theme_Types = {
+  deviceLightMode: "Device light mode",
+  deviceDarkMode: "Device dark mode",
+  appLightMode: "App light mode",
+  appDarkMode: "App dark mode",
+};
+
+export const Theme_Mode = {
+  isDark: "Dark",
+  isLight: "Light",
+};
+
 export const Notification_Types = {
   follow: "Follow",
   unFollow: "UnFollow",

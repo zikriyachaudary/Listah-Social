@@ -17,13 +17,23 @@ import UploadIcon from "../../assets/icons/edit-upload-icon.svg";
 import CheckIcon from "../../assets/icons/edit-check-icon.svg";
 
 import { suggestPost as suggestPostAction } from "../redux/actions";
-import { Notification_Messages, Notification_Types } from "../../util/Strings";
+import {
+  Notification_Messages,
+  Notification_Types,
+  Theme_Mode,
+} from "../../util/Strings";
 import useNotificationManger from "../../hooks/useNotificationManger";
 import MediaTypeSelection from "../../common/MediaTypeSelection";
 import VideoPlayerModal from "../../common/VideoPlayerModal";
 import MediaPickerModal from "../../common/MediaPickerModal";
 import { Routes } from "../../util/Route";
-import { AppColors, AppImages, normalized } from "../../util/AppConstant";
+import {
+  AppColors,
+  AppImages,
+  darkModeColors,
+  lightModeColors,
+  normalized,
+} from "../../util/AppConstant";
 import LoadingImage from "../../common/LoadingImage";
 import { setIsAppLoader } from "../../redux/action/AppLogics";
 import ImageResizer from "react-native-image-resizer";
@@ -34,6 +44,7 @@ import ThreadManager from "../../ChatModule/ThreadManger";
 <SuggestionAddScreen />
 ============================================================================= */
 const SuggestionAddScreen = ({ route, navigation, suggestPost }) => {
+  const themeType = useSelector((AppState) => AppState.sliceReducer.themeType);
   const selector = useSelector((AppState) => AppState);
   const dispatch = useDispatch();
   const [openTypeModal, setOpenTypeModal] = useState(false);
@@ -165,9 +176,29 @@ const SuggestionAddScreen = ({ route, navigation, suggestPost }) => {
     });
   };
   return (
-    <Container>
+    <Container
+      style={{
+        backgroundColor:
+          themeType == Theme_Mode.isDark
+            ? darkModeColors.background
+            : lightModeColors.background,
+      }}
+    >
       <StackHeader title={`What would you like to${"\n"}suggest?`} />
-      <Content>
+      <Content
+        containerStyle={{
+          backgroundColor:
+            themeType == Theme_Mode.isDark
+              ? darkModeColors.background
+              : lightModeColors.background,
+        }}
+        contentContainerStyle={{
+          backgroundColor:
+            themeType == Theme_Mode.isDark
+              ? darkModeColors.background
+              : lightModeColors.background,
+        }}
+      >
         <View horizontal style={styles.changeFieldContainer}>
           {mediaObj?.uri ||
           mediaObj?.image ||
@@ -245,15 +276,39 @@ const SuggestionAddScreen = ({ route, navigation, suggestPost }) => {
             </TouchableOpacity>
           )}
           <TextInput
+            contentContainerStyle={{
+              backgroundColor:
+                themeType == Theme_Mode.isDark
+                  ? darkModeColors.background
+                  : lightModeColors.background,
+            }}
+            inputStyle={{
+              ...styles.input,
+              color:
+                themeType == Theme_Mode.isDark
+                  ? darkModeColors.text
+                  : lightModeColors.text,
+            }}
             value={name}
-            inputStyle={styles.input}
             placeholder="Enter name..."
             containerStyle={styles.inputContainer}
             onChange={setName}
           />
           <TextInput
+            contentContainerStyle={{
+              backgroundColor:
+                themeType == Theme_Mode.isDark
+                  ? darkModeColors.background
+                  : lightModeColors.background,
+            }}
+            inputStyle={{
+              ...styles.input,
+              color:
+                themeType == Theme_Mode.isDark
+                  ? darkModeColors.text
+                  : lightModeColors.text,
+            }}
             value={description}
-            inputStyle={styles.input}
             placeholder="Enter description..."
             containerStyle={styles.inputContainer}
             onChange={setDescription}

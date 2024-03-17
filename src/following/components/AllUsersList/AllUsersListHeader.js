@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Alert } from "react-native";
-import { connect } from "react-redux";
+import { connect, useSelector } from "react-redux";
 
 import { TextInput, View } from "../../../common";
 
@@ -8,11 +8,18 @@ import {
   searchUser as searchUserAction,
   getAllUsers as getAllUsersAction,
 } from "../../redux/actions";
+import { Theme_Mode } from "../../../util/Strings";
+import {
+  AppColors,
+  darkModeColors,
+  lightModeColors,
+} from "../../../util/AppConstant";
 
 /* =============================================================================
 <AllUsersListHeader />
 ============================================================================= */
 const AllUsersListHeader = ({ searchUser, getAllUsers }) => {
+  const themeType = useSelector((AppState) => AppState.sliceReducer.themeType);
   const [text, setText] = useState("");
 
   const _handleSubmit = () => {
@@ -30,6 +37,18 @@ const AllUsersListHeader = ({ searchUser, getAllUsers }) => {
   return (
     <View>
       <TextInput
+        contentContainerStyle={{
+          backgroundColor:
+            themeType == Theme_Mode.isDark
+              ? darkModeColors.background
+              : lightModeColors.background,
+        }}
+        inputStyle={{
+          color:
+            themeType == Theme_Mode.isDark
+              ? AppColors.white.white
+              : AppColors.black.black,
+        }}
         value={text}
         onChange={setText}
         placeholder="Search User..."

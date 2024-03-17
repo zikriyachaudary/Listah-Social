@@ -5,16 +5,17 @@ import View from "../../View";
 import * as Colors from "../../../config/colors";
 import LoadingImage from "../../LoadingImage";
 import { getProfile } from "../../../profile/redux/selectors";
-import { connect } from "react-redux";
+import { connect, useSelector } from "react-redux";
 import {
   AppColors,
   AppImages,
   hv,
   normalized,
 } from "../../../util/AppConstant";
+import { Theme_Mode } from "../../../util/Strings";
 const PostInnerItems = ({ post, userPosts, profile, setOpenVideoModal }) => {
   const [showMore, setShowMore] = useState(false);
-
+  const themeType = useSelector((AppState) => AppState.sliceReducer.themeType);
   const [postItems, setPostItems] = useState(
     userPosts?.length > 3 ? userPosts.slice(0, 3) : userPosts
   );
@@ -48,7 +49,10 @@ const PostInnerItems = ({ post, userPosts, profile, setOpenVideoModal }) => {
                   <Text
                     style={{
                       fontSize: normalized(12),
-                      color: AppColors.black.black,
+                      color:
+                        themeType == Theme_Mode.isDark
+                          ? AppColors.white.white
+                          : AppColors.black.black,
                       fontWeight: "500",
                       marginStart: normalized(10),
                       flex: 0.8,
@@ -63,7 +67,10 @@ const PostInnerItems = ({ post, userPosts, profile, setOpenVideoModal }) => {
                 <Text
                   style={{
                     fontSize: normalized(12),
-                    color: AppColors.black.black,
+                    color:
+                      themeType == Theme_Mode.isDark
+                        ? AppColors.white.white
+                        : AppColors.black.black,
                     fontWeight: "500",
                     marginHorizontal: normalized(10),
                     flex: 0.5,
@@ -129,7 +136,18 @@ const PostInnerItems = ({ post, userPosts, profile, setOpenVideoModal }) => {
                   </TouchableOpacity>
                 ) : null}
 
-                <Text center xs light style={styles.descriptionTxt}>
+                <Text
+                  center
+                  xs
+                  light
+                  style={{
+                    ...styles.descriptionTxt,
+                    color:
+                      themeType == Theme_Mode.isDark
+                        ? AppColors.white.white
+                        : AppColors.black.black,
+                  }}
+                >
                   {item.description || "--"}
                 </Text>
               </View>
@@ -143,7 +161,7 @@ const PostInnerItems = ({ post, userPosts, profile, setOpenVideoModal }) => {
             <Text
               style={{
                 marginTop: 10,
-                fontSize: 12,
+                fontSize: 13,
                 fontFamily: "Poppins-SemiBold",
                 color: Colors.primary,
               }}

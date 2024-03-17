@@ -2,15 +2,24 @@ import React, { useLayoutEffect, useState } from "react";
 import { FlatList, Text, View } from "react-native";
 import CustomHeader from "../../common/CommonHeader";
 import { AppStyles } from "../../util/AppStyles";
-import { AppColors, AppImages, normalized } from "../../util/AppConstant";
+import {
+  AppColors,
+  AppImages,
+  darkModeColors,
+  lightModeColors,
+  normalized,
+} from "../../util/AppConstant";
 import useNotificationManger from "../../hooks/useNotificationManger";
 import { PostItem } from "../../common";
 import { blockUsers } from "../../home/redux/actions";
 import { useDispatch, useSelector } from "react-redux";
 import { setIsAppLoader } from "../../redux/action/AppLogics";
 import VideoPlayerModal from "../../common/VideoPlayerModal";
+import { Theme_Mode } from "../../util/Strings";
 
 const PostDetailScreen = (props) => {
+  const themeType = useSelector((AppState) => AppState.sliceReducer.themeType);
+
   const [openVideoModal, setOpenVideoModal] = useState("");
   const dispatch = useDispatch();
   const selector = useSelector((AppState) => AppState);
@@ -34,7 +43,15 @@ const PostDetailScreen = (props) => {
     }
   }, []);
   return (
-    <View style={AppStyles.MainStyle}>
+    <View
+      style={{
+        ...AppStyles.MainStyle,
+        backgroundColor:
+          themeType == Theme_Mode.isDark
+            ? darkModeColors.background
+            : lightModeColors.background,
+      }}
+    >
       <CustomHeader
         atBackPress={() => {
           props?.navigation.goBack();
@@ -47,7 +64,10 @@ const PostDetailScreen = (props) => {
         <FlatList
           data={post}
           style={{
-            backgroundColor: AppColors.white.lightSky,
+            backgroundColor:
+              themeType == Theme_Mode.isDark
+                ? darkModeColors.background
+                : AppColors.white.lightSky,
             paddingHorizontal: 18,
             paddingVertical: normalized(10),
             zIndex: 0,
@@ -92,7 +112,10 @@ const PostDetailScreen = (props) => {
         >
           <Text
             style={{
-              color: AppColors.black.black,
+              color:
+                themeType == Theme_Mode.isDark
+                  ? darkModeColors.text
+                  : lightModeColors.text,
               fontSize: normalized(16),
               fontWeight: "400",
             }}

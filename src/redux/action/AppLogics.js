@@ -11,6 +11,7 @@ import {
   SET_PUSH_NOTI,
   SET_SHOW_SPLASH,
   SET_SHOW_TOAST,
+  SET_THEME_TYPE,
   SET_THREAD_LIST,
   SET_UPDATE_FB_TOKEN,
 } from "./types";
@@ -82,5 +83,10 @@ export const setIsHideTabBar = (data) => ({
 
 export const setShowToast = (data) => ({
   type: SET_SHOW_TOAST,
+  data: data,
+});
+
+export const setThemeType = (data) => ({
+  type: SET_THEME_TYPE,
   data: data,
 });

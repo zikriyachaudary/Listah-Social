@@ -7,8 +7,18 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { AppColors, AppImages, hv, normalized } from "../util/AppConstant";
+import {
+  AppColors,
+  AppImages,
+  darkModeColors,
+  hv,
+  lightModeColors,
+  normalized,
+} from "../util/AppConstant";
+import { useSelector } from "react-redux";
+import { Theme_Mode } from "../util/Strings";
 const CustomDropDown = (props) => {
+  const themeType = useSelector((AppState) => AppState.sliceReducer.themeType);
   const [isOpen, setIsOpen] = useState(false);
   const handleOptionSelect = (value) => {
     if (props?.atSelect) {
@@ -47,7 +57,13 @@ const CustomDropDown = (props) => {
                       fontWeight: "400",
                     }
                   : props?.selected?.length > 0
-                  ? styles.selectedTxt
+                  ? {
+                      ...styles.selectedTxt,
+                      color:
+                        themeType == Theme_Mode.isDark
+                          ? darkModeColors.text
+                          : lightModeColors.text,
+                    }
                   : styles.unSelectedTxt
               }
             >
@@ -64,7 +80,10 @@ const CustomDropDown = (props) => {
             <Image
               source={AppImages.Common.arrowDown}
               style={{
-                tintColor: AppColors.black.black,
+                tintColor:
+                  themeType == Theme_Mode.isDark
+                    ? darkModeColors.text
+                    : lightModeColors.text,
                 resizeMode: "contain",
                 transform: [
                   {
@@ -94,9 +113,15 @@ const CustomDropDown = (props) => {
                 key={index}
                 style={[
                   styles.dropdownOption,
-                  value == props?.selected
-                    ? { backgroundColor: AppColors.blue.lightNavy }
-                    : null,
+
+                  {
+                    backgroundColor:
+                      value == props?.selected
+                        ? AppColors.blue.lightNavy
+                        : themeType == Theme_Mode.isDark
+                        ? AppColors.black.black
+                        : lightModeColors.background,
+                  },
                 ]}
                 onPress={() => {
                   handleOptionSelect(option);

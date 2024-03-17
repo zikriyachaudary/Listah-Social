@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { connect } from "react-redux";
+import { connect, useSelector } from "react-redux";
 import { StyleSheet, TouchableWithoutFeedback } from "react-native";
 
 import { Avatar, Button, Text, View } from "../../../common";
@@ -8,13 +8,21 @@ import { unFollowUser as unFollowUserAction } from "../../redux/actions";
 import * as Colors from "../../../config/colors";
 import LoadingImage from "../../../common/LoadingImage";
 import { useNavigation } from "@react-navigation/native";
-import { AppColors, AppImages, normalized } from "../../../util/AppConstant";
+import {
+  AppColors,
+  AppImages,
+  darkModeColors,
+  lightModeColors,
+  normalized,
+} from "../../../util/AppConstant";
 import FastImage from "react-native-fast-image";
+import { Theme_Mode } from "../../../util/Strings";
 
 /* =============================================================================
 <FollowingUsersListItem />
 ============================================================================= */
 const FollowingUsersListItem = ({ user, unFollowUser }) => {
+  const themeType = useSelector((AppState) => AppState.sliceReducer.themeType);
   const [loading, setLoading] = useState(false);
   const userId = user?.userId;
   const userName = user?.username;
@@ -83,7 +91,16 @@ const FollowingUsersListItem = ({ user, unFollowUser }) => {
             </View>
 
             <View style={{ width: "55%", marginStart: normalized(10) }}>
-              <Text style={styles.userNameTxt} numberOfLines={2}>
+              <Text
+                style={{
+                  ...styles.userNameTxt,
+                  color:
+                    themeType == Theme_Mode.isDark
+                      ? darkModeColors.text
+                      : lightModeColors.text,
+                }}
+                numberOfLines={2}
+              >
                 {userName}
               </Text>
             </View>

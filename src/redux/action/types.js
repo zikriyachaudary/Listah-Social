@@ -13,3 +13,4 @@ export const SET_APP_LOADER = "SET_APP_LOADER";
 export const SET_THREAD_LIST = "SET_THREAD_LIST";
 export const SET_HIDE_TAB = "SET_HIDE_TAB";
 export const SET_SHOW_TOAST = "SET_SHOW_TOAST";
+export const SET_THEME_TYPE = "SET_THEME_TYPE";

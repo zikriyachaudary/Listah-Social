@@ -5,7 +5,15 @@ import Hyperlink from "react-native-hyperlink";
 import SingleVideoItem from "./SingleVideoItem";
 import SingleImageItem from "./SingleImageItem";
 import SingleDocItem from "./SingleDocItem";
-import { AppColors, hv, normalized } from "../../util/AppConstant";
+import {
+  AppColors,
+  darkModeColors,
+  hv,
+  lightModeColors,
+  normalized,
+} from "../../util/AppConstant";
+import { useSelector } from "react-redux";
+import { Theme_Mode } from "../../util/Strings";
 const OtherUserMessage = ({ item, onPdf, onImage, playVideo }) => {
   const setContainerComponent = () => {
     if (item["videoUrl"]) {
@@ -54,7 +62,13 @@ const OtherUserMessage = ({ item, onPdf, onImage, playVideo }) => {
             }
           }}
         >
-          <Text style={styles.message}>{item.content}</Text>
+          <Text
+            style={{
+              ...styles.message,
+            }}
+          >
+            {item.content}
+          </Text>
         </Hyperlink>
       </View>
     );

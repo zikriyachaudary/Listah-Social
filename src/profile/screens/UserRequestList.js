@@ -12,6 +12,8 @@ import { useIsFocused } from "@react-navigation/native";
 import {
   AppColors,
   AppHorizontalMargin,
+  darkModeColors,
+  lightModeColors,
   normalized,
 } from "../../util/AppConstant";
 import LoadingImage from "../../common/LoadingImage";
@@ -19,11 +21,12 @@ import {
   adminActionAtReq,
   fetchUserRequestedList,
 } from "../../network/Services/ProfileServices";
-import { RequestStatus } from "../../util/Strings";
-import { useDispatch } from "react-redux";
+import { RequestStatus, Theme_Mode } from "../../util/Strings";
+import { useDispatch, useSelector } from "react-redux";
 import { setIsAlertShow } from "../../redux/action/AppLogics";
 
 const UserRequestListScreen = (route) => {
+  const themeType = useSelector((AppState) => AppState.sliceReducer.themeType);
   const isFocused = useIsFocused();
   const dispatch = useDispatch();
   const [loader, setLoader] = useState(false);
@@ -55,11 +58,25 @@ const UserRequestListScreen = (route) => {
     });
   };
   return (
-    <Container style={styles.content}>
+    <Container
+      style={{
+        ...styles.content,
+        backgroundColor:
+          themeType == Theme_Mode.isDark
+            ? darkModeColors.background
+            : lightModeColors.background,
+      }}
+    >
       <StackHeader title={"User Request's"} />
       {data?.length > 0 ? (
         <FlatList
-          style={styles.mainCont}
+          style={{
+            ...styles.mainCont,
+            backgroundColor:
+              themeType == Theme_Mode.isDark
+                ? darkModeColors.background
+                : lightModeColors.background,
+          }}
           showsVerticalScrollIndicator={false}
           data={data}
           keyExtractor={(item, index) => `${index}`}
@@ -76,7 +93,15 @@ const UserRequestListScreen = (route) => {
                     style={styles.profile}
                   />
                   <View style={styles.nameCont}>
-                    <Text style={styles.nameTxt}>
+                    <Text
+                      style={{
+                        ...styles.nameTxt,
+                        color:
+                          themeType == Theme_Mode.isDark
+                            ? darkModeColors.text
+                            : lightModeColors.text,
+                      }}
+                    >
                       {item?.name?.length > 0 ? item?.name : "No name"}
                       <Text
                         style={{
@@ -135,7 +160,17 @@ const UserRequestListScreen = (route) => {
           {loader ? (
             <ActivityIndicator color={AppColors.blue.navy} size={"large"} />
           ) : (
-            <Text style={styles.emptyTxt}>No Request found!</Text>
+            <Text
+              style={{
+                ...styles.emptyTxt,
+                color:
+                  themeType == Theme_Mode.isDark
+                    ? darkModeColors.text
+                    : lightModeColors.text,
+              }}
+            >
+              No Request found!
+            </Text>
           )}
         </View>
       )}
@@ -158,7 +193,7 @@ const styles = StyleSheet.create({
   },
   mainCont: {
     flex: 1,
-    margin: AppHorizontalMargin,
+    padding: AppHorizontalMargin,
   },
   singleItemStyle: {
     flexDirection: "row",

@@ -1,11 +1,18 @@
 import React from "react";
 import { View, ActivityIndicator } from "react-native";
 import { AppColors } from "../util/AppConstant";
+import { useSelector } from "react-redux";
+import { Theme_Mode } from "../util/Strings";
 const AppLoader = (props) => {
+  const themeType = useSelector((AppState) => AppState.sliceReducer.themeType);
+
   return (
     <View
       style={{
-        backgroundColor: "rgba(0,0,0, 0.2)",
+        backgroundColor:
+          themeType == Theme_Mode.isDark
+            ? "rgba(0,0,0,0.4)"
+            : "rgba(0,0,0,0.2)",
         justifyContent: "center",
         alignItems: "center",
         position: "absolute",

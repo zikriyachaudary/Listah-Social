@@ -1,4 +1,4 @@
-import { connect } from "react-redux";
+import { connect, useSelector } from "react-redux";
 import React, { useEffect, useState } from "react";
 import { useIsFocused } from "@react-navigation/native";
 import { TabView, SceneMap } from "react-native-tab-view";
@@ -12,11 +12,14 @@ import {
   getAllUsers as getAllUsersAction,
   getUserFollowings as getUserFollowingsAction,
 } from "../redux/actions";
+import { Theme_Mode } from "../../util/Strings";
+import { darkModeColors, lightModeColors } from "../../util/AppConstant";
 
 /* =============================================================================
 <FollowingScreen />
 ============================================================================= */
 const FollowingScreen = ({ getUserFollowings, getAllUsers }) => {
+  const themeType = useSelector((AppState) => AppState.sliceReducer.themeType);
   const isFocused = useIsFocused();
   const [index, setIndex] = useState(0);
   const [routes] = useState([
@@ -30,7 +33,6 @@ const FollowingScreen = ({ getUserFollowings, getAllUsers }) => {
     },
   ]);
 
-  // GET_ALL_USERS && USER_FOLLOWING
   useEffect(() => {
     if (isFocused) {
       getAllUsers();
@@ -38,7 +40,14 @@ const FollowingScreen = ({ getUserFollowings, getAllUsers }) => {
     }
   }, [isFocused]);
   return (
-    <Container>
+    <Container
+      style={{
+        backgroundColor:
+          themeType == Theme_Mode.isDark
+            ? darkModeColors.background
+            : lightModeColors.background,
+      }}
+    >
       <TabView
         lazy
         onIndexChange={setIndex}

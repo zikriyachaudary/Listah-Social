@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { connect } from 'react-redux';
-import { StyleSheet } from 'react-native';
-import ImageResizer from 'react-native-image-resizer';
-import FireStore from '@react-native-firebase/storage';
+import React, { useState } from "react";
+import { connect, useSelector } from "react-redux";
+import { StyleSheet } from "react-native";
+import ImageResizer from "react-native-image-resizer";
+import FireStore from "@react-native-firebase/storage";
 
 import {
   View,
@@ -11,27 +11,40 @@ import {
   Content,
   TextInput,
   ImagePickerButton,
-} from '../../common';
-import EditProfileHeader from '../components/EditProfileHeader';
-import * as Colors from '../../config/colors';
+} from "../../common";
+import EditProfileHeader from "../components/EditProfileHeader";
+import * as Colors from "../../config/colors";
 
-import { getProfile, getLoading } from '../redux/selectors';
-import { updateProfile as updateProfileAction } from '../redux/actions';
+import { getProfile, getLoading } from "../redux/selectors";
+import { updateProfile as updateProfileAction } from "../redux/actions";
+import { Theme_Mode } from "../../util/Strings";
+import { darkModeColors, lightModeColors } from "../../util/AppConstant";
 
 /* =============================================================================
 <EditProfileScreen />
 ============================================================================= */
 const EditProfileScreen = ({ profile, updateProfile }) => {
+  const themeType = useSelector((AppState) => AppState.sliceReducer.themeType);
+
   const photoUrl = profile?.profileImage;
-  const [profileImage, setProfileImage] = useState('');
+  const [profileImage, setProfileImage] = useState("");
   const [username, setUsername] = useState(profile?.username);
   const [loading, setLoading] = useState(false);
 
   const _handleSubmit = async () => {
     if (profileImage) {
-      setLoading(true)
-      const compressedImage = await ImageResizer.createResizedImage(profileImage.uri, 1000, 1000, 'PNG', 100, 0);
-      const storageRef = await FireStore().ref('profile_pics').child(profileImage.fileName);
+      setLoading(true);
+      const compressedImage = await ImageResizer.createResizedImage(
+        profileImage.uri,
+        1000,
+        1000,
+        "PNG",
+        100,
+        0
+      );
+      const storageRef = await FireStore()
+        .ref("profile_pics")
+        .child(profileImage.fileName);
 
       await storageRef.putFile(compressedImage.uri);
       const uploadImgUrl = await storageRef.getDownloadURL();
@@ -48,18 +61,66 @@ const EditProfileScreen = ({ profile, updateProfile }) => {
         profileImage: photoUrl,
       });
       setLoading(false);
-    };
+    }
   };
 
   return (
-    <Container>
+    <Container
+      style={{
+        backgroundColor:
+          themeType == Theme_Mode.isDark
+            ? darkModeColors.background
+            : lightModeColors.background,
+      }}
+    >
       <EditProfileHeader photoUrl={photoUrl} photoUrlLocalUrl={profileImage} />
-      <Content contentContainerStyle={styles.content}>
-        <TextInput value={username} label='User Name' onChange={setUsername} />
+      <Content
+        contentContainerStyle={{
+          ...styles.content,
+          backgroundColor:
+            themeType == Theme_Mode.isDark
+              ? darkModeColors.background
+              : lightModeColors.background,
+        }}
+        containerStyle={{
+          backgroundColor:
+            themeType == Theme_Mode.isDark
+              ? darkModeColors.background
+              : lightModeColors.background,
+        }}
+      >
+        <TextInput
+          value={username}
+          label="User Name"
+          onChange={setUsername}
+          contentContainerStyle={{
+            backgroundColor:
+              themeType == Theme_Mode.isDark
+                ? darkModeColors.background
+                : lightModeColors.background,
+          }}
+          inputStyle={{
+            ...styles.input,
+            color:
+              themeType == Theme_Mode.isDark
+                ? darkModeColors.text
+                : lightModeColors.text,
+          }}
+          labelStyle={{
+            color:
+              themeType == Theme_Mode.isDark
+                ? darkModeColors.text
+                : lightModeColors.text,
+          }}
+        />
         <ImagePickerButton onImageSelect={setProfileImage} />
       </Content>
       <View center style={styles.btnContainer}>
-        <Button loading={loading} title='Update Profile' onPress={_handleSubmit} />
+        <Button
+          loading={loading}
+          title="Update Profile"
+          onPress={_handleSubmit}
+        />
       </View>
     </Container>
   );
@@ -85,7 +146,7 @@ const styles = StyleSheet.create({
   imgBtn: {
     borderWidth: 1,
     borderColor: Colors.primary,
-    backgroundColor: '#fff'
+    backgroundColor: "#fff",
   },
   imgBtnTxt: {
     color: Colors.primary,

@@ -39,7 +39,9 @@ import {
   AppHorizontalMargin,
   AppImages,
   ScreenSize,
+  darkModeColors,
   hv,
+  lightModeColors,
   normalized,
 } from "../../util/AppConstant";
 import useNotificationManger from "../../hooks/useNotificationManger";
@@ -54,6 +56,7 @@ import MediaPickerModal from "../../common/MediaPickerModal";
 import VideoPlayerModal from "../../common/VideoPlayerModal";
 import ThreadManager from "../../ChatModule/ThreadManger";
 import MediaTypeSelection from "../../common/MediaTypeSelection";
+import { Theme_Mode } from "../../util/Strings";
 
 /* =============================================================================
 <PostCreateScreen />
@@ -65,6 +68,7 @@ const PostCreateScreen = ({
   createAnnouncementPost,
   updatePost,
 }) => {
+  const themeType = useSelector((AppState) => AppState.sliceReducer.themeType);
   const { generateMultiplePushNotification, userSubscribed } =
     useNotificationManger();
   const selector = useSelector((AppState) => AppState);
@@ -445,7 +449,15 @@ const PostCreateScreen = ({
     setItemList(updatedArray);
   };
   return (
-    <View style={AppStyles.MainStyle}>
+    <View
+      style={{
+        ...AppStyles.MainStyle,
+        backgroundColor:
+          themeType == Theme_Mode.isDark
+            ? darkModeColors.background
+            : lightModeColors.background,
+      }}
+    >
       <CustomHeader
         isStatusBar={true}
         atBackPress={() => {
@@ -620,9 +632,23 @@ const PostCreateScreen = ({
                       >
                         <TextInput
                           value={item?.name}
-                          inputStyle={styles.input}
+                          inputStyle={{
+                            ...styles.input,
+                            color:
+                              themeType == Theme_Mode.isDark
+                                ? darkModeColors.text
+                                : lightModeColors.text,
+                          }}
+                          contentContainerStyle={{
+                            backgroundColor:
+                              themeType == Theme_Mode.isDark
+                                ? darkModeColors.background
+                                : lightModeColors.background,
+                          }}
                           placeholder="Enter name..."
-                          containerStyle={styles.inputContainer}
+                          containerStyle={{
+                            ...styles.inputContainer,
+                          }}
                           errorText={
                             item?.name?.length == 0 ? "!Empty Field" : null
                           }
@@ -632,7 +658,19 @@ const PostCreateScreen = ({
                         />
                         <TextInput
                           value={item?.description}
-                          inputStyle={styles.input}
+                          inputStyle={{
+                            ...styles.input,
+                            color:
+                              themeType == Theme_Mode.isDark
+                                ? darkModeColors.text
+                                : lightModeColors.text,
+                          }}
+                          contentContainerStyle={{
+                            backgroundColor:
+                              themeType == Theme_Mode.isDark
+                                ? darkModeColors.background
+                                : lightModeColors.background,
+                          }}
                           placeholder="Enter description..."
                           containerStyle={styles.inputContainer}
                           errorText={
@@ -740,7 +778,10 @@ const PostCreateScreen = ({
                   style={{
                     fontSize: 14,
                     marginStart: 5,
-                    color: AppColors.black.black,
+                    color:
+                      themeType == Theme_Mode.isDark
+                        ? darkModeColors.text
+                        : lightModeColors.text,
                   }}
                 >
                   Numbered List
@@ -819,7 +860,7 @@ const PostCreateScreen = ({
             });
           }}
           onMediaSelection={(value) => {
-            console.log('value------>', value);
+            console.log("value------>", value);
             if (!value) {
               setOpenMediaModal({
                 value: false,

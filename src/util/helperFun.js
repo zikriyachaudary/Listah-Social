@@ -21,6 +21,27 @@ export const saveUserDraftPost = async (data) => {
     console.log("Error storing draftPost", e);
   }
 };
+export const saveThemeType = async (data) => {
+  try {
+    await AsyncStorage.setItem("themeType", JSON.stringify(data));
+  } catch (e) {
+    console.log("Error storing themeType", e);
+  }
+};
+
+export const getThemeType = async () => {
+  try {
+    let themeType = await AsyncStorage.getItem("themeType");
+    if (themeType) {
+      return JSON.parse(themeType);
+    } else {
+      return null;
+    }
+  } catch (e) {
+    console.log("Error ", e);
+    return null;
+  }
+};
 
 export const paginationLogic = (totalCount, limit) => {
   let totalPages = 0;

@@ -17,24 +17,31 @@ import {
   deleteUserAccount,
   logout as logoutAction,
 } from "../../auth/redux/actions";
-import { AppColors, AppImages, normalized } from "../../util/AppConstant";
+import {
+  AppColors,
+  AppImages,
+  darkModeColors,
+  lightModeColors,
+  normalized,
+} from "../../util/AppConstant";
 import {
   setDraftPost,
   setIsAppLoader,
+  setThemeType,
   setThreadList,
 } from "../../redux/action/AppLogics";
-import { saveUserDraftPost } from "../../util/helperFun";
+import { getThemeType, saveUserDraftPost } from "../../util/helperFun";
 import AlertModal from "../../common/AlertModal";
 import { Routes } from "../../util/Route";
 import { checkUserAccountRequestStatus } from "../../network/Services/ProfileServices";
-import { RequestStatus } from "../../util/Strings";
+import { RequestStatus, Theme_Mode, Theme_Types } from "../../util/Strings";
 import useNotificationManger from "../../hooks/useNotificationManger";
-import AppLoader from "../../common/AppLoader";
 
 /* =============================================================================
 <ProfileScreen />
 ============================================================================= */
 const ProfileScreen = ({ profile, getProfile, logout, deleteUserAccount }) => {
+  const themeType = useSelector((AppState) => AppState.sliceReducer.themeType);
   const [reqBtnStatus, setReqBtnStatus] = useState(null);
   const isFocused = useIsFocused();
   const { checkNUpdateFCMToken } = useNotificationManger();
@@ -67,6 +74,17 @@ const ProfileScreen = ({ profile, getProfile, logout, deleteUserAccount }) => {
     dispatch(setThreadList([]));
     logout();
     dispatch(setIsAppLoader(false));
+    let themeType = await getThemeType();
+    if (themeType) {
+      dispatch(
+        setThemeType(
+          themeType === Theme_Types.appDarkMode ||
+            themeType === Theme_Types.deviceDarkMode
+            ? Theme_Mode.isDark
+            : Theme_Mode.isLight
+        )
+      );
+    }
   };
 
   const _deleteAccount = async () => {
@@ -80,6 +98,17 @@ const ProfileScreen = ({ profile, getProfile, logout, deleteUserAccount }) => {
     await saveUserDraftPost([]);
     deleteUserAccount();
     dispatch(setIsAppLoader(false));
+    let themeType = await getThemeType();
+    if (themeType) {
+      dispatch(
+        setThemeType(
+          themeType === Theme_Types.appDarkMode ||
+            themeType === Theme_Types.deviceDarkMode
+            ? Theme_Mode.isDark
+            : Theme_Mode.isLight
+        )
+      );
+    }
   };
   const fetchReqStatus = async (id) => {
     await checkUserAccountRequestStatus(id, (res) => {
@@ -87,21 +116,57 @@ const ProfileScreen = ({ profile, getProfile, logout, deleteUserAccount }) => {
     });
   };
   return (
-    <Container>
+    <Container
+      style={{
+        backgroundColor:
+          themeType == Theme_Mode.isDark
+            ? darkModeColors.background
+            : lightModeColors.background,
+      }}
+    >
       <ProfileHeader photoUrl={profileImage} />
-      <Content contentContainerStyle={styles.content}>
+      <Content
+        contentContainerStyle={{
+          ...styles.content,
+          backgroundColor:
+            themeType == Theme_Mode.isDark
+              ? darkModeColors.background
+              : lightModeColors.background,
+        }}
+        horizontalPadding={0}
+      >
         <View horizontal style={styles.item}>
           <NameIcon />
           <View style={styles.itemInfoContainer}>
             <Text xs>User Name:</Text>
-            <Text normal>{username}</Text>
+            <Text
+              normal
+              style={{
+                color:
+                  themeType == Theme_Mode.isDark
+                    ? darkModeColors.text
+                    : lightModeColors.text,
+              }}
+            >
+              {username}
+            </Text>
           </View>
         </View>
         <View horizontal style={styles.item}>
           <EditIcon />
           <View style={styles.itemInfoContainer}>
             <Text xs>Email:</Text>
-            <Text normal>{email}</Text>
+            <Text
+              normal
+              style={{
+                color:
+                  themeType == Theme_Mode.isDark
+                    ? darkModeColors.text
+                    : lightModeColors.text,
+              }}
+            >
+              {email}
+            </Text>
           </View>
         </View>
         <View style={styles.simpleLine} />
@@ -121,7 +186,17 @@ const ProfileScreen = ({ profile, getProfile, logout, deleteUserAccount }) => {
             }}
           />
           <View style={styles.itemInfoContainer}>
-            <Text normal>{"Chat"}</Text>
+            <Text
+              normal
+              style={{
+                color:
+                  themeType == Theme_Mode.isDark
+                    ? darkModeColors.text
+                    : lightModeColors.text,
+              }}
+            >
+              {"Chat"}
+            </Text>
           </View>
         </TouchableOpacity>
         <TouchableOpacity
@@ -133,7 +208,17 @@ const ProfileScreen = ({ profile, getProfile, logout, deleteUserAccount }) => {
         >
           <EditIcon />
           <View style={styles.itemInfoContainer}>
-            <Text normal>{"My Draft Post"}</Text>
+            <Text
+              normal
+              style={{
+                color:
+                  themeType == Theme_Mode.isDark
+                    ? darkModeColors.text
+                    : lightModeColors.text,
+              }}
+            >
+              {"My Draft Post"}
+            </Text>
           </View>
         </TouchableOpacity>
         {reqBtnStatus?.length > 0 ? (
@@ -152,7 +237,15 @@ const ProfileScreen = ({ profile, getProfile, logout, deleteUserAccount }) => {
             >
               <NotificationIcon stroke={AppColors.blue.navy} />
               <View style={styles.itemInfoContainer}>
-                <Text normal>
+                <Text
+                  normal
+                  style={{
+                    color:
+                      themeType == Theme_Mode.isDark
+                        ? darkModeColors.text
+                        : lightModeColors.text,
+                  }}
+                >
                   {reqBtnStatus == RequestStatus.newReq ||
                   reqBtnStatus == RequestStatus.rejected
                     ? "Request for verified Account"
@@ -175,7 +268,17 @@ const ProfileScreen = ({ profile, getProfile, logout, deleteUserAccount }) => {
               >
                 <ProfileIcon stroke={AppColors.blue.navy} />
                 <View style={styles.itemInfoContainer}>
-                  <Text normal>{"App User"}</Text>
+                  <Text
+                    normal
+                    style={{
+                      color:
+                        themeType == Theme_Mode.isDark
+                          ? darkModeColors.text
+                          : lightModeColors.text,
+                    }}
+                  >
+                    {"App User"}
+                  </Text>
                 </View>
               </TouchableOpacity>
               <TouchableOpacity
@@ -187,7 +290,17 @@ const ProfileScreen = ({ profile, getProfile, logout, deleteUserAccount }) => {
               >
                 <NotificationIcon stroke={AppColors.blue.navy} />
                 <View style={styles.itemInfoContainer}>
-                  <Text normal>{"User Requests"}</Text>
+                  <Text
+                    normal
+                    style={{
+                      color:
+                        themeType == Theme_Mode.isDark
+                          ? darkModeColors.text
+                          : lightModeColors.text,
+                    }}
+                  >
+                    {"User Requests"}
+                  </Text>
                 </View>
               </TouchableOpacity>
             </View>
@@ -199,12 +312,43 @@ const ProfileScreen = ({ profile, getProfile, logout, deleteUserAccount }) => {
           activeOpacity={1}
           onPress={() => {
             navigation.navigate("SavePosts");
-            // _handleLogout();
           }}
         >
           <Image source={AppImages.profile.savePosts} style={styles.icon} />
           <View style={styles.itemInfoContainer}>
-            <Text normal>{"Saved Posts"}</Text>
+            <Text
+              normal
+              style={{
+                color:
+                  themeType == Theme_Mode.isDark
+                    ? darkModeColors.text
+                    : lightModeColors.text,
+              }}
+            >
+              {"Saved Posts"}
+            </Text>
+          </View>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={{ ...styles.item, paddingVertical: normalized(5) }}
+          activeOpacity={1}
+          onPress={() => {
+            navigation.navigate(Routes.Profile.themeChanging);
+          }}
+        >
+          <Image source={AppImages.profile.darkThemeIcon} style={styles.icon} />
+          <View style={styles.itemInfoContainer}>
+            <Text
+              normal
+              style={{
+                color:
+                  themeType == Theme_Mode.isDark
+                    ? darkModeColors.text
+                    : lightModeColors.text,
+              }}
+            >
+              {"Theme"}
+            </Text>
           </View>
         </TouchableOpacity>
 
@@ -217,7 +361,17 @@ const ProfileScreen = ({ profile, getProfile, logout, deleteUserAccount }) => {
         >
           <Image source={AppImages.profile.logout} style={styles.icon} />
           <View style={styles.itemInfoContainer}>
-            <Text normal>{"Logout"}</Text>
+            <Text
+              normal
+              style={{
+                color:
+                  themeType == Theme_Mode.isDark
+                    ? darkModeColors.text
+                    : lightModeColors.text,
+              }}
+            >
+              {"Logout"}
+            </Text>
           </View>
         </TouchableOpacity>
 
@@ -231,7 +385,14 @@ const ProfileScreen = ({ profile, getProfile, logout, deleteUserAccount }) => {
           <Image source={AppImages.profile.delete} style={styles.icon} />
 
           <View style={styles.itemInfoContainer}>
-            <Text normal>{"Delete Account"}</Text>
+            <Text
+              normal
+              style={{
+                color: AppColors.red.dark,
+              }}
+            >
+              {"Delete Account"}
+            </Text>
           </View>
         </TouchableOpacity>
       </Content>
@@ -256,9 +417,9 @@ const ProfileScreen = ({ profile, getProfile, logout, deleteUserAccount }) => {
 
 const styles = StyleSheet.create({
   content: {
-    marginTop: normalized(40),
-    paddingHorizontal: normalized(20),
-    bottom: 20,
+    paddingTop: normalized(40),
+    paddingHorizontal: normalized(30),
+    paddingBottom: 40,
   },
   item: {
     flexDirection: "row",

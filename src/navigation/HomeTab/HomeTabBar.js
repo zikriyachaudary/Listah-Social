@@ -12,16 +12,34 @@ import AddIcon from "../../assets/icons/plus-btn.svg";
 import NavSearch from "../../assets/images/Common/Search.svg";
 import * as Colors from "../../config/colors";
 import { useSelector } from "react-redux";
+import { Theme_Mode } from "../../util/Strings";
+import {
+  AppColors,
+  darkModeColors,
+  lightModeColors,
+} from "../../util/AppConstant";
 
 /* =============================================================================
 <HomeTabBar />
 ============================================================================= */
 const HomeTabBar = ({ state, navigation }) => {
+  const themeType = useSelector((AppState) => AppState.sliceReducer.themeType);
   const insets = useSafeAreaInsets();
   const selector = useSelector((AppState) => AppState);
 
   return (
-    <View style={[styles.container, { paddingBottom: insets.bottom }]}>
+    <View
+      style={[
+        styles.container,
+        {
+          paddingBottom: insets.bottom,
+          backgroundColor:
+            themeType == Theme_Mode.isDark
+              ? darkModeColors.background
+              : lightModeColors.background,
+        },
+      ]}
+    >
       {state.routes.map((route, index) => {
         const isFocused = state.index === index;
 
@@ -55,11 +73,6 @@ const HomeTabBar = ({ state, navigation }) => {
                 "Notification" && <View style={styles.badgeView} />}
 
             {isFocused ? ICONS[index][1] : ICONS[index][0]}
-            {/* <Text xs style={isFocused ? styles.activeTxt : styles.txt}>
-              {route.name.slice(0, route.name.indexOf("Stack")) == "Discover"
-                ? "Add Post"
-                : route.name.slice(0, route.name.indexOf("Stack"))}
-            </Text> */}
           </Touchable>
         );
       })}
@@ -68,26 +81,17 @@ const HomeTabBar = ({ state, navigation }) => {
 };
 
 const ICONS = {
-  0: [<HomeIcon stroke="#999" />, <HomeIcon stroke={Colors.primary} />],
+  0: [<HomeIcon stroke={"#999"} />, <HomeIcon stroke={Colors.primary} />],
   1: [
     <FollowingIcon stroke="#999" />,
     <FollowingIcon stroke={Colors.primary} />,
   ],
-  2: [
-    <AddIcon stroke="#999" />,
-    <AddIcon stroke={Colors.primary} />,
-    // <DiscoverIcon stroke="#999" />,
-    // <DiscoverIcon stroke={Colors.primary} />,
-  ],
+  2: [<AddIcon stroke="#999" />, <AddIcon stroke={Colors.primary} />],
   3: [
     <NotificationIcon stroke="#999" />,
     <NotificationIcon stroke={Colors.primary} />,
   ],
-  4: [
-    // <ProfileIcon stroke="#999" />, <ProfileIcon stroke={Colors.primary} />
-    <NavSearch stroke="#999" />,
-    <NavSearch stroke={Colors.primary} />,
-  ],
+  4: [<NavSearch stroke="#999" />, <NavSearch stroke={Colors.primary} />],
 };
 
 const styles = StyleSheet.create({

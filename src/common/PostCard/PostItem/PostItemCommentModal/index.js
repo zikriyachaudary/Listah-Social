@@ -9,11 +9,7 @@ import {
   SafeAreaView,
   KeyboardAvoidingView,
   Platform,
-  TouchableWithoutFeedback,
-  Keyboard,
 } from "react-native";
-
-import Card from "../../../Card";
 import Text from "../../../Text";
 import View from "../../../View";
 import Touchable from "../../../Touchable";
@@ -31,13 +27,13 @@ import {
 } from "../../../../home/redux/actions";
 import { updateHomeData } from "../../../../home/redux/appLogics";
 import { useEffect } from "react";
-import { Notification_Types } from "../../../../util/Strings";
+import { Notification_Types, Theme_Mode } from "../../../../util/Strings";
 import useNotificationManger from "../../../../hooks/useNotificationManger";
+import { darkModeColors, lightModeColors } from "../../../../util/AppConstant";
 
 /* =============================================================================
  PostItemCommentModal />
 ============================================================================= */
-let isEditComment = null;
 let isAddComment = false;
 const PostItemCommentModal = ({
   post,
@@ -46,6 +42,7 @@ const PostItemCommentModal = ({
   postComment,
   postRefresh,
 }) => {
+  const themeType = useSelector((AppState) => AppState.sliceReducer.themeType);
   const { commentPostNoti } = useNotificationManger();
   const [comments, setComments] = useState([]);
   const [isEmptyVisible, setIsEmptyVisible] = useState(false);
@@ -204,8 +201,13 @@ const PostItemCommentModal = ({
     <SafeAreaView>
       <Modal
         isVisible={visible}
-        style={styles.modal}
-        // swipeDirection={"down"}
+        style={{
+          ...styles.modal,
+          backgroundColor:
+            themeType == Theme_Mode.isDark
+              ? darkModeColors.background
+              : lightModeColors.background,
+        }}
         onModalShow={async () => {
           const myPostInfo = await getPostInfoById(post.id);
           if (myPostInfo.comments && myPostInfo.comments.length > 0) {
@@ -246,7 +248,15 @@ const PostItemCommentModal = ({
                   onClose(comments.length);
                 }}
               >
-                <ChevronLeftIcon />
+                <ChevronLeftIcon
+                  width={20}
+                  height={20}
+                  stroke={
+                    themeType === Theme_Mode.isDark
+                      ? darkModeColors.text
+                      : lightModeColors.text
+                  }
+                />
               </Touchable>
               <View
                 style={{
@@ -301,7 +311,15 @@ const PostItemCommentModal = ({
                     setText("");
                   }}
                 >
-                  <EditCloseIcon width={20} height={20} stroke={"#999"} />
+                  <EditCloseIcon
+                    width={20}
+                    height={20}
+                    stroke={
+                      themeType === Theme_Mode.isDark
+                        ? darkModeColors.text
+                        : lightModeColors.text
+                    }
+                  />
                 </Touchable>
               </View>
             )}
@@ -332,7 +350,15 @@ const PostItemCommentModal = ({
                     setText("");
                   }}
                 >
-                  <EditCloseIcon width={20} height={20} stroke={"#999"} />
+                  <EditCloseIcon
+                    width={20}
+                    height={20}
+                    stroke={
+                      themeType === Theme_Mode.isDark
+                        ? darkModeColors.text
+                        : lightModeColors.text
+                    }
+                  />
                 </Touchable>
               </View>
             )}
@@ -340,8 +366,21 @@ const PostItemCommentModal = ({
             <TextInput
               value={text}
               onChange={setText}
-              containerStyle={styles.inputContainer}
-              // autoFocus={"true"}
+              inputStyle={{
+                color:
+                  themeType === Theme_Mode.isDark
+                    ? darkModeColors.text
+                    : lightModeColors.text,
+              }}
+              containerStyle={{
+                ...styles.inputContainer,
+              }}
+              contentContainerStyle={{
+                backgroundColor:
+                  themeType === Theme_Mode.isDark
+                    ? darkModeColors.background
+                    : lightModeColors.background,
+              }}
               placeholder="Type a comment..."
               onFocus={() => setShouldDismissKeyboard(false)}
               onBlur={() => setShouldDismissKeyboard(true)}

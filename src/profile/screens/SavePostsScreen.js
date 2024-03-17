@@ -12,11 +12,21 @@ import {
 } from "react-native";
 import * as Colors from "../../config/colors";
 import Text from "../../common/Text";
-import { AppColors, AppImages, normalized } from "../../util/AppConstant";
+import {
+  AppColors,
+  AppImages,
+  darkModeColors,
+  lightModeColors,
+  normalized,
+} from "../../util/AppConstant";
 import { blockUsers, getUserSavedPost } from "../../home/redux/actions";
 import VideoPlayerModal from "../../common/VideoPlayerModal";
+import { useSelector } from "react-redux";
+import { Theme_Mode } from "../../util/Strings";
 
 const SavePostsScreen = () => {
+  const themeType = useSelector((AppState) => AppState.sliceReducer.themeType);
+
   const [openVideoModal, setOpenVideoModal] = useState("");
   const navigation = useNavigation();
   const [loaderVisible, setLoaderVisible] = useState(true);
@@ -64,7 +74,6 @@ const SavePostsScreen = () => {
             navigation.goBack();
           } else {
             reportPostItem = item;
-            // setReportPostModal(true)
             navigation.navigate("ReportPost", {
               post: item,
               isReportCount: isReportCount,
@@ -79,7 +88,14 @@ const SavePostsScreen = () => {
   };
 
   return (
-    <Container>
+    <Container
+      style={{
+        backgroundColor:
+          themeType == Theme_Mode.isDark
+            ? darkModeColors.background
+            : lightModeColors.background,
+      }}
+    >
       <StackHeader title={"Saved Posts"} />
 
       {loaderVisible ? (
@@ -95,7 +111,16 @@ const SavePostsScreen = () => {
               alignItems: "center",
             }}
           >
-            <Text sm center>
+            <Text
+              sm
+              center
+              style={{
+                color:
+                  themeType == Theme_Mode.isDark
+                    ? darkModeColors.text
+                    : AppColors.grey.dark,
+              }}
+            >
               You don't have any save posts
             </Text>
           </View>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { connect } from "react-redux";
+import { connect, useSelector } from "react-redux";
 import { ScrollView } from "react-native-gesture-handler";
 import {
   ActivityIndicator,
@@ -24,9 +24,15 @@ import { getProfile } from "../../../profile/redux/selectors";
 import Touchable from "../../Touchable";
 import { challengePostLikeUnlike } from "../../../home/redux/actions";
 import { CHALLENGE_REQUEST } from "../../../suggestion/redux/constants";
-import { AppColors, AppImages, normalized } from "../../../util/AppConstant";
+import {
+  AppColors,
+  AppImages,
+  darkModeColors,
+  normalized,
+} from "../../../util/AppConstant";
 import moment from "moment";
 import ThreadManager from "../../../ChatModule/ThreadManger";
+import { Theme_Mode } from "../../../util/Strings";
 /* =============================================================================
 <PostItem />
 ============================================================================= */
@@ -43,6 +49,7 @@ const PostItem = ({
   postSaveTrigger = null,
   openVideoModal,
 }) => {
+  const themeType = useSelector((AppState) => AppState.sliceReducer.themeType);
   const postItems =
     post?.order && post.order == "1" ? post?.items : post?.items?.reverse();
 
@@ -145,7 +152,7 @@ const PostItem = ({
     if (post.challenge && post.challenge.likedUsers) {
       const isChallengeLiked =
         post.challenge.likedUsers.filter((id) => id == profile?.userId).length >
-          0
+        0
           ? true
           : false;
       setChallengeLiked(isChallengeLiked);
@@ -162,7 +169,13 @@ const PostItem = ({
   return (
     <ScrollView
       nestedScrollEnabled
-      style={styles.container}
+      style={{
+        ...styles.container,
+        backgroundColor:
+          themeType == Theme_Mode.isDark
+            ? darkModeColors.background
+            : AppColors.white.white,
+      }}
       showsVerticalScrollIndicator={false}
     >
       <PostItemHeader
@@ -192,7 +205,11 @@ const PostItem = ({
 
       <PostInnerItems
         post={post}
-        userPosts={post?.order && post.order == "1" ? post?.items : post?.items?.reverse()}
+        userPosts={
+          post?.order && post.order == "1"
+            ? post?.items
+            : post?.items?.reverse()
+        }
         setOpenVideoModal={(uri) => {
           if (openVideoModal) {
             openVideoModal(uri);
@@ -313,13 +330,22 @@ const PostItem = ({
         )}
 
       {post?.description && (
-        <Text style={{ marginTop: 10, fontSize: 16, color: "black" }}>
+        <Text
+          style={{
+            marginTop: 10,
+            fontSize: 16,
+            color:
+              themeType == Theme_Mode.isDark
+                ? AppColors.white.white
+                : AppColors.black.black,
+          }}
+        >
           <B>
             {post?.announcement
               ? "A-Listah"
               : post?.author?.username
-                ? post?.author?.username
-                : ""}
+              ? post?.author?.username
+              : ""}
           </B>{" "}
           {post.description}.
         </Text>
@@ -345,7 +371,10 @@ const PostItem = ({
         <Text
           style={{
             fontSize: normalized(14),
-            color: AppColors.grey.dark,
+            color:
+              themeType == Theme_Mode.isDark
+                ? AppColors.white.white
+                : AppColors.grey.dark,
             marginBottom: normalized(10),
           }}
         >
@@ -438,7 +467,7 @@ const mapStateToProps = (state) => ({
 const propsAreEqual = (prevProps, nextProps) =>
   prevProps.id === nextProps.id &&
   JSON.stringify(prevProps.post?.items) ===
-  JSON.stringify(nextProps?.post?.items);
+    JSON.stringify(nextProps?.post?.items);
 
 /* Export
 ============================================================================= */

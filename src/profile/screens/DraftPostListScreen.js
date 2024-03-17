@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { Container, StackHeader } from "../../common";
 import {
   FlatList,
-  Image,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -14,9 +13,16 @@ import { setDraftPost } from "../../redux/action/AppLogics";
 import { saveUserDraftPost } from "../../util/helperFun";
 import { useIsFocused, useNavigation } from "@react-navigation/native";
 import AlertModal from "../../common/AlertModal";
-import { AppColors } from "../../util/AppConstant";
+import {
+  AppColors,
+  darkModeColors,
+  lightModeColors,
+} from "../../util/AppConstant";
+import { Theme_Mode } from "../../util/Strings";
 
 const DraftPostListScreen = (route) => {
+  const themeType = useSelector((AppState) => AppState.sliceReducer.themeType);
+
   const isFocused = useIsFocused();
   const dispatch = useDispatch();
   const navigation = useNavigation();
@@ -38,7 +44,15 @@ const DraftPostListScreen = (route) => {
     await saveUserDraftPost(updatedList);
   };
   return (
-    <Container style={styles.content}>
+    <Container
+      style={{
+        ...styles.content,
+        backgroundColor:
+          themeType == Theme_Mode.isDark
+            ? darkModeColors.background
+            : lightModeColors.background,
+      }}
+    >
       <StackHeader title={"Draft Post"} />
       {data?.length > 0 ? (
         <FlatList
@@ -68,7 +82,10 @@ const DraftPostListScreen = (route) => {
                     <Text
                       style={{
                         fontSize: 14,
-                        color: AppColors.black.black,
+                        color:
+                          themeType == Theme_Mode.isDark
+                            ? darkModeColors.text
+                            : lightModeColors.text,
                         fontWeight: "400",
                         marginVertical: 5,
                       }}
@@ -113,7 +130,17 @@ const DraftPostListScreen = (route) => {
         />
       ) : (
         <View style={styles.emptyCont}>
-          <Text style={styles.emptyTxt}>No Post found!</Text>
+          <Text
+            style={{
+              ...styles.emptyTxt,
+              color:
+                themeType == Theme_Mode.isDark
+                  ? darkModeColors.text
+                  : lightModeColors.text,
+            }}
+          >
+            No Post found!
+          </Text>
         </View>
       )}
       {alertModal?.value ? (

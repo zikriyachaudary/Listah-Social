@@ -31,7 +31,13 @@ import * as Colors from "../../config/colors";
 import Modal, { ReactNativeModal } from "react-native-modal";
 import { UPDATE_CHALLENGE_FEATURE } from "../../suggestion/redux/constants";
 import FastImage from "react-native-fast-image";
-import { AppColors, AppImages, normalized } from "../../util/AppConstant";
+import {
+  AppColors,
+  AppImages,
+  darkModeColors,
+  lightModeColors,
+  normalized,
+} from "../../util/AppConstant";
 import CustomHeader from "../../common/CommonHeader";
 import TopicsComp from "../components/TopicsComp";
 import HomeTopBar from "../components/HomeTopBar";
@@ -45,12 +51,14 @@ import { Routes } from "../../util/Route";
 import moment from "moment";
 import ThreadManager from "../../ChatModule/ThreadManger";
 import VideoPlayerModal from "../../common/VideoPlayerModal";
+import { Theme_Mode } from "../../util/Strings";
 
 /* =============================================================================
 <HomeScreen />
 ============================================================================= */
 
 const HomeScreen = ({ posts, getProfile }) => {
+  const themeType = useSelector((AppState) => AppState.sliceReducer.themeType);
   const selector = useSelector((AppState) => AppState);
   const dispatch = useDispatch();
   const [openVideoModal, setOpenVideoModal] = useState("");
@@ -170,7 +178,6 @@ const HomeScreen = ({ posts, getProfile }) => {
           getMyUserHomePosts();
         }}
         openVideoModal={(uri) => {
-          console.log("uri----->", uri);
           setOpenVideoModal(uri);
         }}
         postReport={async (isReportCount) => {
@@ -255,7 +262,15 @@ const HomeScreen = ({ posts, getProfile }) => {
     }
   };
   return (
-    <View style={{ backgroundColor: AppColors.white.simpleLight, flex: 1 }}>
+    <View
+      style={{
+        backgroundColor:
+          themeType == Theme_Mode.isDark
+            ? darkModeColors.background
+            : AppColors.white.simpleLight,
+        flex: 1,
+      }}
+    >
       {searchPostVisible ? (
         <View style={styles.searchTopStyle}>
           <TouchableOpacity
@@ -379,7 +394,10 @@ const HomeScreen = ({ posts, getProfile }) => {
       />
       <FlatList
         style={{
-          backgroundColor: AppColors.white.lightSky,
+          backgroundColor:
+            themeType == Theme_Mode.isDark
+              ? darkModeColors.background
+              : AppColors.white.lightSky,
           paddingHorizontal: 18,
           paddingVertical: normalized(10),
           zIndex: 0,

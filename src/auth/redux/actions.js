@@ -117,12 +117,10 @@ export const register = (info) => async (dispatch) => {
 export const logout = () => async (dispatch) => {
   try {
     dispatch({ type: constants.LOGOUT.REQUEST });
-
     const user = auth().currentUser;
     if (user) {
       await auth().signOut();
     }
-
     dispatch({ type: constants.LOGOUT.SUCCESS });
   } catch (error) {
     Alert.alert(error.message);
@@ -139,16 +137,9 @@ export const deleteUserAccount = () => async (dispatch) => {
     const user = auth().currentUser;
 
     if (user) {
-      console.log("enter --- > ", auth().currentUser.uid);
       await ProfileCollection.doc(auth().currentUser.uid).delete();
-      console.log("done --- > ", auth().currentUser.uid);
-
       await auth().currentUser.delete();
-      // console.log("enter111 --- > " , auth().currentUser.uid)
-
-      // await auth().signOut();
     }
-
     dispatch({ type: constants.LOGOUT.SUCCESS });
   } catch (error) {
     console.log("showError - > ", error);

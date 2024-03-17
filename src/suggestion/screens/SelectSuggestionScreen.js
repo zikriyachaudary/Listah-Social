@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { connect } from "react-redux";
+import { connect, useDispatch, useSelector } from "react-redux";
 import { Alert, StyleSheet } from "react-native";
 
 import {
@@ -15,11 +15,20 @@ import * as Colors from "../../config/colors";
 
 import { getPostsById as getHomePostById } from "../../home/redux/selectors";
 import { getPostsById as getDiscoverPostById } from "../../discover/redux/selectors";
+import { Theme_Mode } from "../../util/Strings";
+import {
+  AppColors,
+  darkModeColors,
+  lightModeColors,
+} from "../../util/AppConstant";
+import { setIsAlertShow } from "../../redux/action/AppLogics";
 
 /* =============================================================================
 <SelectSuggestionScreen />
 ============================================================================= */
 const SelectSuggestionScreen = ({ mpost, navigation, route }) => {
+  const dispatch = useDispatch();
+  const themeType = useSelector((AppState) => AppState.sliceReducer.themeType);
   const post = route?.params?.post;
   const [selected, setSelected] = useState();
   const items = post?.items;
@@ -42,7 +51,9 @@ const SelectSuggestionScreen = ({ mpost, navigation, route }) => {
         authorId,
       });
     } else {
-      Alert.alert("Please Select an Item");
+      dispatch(
+        setIsAlertShow({ value: true, message: "Please Select an Item" })
+      );
     }
   };
 
@@ -68,9 +79,29 @@ const SelectSuggestionScreen = ({ mpost, navigation, route }) => {
   };
 
   return (
-    <Container>
+    <Container
+      style={{
+        backgroundColor:
+          themeType == Theme_Mode.isDark
+            ? darkModeColors.background
+            : lightModeColors.background,
+      }}
+    >
       <StackHeader title={`What would you like to${"\n"}suggest?`} />
-      <Content>
+      <Content
+        containerStyle={{
+          backgroundColor:
+            themeType == Theme_Mode.isDark
+              ? darkModeColors.background
+              : lightModeColors.background,
+        }}
+        contentContainerStyle={{
+          backgroundColor:
+            themeType == Theme_Mode.isDark
+              ? darkModeColors.background
+              : lightModeColors.background,
+        }}
+      >
         <View horizontal style={styles.header}>
           <Button
             style={{ flex: 0.3, marginEnd: 5, paddingHorizontal: 2 }}
@@ -117,7 +148,17 @@ const SelectSuggestionScreen = ({ mpost, navigation, route }) => {
                     ]}
                     onPress={() => _handleSelect(item?.id)}
                   >
-                    <View style={styles.indexCounter}>
+                    <View
+                      style={{
+                        ...styles.indexCounter,
+                        borderColor:
+                          selected === item?.id
+                            ? AppColors.blue.navy
+                            : themeType == Theme_Mode.isDark
+                            ? darkModeColors.text
+                            : lightModeColors.text,
+                      }}
+                    >
                       <Text sm bold primary>
                         {item?.id === 0 ? 1 : item?.id + 1}
                       </Text>

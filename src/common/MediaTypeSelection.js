@@ -14,13 +14,18 @@ import {
   AppImages,
   ScreenSize,
   TYPE_SELECTION_ARR,
+  darkModeColors,
   hv,
   isSmallDevice,
+  lightModeColors,
   normalized,
 } from "../util/AppConstant";
-import { AppStrings } from "../util/Strings";
+import { AppStrings, Theme_Mode } from "../util/Strings";
+import { useSelector } from "react-redux";
 
 const MediaTypeSelection = (props) => {
+  const themeType = useSelector((AppState) => AppState.sliceReducer.themeType);
+
   return (
     <Modal transparent animationType="slide" onRequestClose={props.onClose}>
       <View style={styles.outerContainer}>
@@ -31,15 +36,39 @@ const MediaTypeSelection = (props) => {
         <TouchableWithoutFeedback onPress={props.onClose}>
           <View style={styles.transparentBg} />
         </TouchableWithoutFeedback>
-        <View style={styles.mainContainer}>
+        <View
+          style={{
+            ...styles.mainContainer,
+            backgroundColor:
+              themeType == Theme_Mode.isDark
+                ? darkModeColors.background
+                : lightModeColors.background,
+          }}
+        >
           <View style={styles.headerRow}>
-            <Text style={styles.headingText}>Upload Media</Text>
+            <Text
+              style={{
+                ...styles.headingText,
+                color:
+                  themeType == Theme_Mode.isDark
+                    ? darkModeColors.text
+                    : lightModeColors.text,
+              }}
+            >
+              Upload Media
+            </Text>
             <TouchableWithoutFeedback onPress={props.onClose}>
               <View style={styles.crossView}>
                 <Image
                   source={AppImages.Common.cross}
                   resizeMode="contain"
-                  style={styles.crossImg}
+                  style={{
+                    ...styles.crossImg,
+                    tintColor:
+                      themeType == Theme_Mode.isDark
+                        ? darkModeColors.text
+                        : lightModeColors.text,
+                  }}
                 />
               </View>
             </TouchableWithoutFeedback>
@@ -54,7 +83,15 @@ const MediaTypeSelection = (props) => {
                 activeOpacity={1}
                 style={styles.singlePicker}
               >
-                <Text style={styles.pickerText}>
+                <Text
+                  style={{
+                    ...styles.pickerText,
+                    color:
+                      themeType == Theme_Mode.isDark
+                        ? darkModeColors.text
+                        : lightModeColors.text,
+                  }}
+                >
                   {item?.text.toUpperCase()}
                 </Text>
               </TouchableOpacity>
@@ -65,7 +102,10 @@ const MediaTypeSelection = (props) => {
               marginHorizontal: normalized(20),
               fontSize: normalized(13),
               fontWeight: "400",
-              color: AppColors.black.black,
+              color:
+                themeType == Theme_Mode.isDark
+                  ? darkModeColors.text
+                  : lightModeColors.text,
             }}
           >
             Note:{" "}

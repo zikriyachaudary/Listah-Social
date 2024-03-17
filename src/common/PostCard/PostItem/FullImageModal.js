@@ -6,8 +6,13 @@ import ChevronLeftIcon from "../../../assets/icons/edit-chevron-left.svg";
 import Touchable from "../../Touchable";
 import View from "../../View";
 import LoadingImage from "../../LoadingImage";
+import { useSelector } from "react-redux";
+import { Theme_Mode } from "../../../util/Strings";
+import { darkModeColors, lightModeColors } from "../../../util/AppConstant";
 
 const FullImageModal = ({ visible, onClose, userImage }) => {
+  const themeType = useSelector((AppState) => AppState.sliceReducer.themeType);
+
   const [usersImage] = useState(userImage);
 
   useEffect(() => {}, []);
@@ -15,19 +20,38 @@ const FullImageModal = ({ visible, onClose, userImage }) => {
     <SafeAreaView>
       <Modal
         isVisible={visible}
-        style={styles.modal}
-        // swipeDirection={"up"}
+        style={{
+          ...styles.modal,
+          backgroundColor:
+            themeType == Theme_Mode.isDark
+              ? darkModeColors.background
+              : lightModeColors.background,
+        }}
         animationIn={"fadeIn"}
         animationOut={"slideOutRight"}
         useNativeDriver={true}
         onBackButtonPress={onClose}
         onBackdropPress={onClose}
       >
-        <Card style={styles.card}>
+        <Card
+          style={{
+            ...styles.card,
+            backgroundColor:
+              themeType == Theme_Mode.isDark
+                ? darkModeColors.background
+                : lightModeColors.background,
+          }}
+        >
           <SafeAreaView />
           <View style={styles.header}>
             <Touchable style={styles.headerBackBtn} onPress={onClose}>
-              <ChevronLeftIcon />
+              <ChevronLeftIcon
+                stroke={
+                  themeType == Theme_Mode.isDark
+                    ? darkModeColors.text
+                    : lightModeColors.text
+                }
+              />
             </Touchable>
           </View>
           <LoadingImage source={usersImage} style={styles.contentContainer} />

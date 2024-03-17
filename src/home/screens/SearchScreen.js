@@ -31,7 +31,9 @@ import {
   AppHorizontalMargin,
   AppImages,
   ScreenSize,
+  darkModeColors,
   hv,
+  lightModeColors,
   normalized,
 } from "../../util/AppConstant";
 import CustomHeader from "../../common/CommonHeader";
@@ -39,12 +41,15 @@ import LoadingImage from "../../common/LoadingImage";
 import { setIsAppLoader } from "../../redux/action/AppLogics";
 import { filterPostReq } from "../../network/Services/ProfileServices";
 import VideoPlayerModal from "../../common/VideoPlayerModal";
+import { Theme_Mode } from "../../util/Strings";
 
 let allHomePosts = [];
 /* =============================================================================
 <search screen/>
 ============================================================================= */
 const SearchScreen = ({ posts, getProfile }) => {
+  const themeType = useSelector((AppState) => AppState.sliceReducer.themeType);
+
   const [openVideoModal, setOpenVideoModal] = useState("");
   const selector = useSelector((AppState) => AppState);
   const dispatch = useDispatch();
@@ -225,26 +230,63 @@ const SearchScreen = ({ posts, getProfile }) => {
     );
   };
   return (
-    <View>
+    <View
+      style={{
+        backgroundColor:
+          themeType == Theme_Mode.isDark
+            ? darkModeColors.background
+            : lightModeColors.background,
+      }}
+    >
       <CustomHeader
         isStatusBar={true}
         logo={AppImages.Common.appLogo}
         mainStyle={{ backgroundColor: AppColors.blue.royalBlue }}
       />
-      <View style={styles.searchTopStyle}>
+      <View
+        style={{
+          ...styles.searchTopStyle,
+          backgroundColor:
+            themeType == Theme_Mode.isDark
+              ? darkModeColors.background
+              : lightModeColors.background,
+        }}
+      >
         {selectedCat ? (
           <TouchableOpacity
             activeOpacity={1}
-            style={styles.selectedCatCont}
+            style={{
+              ...styles.selectedCatCont,
+              backgroundColor:
+                themeType == Theme_Mode.isDark
+                  ? AppColors.black.shadow
+                  : AppColors.white.simpleLight,
+            }}
             onPress={() => {
               setSelectedCat("");
               setFilteredPostByCat([]);
             }}
           >
-            <Text style={styles.catName}>{selectedCat}</Text>
+            <Text
+              style={{
+                ...styles.catName,
+                color:
+                  themeType == Theme_Mode.isDark
+                    ? darkModeColors.text
+                    : lightModeColors.text,
+              }}
+            >
+              {selectedCat}
+            </Text>
             <Image
               source={AppImages.Common.cross}
-              style={{ marginHorizontal: normalized(10) }}
+              style={{
+                marginHorizontal: normalized(10),
+                tintColor:
+                  themeType == Theme_Mode.isDark
+                    ? darkModeColors.text
+                    : lightModeColors.text,
+              }}
             />
           </TouchableOpacity>
         ) : (
@@ -253,7 +295,10 @@ const SearchScreen = ({ posts, getProfile }) => {
               flex: 1,
               height: 40,
               fontSize: 16,
-              color: "black",
+              color:
+                themeType == Theme_Mode.isDark
+                  ? darkModeColors.text
+                  : lightModeColors.text,
             }}
             placeholder="Search in post..."
             placeholderTextColor={"gray"}
@@ -277,13 +322,16 @@ const SearchScreen = ({ posts, getProfile }) => {
       </View>
       {!searchTxt && !selectedCat ? (
         <>
-          <Text style={styles.topTrendTxt}>Trending Topics</Text>
+          <Text style={{ ...styles.topTrendTxt }}>Trending Topics</Text>
           <FlatList
             showsVerticalScrollIndicator={false}
             data={selector?.sliceReducer?.categoriesList}
             style={{
               ...styles.list,
-              backgroundColor: AppColors.white.white,
+              backgroundColor:
+                themeType == Theme_Mode.isDark
+                  ? darkModeColors.background
+                  : lightModeColors.background,
               height: ScreenSize.height - normalized(300),
             }}
             keyExtractor={(index) => `${index}`}
@@ -291,7 +339,13 @@ const SearchScreen = ({ posts, getProfile }) => {
               return (
                 <TouchableOpacity
                   activeOpacity={1}
-                  style={styles.singleCatBtn}
+                  style={{
+                    ...styles.singleCatBtn,
+                    backgroundColor:
+                      themeType == Theme_Mode.isDark
+                        ? darkModeColors.background
+                        : lightModeColors.background,
+                  }}
                   onPress={async () => {
                     setSelectedCat(item?.name);
                     if (item?.name) {
@@ -310,7 +364,17 @@ const SearchScreen = ({ posts, getProfile }) => {
                     style={styles.catIcon}
                     isDisable={true}
                   />
-                  <Text style={styles.catName}>{item?.name}</Text>
+                  <Text
+                    style={{
+                      ...styles.catName,
+                      color:
+                        themeType == Theme_Mode.isDark
+                          ? darkModeColors.text
+                          : lightModeColors.text,
+                    }}
+                  >
+                    {item?.name}
+                  </Text>
                 </TouchableOpacity>
               );
             }}
@@ -318,7 +382,14 @@ const SearchScreen = ({ posts, getProfile }) => {
         </>
       ) : (
         <FlatList
-          style={{ ...styles.list, height: "75%" }}
+          style={{
+            ...styles.list,
+            height: "75%",
+            backgroundColor:
+              themeType == Theme_Mode.isDark
+                ? darkModeColors.background
+                : AppColors.white.lightSky,
+          }}
           showsVerticalScrollIndicator={false}
           data={selectedCat?.length > 0 ? filterdPostByCat : filtersPost}
           refreshing={refreshing}

@@ -10,6 +10,9 @@ import * as Colors from "../config/colors";
 
 import ChevronLeftIcon from "../assets/icons/edit-chevron-left.svg";
 import AppLogoImg from "../assets/images/edit-app-logo.jpeg";
+import { useSelector } from "react-redux";
+import { Theme_Mode } from "../util/Strings";
+import { darkModeColors, lightModeColors } from "../util/AppConstant";
 
 /* =============================================================================
 <StackHeader />
@@ -30,6 +33,8 @@ const StackHeader = ({
   onRightPress,
   isHome = false,
 }) => {
+  const themeType = useSelector((AppState) => AppState.sliceReducer.themeType);
+
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
 
@@ -54,7 +59,17 @@ const StackHeader = ({
     if (left) {
       return left;
     }
-    return <ChevronLeftIcon />;
+    return (
+      <ChevronLeftIcon
+        width={20}
+        height={20}
+        stroke={
+          themeType === Theme_Mode.isDark
+            ? darkModeColors.text
+            : lightModeColors.text
+        }
+      />
+    );
   };
 
   const _renderRight = () => {
@@ -70,7 +85,18 @@ const StackHeader = ({
     }
     if (title) {
       return (
-        <Text style={[styles.title, titleStyle]} bold>
+        <Text
+          style={
+            ([styles.title, titleStyle],
+            {
+              color:
+                themeType === Theme_Mode.isDark
+                  ? darkModeColors.text
+                  : lightModeColors.text,
+            })
+          }
+          bold
+        >
           {title}
         </Text>
       );
@@ -92,7 +118,6 @@ const StackHeader = ({
       ]}
     >
       <TouchableOpacity
-        // style={[styles.left, { height: !title ? 110 : 0, width : 100 }, leftContainerStyle]}
         style={{
           ...styles.left,
           ...leftContainerStyle,

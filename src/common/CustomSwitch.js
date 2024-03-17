@@ -6,10 +6,13 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { AppColors, normalized } from "../util/AppConstant";
+import { useSelector } from "react-redux";
 
 const switchWidth = normalized(54);
 
 const CustomSwitch = (props) => {
+  const themeType = useSelector((AppState) => AppState.sliceReducer.themeType);
+
   const switchOffset = useSharedValue(
     props.value ? switchWidth / 2 - normalized(10) : 0
   );

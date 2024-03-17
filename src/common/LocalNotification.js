@@ -11,9 +11,17 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
-import { AppImages, normalized } from "../util/AppConstant";
+import {
+  AppImages,
+  darkModeColors,
+  lightModeColors,
+  normalized,
+} from "../util/AppConstant";
 import { useSelector } from "react-redux";
+import { Theme_Mode } from "../util/Strings";
 const LocalNotification = (props) => {
+  const themeType = useSelector((AppState) => AppState.sliceReducer.themeType);
+
   const translationY = useSharedValue(-100);
   const selector = useSelector((AppState) => AppState);
   useEffect(() => {
@@ -35,7 +43,10 @@ const LocalNotification = (props) => {
       borderRadius: 8,
       marginTop: Platform.OS === "android" ? 35 : 5,
       paddingHorizontal: 10,
-      backgroundColor: "#F2F2F2",
+      backgroundColor:
+        themeType == Theme_Mode.isDark
+          ? darkModeColors.background
+          : lightModeColors.background,
       transform: [
         {
           translateY: translationY.value,
@@ -57,7 +68,10 @@ const LocalNotification = (props) => {
             height: normalized(40),
             width: normalized(40),
             borderRadius: normalized(6),
-            backgroundColor: "black",
+            backgroundColor:
+              themeType == Theme_Mode.isDark
+                ? darkModeColors.background
+                : lightModeColors.background,
           }}
           source={AppImages.Common.appLogo}
         />
@@ -71,7 +85,10 @@ const LocalNotification = (props) => {
             numberOfLines={1}
             style={{
               fontSize: normalized(12),
-              color: "black",
+              color:
+                themeType == Theme_Mode.isDark
+                  ? darkModeColors.text
+                  : lightModeColors.text,
             }}
           >
             {selector?.sliceReducer?.push_Noti?._title}
@@ -80,7 +97,10 @@ const LocalNotification = (props) => {
             numberOfLines={1}
             style={{
               fontSize: 12,
-              color: "black",
+              color:
+                themeType == Theme_Mode.isDark
+                  ? darkModeColors.text
+                  : lightModeColors.text,
             }}
           >
             {selector?.sliceReducer?.push_Noti?._body}

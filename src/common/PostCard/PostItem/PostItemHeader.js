@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { connect } from "react-redux";
+import { connect, useSelector } from "react-redux";
 import {
   StyleSheet,
   TouchableOpacity,
   Text,
   Dimensions,
   Modal,
+  Image,
 } from "react-native";
 import FireAuth from "@react-native-firebase/auth";
 import { useNavigation, useRoute } from "@react-navigation/native";
@@ -19,13 +20,22 @@ import MenuIcon from "../../../assets/icons/edit-menu-icon.svg";
 import * as Colors from "../../../config/colors";
 
 import { getPostsById } from "../../../home/redux/selectors";
-import { deletePost as deletePostAction, savePostInDb } from "../../../home/redux/actions";
+import {
+  deletePost as deletePostAction,
+  savePostInDb,
+} from "../../../home/redux/actions";
 import LoadingImage from "../../LoadingImage";
 
 import AppLogoImg from "../../../assets/images/edit-app-logo.jpeg";
 import FastImage from "react-native-fast-image";
-import { AppColors, AppImages, normalized } from "../../../util/AppConstant";
+import {
+  AppColors,
+  AppImages,
+  darkModeColors,
+  normalized,
+} from "../../../util/AppConstant";
 import { useToast } from "react-native-toast-notifications";
+import { Theme_Mode } from "../../../util/Strings";
 
 /* =============================================================================
 <PostItemHeader />
@@ -40,8 +50,9 @@ const PostItemHeader = ({
   postIndex,
   showIndex,
   isChallenge = false,
-  postSaveTrigger = null
+  postSaveTrigger = null,
 }) => {
+  const themeType = useSelector((AppState) => AppState.sliceReducer.themeType);
   const navigation = useNavigation();
   const [visible, setVisible] = useState(false);
   const toast = useToast();
@@ -53,8 +64,8 @@ const PostItemHeader = ({
   const authorId = isChallenge
     ? post?.challenge?.author?.userId
     : post?.author?.userId
-      ? post?.author?.userId
-      : post?.author;
+    ? post?.author?.userId
+    : post?.author;
   const profileImage = isChallenge
     ? post?.challenge?.author?.profileImage
     : post?.author?.profileImage;
@@ -64,7 +75,7 @@ const PostItemHeader = ({
   const _toggleMenu = () => setVisible((prev) => !prev);
 
   const _handleEditPress = () => {
-    console.log("showPostttt - > ", JSON.stringify(post))
+    console.log("showPostttt - > ", JSON.stringify(post));
     navigation.navigate("DiscoverStack", {
       id: id,
       data: post,
@@ -76,16 +87,16 @@ const PostItemHeader = ({
   };
 
   const _savePost = async () => {
-    setVisible(false)
+    setVisible(false);
     const data = await savePostInDb(post.id);
 
-    toast.show(data)
+    toast.show(data);
 
-    console.log("pppp ", postSaveTrigger())
+    console.log("pppp ", postSaveTrigger());
     if (postSaveTrigger()) {
-      postSaveTrigger()
+      postSaveTrigger();
     }
-  }
+  };
 
   const _handleDeletePress = async () => {
     await deletePost(id);
@@ -104,7 +115,16 @@ const PostItemHeader = ({
   };
   const route = useRoute();
   return (
-    <View horizontal style={styles.header}>
+    <View
+      horizontal
+      style={{
+        ...styles.header,
+        backgroundColor:
+          themeType == Theme_Mode.isDark
+            ? darkModeColors.background
+            : AppColors.white.white,
+      }}
+    >
       <TouchableOpacity
         disabled={post?.announcement}
         onPress={() => {
@@ -186,7 +206,10 @@ const PostItemHeader = ({
               style={{
                 fontFamily: "Poppins-Bold",
                 fontSize: 16,
-                color: "black",
+                color:
+                  themeType == Theme_Mode.isDark
+                    ? AppColors.white.white
+                    : darkModeColors.background,
                 width: Dimensions.get("screen").width - 200,
               }}
               adjustsFontSizeToFit={true}
@@ -196,7 +219,10 @@ const PostItemHeader = ({
             </Text>
             <Text
               style={{
-                color: "black",
+                color:
+                  themeType == Theme_Mode.isDark
+                    ? AppColors.white.white
+                    : darkModeColors.background,
               }}
             >
               {post?.announcement == true ? "A-Listah" : username}
@@ -207,10 +233,16 @@ const PostItemHeader = ({
       {!isChallenge && !post?.announcement && (
         <Menu
           visible={visible}
+          style={{
+            backgroundColor:
+              themeType == Theme_Mode.isDark
+                ? AppColors.black.black
+                : AppColors.white.white,
+          }}
           onRequestClose={_toggleMenu}
           anchor={
             <Touchable style={styles.menuBtn} onPress={_toggleMenu}>
-              <MenuIcon />
+              <MenuIcon style={{ tintColor: "#fff" }} />
             </Touchable>
           }
         >
@@ -219,19 +251,34 @@ const PostItemHeader = ({
               <>
                 <MenuItem
                   onPress={_savePost}
-                  textStyle={{ color: AppColors.black.black }}
+                  textStyle={{
+                    color:
+                      themeType == Theme_Mode.isDark
+                        ? AppColors.white.white
+                        : darkModeColors.background,
+                  }}
                 >
                   Save Post
                 </MenuItem>
                 <MenuItem
                   onPress={_handleEditPress}
-                  textStyle={{ color: AppColors.black.black }}
+                  textStyle={{
+                    color:
+                      themeType == Theme_Mode.isDark
+                        ? AppColors.white.white
+                        : darkModeColors.background,
+                  }}
                 >
                   Edit
                 </MenuItem>
                 <MenuItem
                   onPress={_handleDeletePress}
-                  textStyle={{ color: AppColors.black.black }}
+                  textStyle={{
+                    color:
+                      themeType == Theme_Mode.isDark
+                        ? AppColors.white.white
+                        : darkModeColors.background,
+                  }}
                 >
                   Delete
                 </MenuItem>
@@ -240,25 +287,45 @@ const PostItemHeader = ({
               <>
                 <MenuItem
                   onPress={_savePost}
-                  textStyle={{ color: AppColors.black.black }}
+                  textStyle={{
+                    color:
+                      themeType == Theme_Mode.isDark
+                        ? AppColors.white.white
+                        : darkModeColors.background,
+                  }}
                 >
                   Save Post
                 </MenuItem>
                 <MenuItem
                   onPress={blockUser}
-                  textStyle={{ color: AppColors.black.black }}
+                  textStyle={{
+                    color:
+                      themeType == Theme_Mode.isDark
+                        ? AppColors.white.white
+                        : darkModeColors.background,
+                  }}
                 >
                   Block User
                 </MenuItem>
                 <MenuItem
                   onPress={() => reportPost(0)}
-                  textStyle={{ color: AppColors.black.black }}
+                  textStyle={{
+                    color:
+                      themeType == Theme_Mode.isDark
+                        ? AppColors.white.white
+                        : darkModeColors.background,
+                  }}
                 >
                   Report Post
                 </MenuItem>
                 <MenuItem
                   onPress={() => reportPost(1)}
-                  textStyle={{ color: AppColors.black.black }}
+                  textStyle={{
+                    color:
+                      themeType == Theme_Mode.isDark
+                        ? AppColors.white.white
+                        : darkModeColors.background,
+                  }}
                 >
                   Report User
                 </MenuItem>

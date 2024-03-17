@@ -14,7 +14,9 @@ import {
   AppColors,
   AppHorizontalMargin,
   AppImages,
+  darkModeColors,
   hv,
+  lightModeColors,
   normalized,
 } from "../../util/AppConstant";
 import LoadingImage from "../../common/LoadingImage";
@@ -26,8 +28,12 @@ import {
 import { paginationLogic } from "../../util/helperFun";
 import * as Colors from "../../config/colors";
 import FastImage from "react-native-fast-image";
+import { useSelector } from "react-redux";
+import { Theme_Mode } from "../../util/Strings";
 
 const AppUserListScreen = (route) => {
+  const themeType = useSelector((AppState) => AppState.sliceReducer.themeType);
+
   const isFocused = useIsFocused();
   const [isLoader, setIsLoader] = useState(false);
   const [adminData, setAdminData] = useState([]);
@@ -51,7 +57,6 @@ const AppUserListScreen = (route) => {
           await getUserListSize((result) => {
             setTotalUser(result);
             let pageLimit = paginationLogic(result, 5);
-            console.log("pageLimit------->", pageLimit);
           });
         }
         if (onResponse?.length > 0) {
@@ -68,7 +73,15 @@ const AppUserListScreen = (route) => {
     }
   };
   return (
-    <Container style={styles.content}>
+    <Container
+      style={{
+        ...styles.content,
+        backgroundColor:
+          themeType == Theme_Mode.isDark
+            ? darkModeColors.background
+            : lightModeColors.background,
+      }}
+    >
       <StackHeader title={"Users"} />
       <View style={{ flex: 1 }}>
         <FlatList
@@ -121,7 +134,15 @@ const AppUserListScreen = (route) => {
                             </View>
 
                             <View style={styles.nameCont}>
-                              <Text style={styles.nameTxt}>
+                              <Text
+                                style={{
+                                  ...styles.nameTxt,
+                                  color:
+                                    themeType == Theme_Mode.isDark
+                                      ? darkModeColors.text
+                                      : lightModeColors.text,
+                                }}
+                              >
                                 {item?.name?.length > 0
                                   ? item?.name
                                   : "No name"}
@@ -186,7 +207,15 @@ const AppUserListScreen = (route) => {
                               )}
                             </View>
                             <View style={styles.nameCont}>
-                              <Text style={styles.nameTxt}>
+                              <Text
+                                style={{
+                                  ...styles.nameTxt,
+                                  color:
+                                    themeType == Theme_Mode.isDark
+                                      ? darkModeColors.text
+                                      : lightModeColors.text,
+                                }}
+                              >
                                 {item?.name?.length > 0
                                   ? item?.name
                                   : "No name"}
@@ -213,7 +242,17 @@ const AppUserListScreen = (route) => {
             {isLoader ? (
               <ActivityIndicator color={AppColors.blue.navy} size={"large"} />
             ) : userList?.length == 0 && adminData?.length == 0 ? (
-              <Text style={styles.emptyTxt}>No User found!</Text>
+              <Text
+                style={{
+                  ...styles.emptyTxt,
+                  color:
+                    themeType == Theme_Mode.isDark
+                      ? darkModeColors.text
+                      : lightModeColors.text,
+                }}
+              >
+                No User found!
+              </Text>
             ) : null}
           </View>
         ) : null}

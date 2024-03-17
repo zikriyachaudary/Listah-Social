@@ -29,15 +29,18 @@ import ChatImageView from "../Components/ChatImageView";
 import MediaSelectionModal from "../Components/MediaSelectionModal";
 import {
   AppColors,
+  darkModeColors,
   hv,
   isSmallDevice,
+  lightModeColors,
   normalized,
 } from "../../util/AppConstant";
 import { capitalizeFirstLetter, removeEmptyLines } from "../../util/helperFun";
-import { Notification_Types } from "../../util/Strings";
+import { Notification_Types, Theme_Mode } from "../../util/Strings";
 import { sendPushNotification } from "../../network/Services/NotificationServices";
 import { useIsFocused } from "@react-navigation/native";
 const ChatScreen = (props) => {
+  const themeType = useSelector((AppState) => AppState.sliceReducer.themeType);
   const selector = useSelector((AppState) => AppState?.Profile);
   const thread =
     props?.route?.params?.thread &&
@@ -518,8 +521,23 @@ const ChatScreen = (props) => {
   };
   return (
     <>
-      <SafeAreaView style={{ backgroundColor: AppColors.white.white }} />
-      <View style={styles.container}>
+      <SafeAreaView
+        style={{
+          backgroundColor:
+            themeType == Theme_Mode.isDark
+              ? darkModeColors.background
+              : lightModeColors.background,
+        }}
+      />
+      <View
+        style={{
+          ...styles.container,
+          backgroundColor:
+            themeType == Theme_Mode.isDark
+              ? darkModeColors.background
+              : lightModeColors.background,
+        }}
+      >
         <ChatHeader
           otherUserStatus={otherUserStatus}
           title={setName()}

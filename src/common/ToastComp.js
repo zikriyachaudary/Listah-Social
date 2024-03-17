@@ -43,7 +43,7 @@ const ToastComp = () => {
       opacity: opacityOffset.value,
     };
   });
-  console.log("showToast----->", showToast);
+
   return (
     <View style={styles.outerContainer}>
       <Animated.View style={[styles.mainBox, viewStyles]}>

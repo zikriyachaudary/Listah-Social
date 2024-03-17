@@ -3,6 +3,7 @@ export const Routes = {
     requestForVerify: "RequestForVerifyAccount",
     appUserList: "AppUserListScreen",
     userRequestList: "UserRequestListScreen",
+    themeChanging: "ThemeChanging",
   },
   Search: {
     searchScreen: "SearchScreen",

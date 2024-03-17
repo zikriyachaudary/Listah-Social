@@ -1,6 +1,5 @@
-import React from 'react';
-import { StyleSheet, View } from 'react-native';
-
+import React from "react";
+import { StyleSheet, View } from "react-native";
 
 /* =============================================================================
 <Container />
@@ -14,11 +13,11 @@ const Container = ({ style, center, children, ...props }) => (
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#ffff',
+    backgroundColor: "#ffff",
   },
   center: {
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
 

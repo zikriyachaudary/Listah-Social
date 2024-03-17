@@ -11,7 +11,10 @@ import {
 } from "../../util/AppConstant";
 import { removeEmptyLines } from "../../util/helperFun";
 import ThreadManager from "../../ChatModule/ThreadManger";
+import { useSelector } from "react-redux";
+import { Theme_Mode } from "../../util/Strings";
 const SingleChatComponent = (props) => {
+  const themeType = useSelector((AppState) => AppState.sliceReducer.themeType);
   const [time, setTime] = useState("");
   const [count, setUnreadCount] = useState(
     props?.obj[`${[props.obj.participants[props?.findedIndex].user]}$$`]
@@ -68,7 +71,16 @@ const SingleChatComponent = (props) => {
             </TouchableOpacity>
 
             <View style={styles.userContainer}>
-              <Text numberOfLines={1} style={styles.userName}>
+              <Text
+                numberOfLines={1}
+                style={{
+                  ...styles.userName,
+                  color:
+                    themeType == Theme_Mode.isDark
+                      ? AppColors.white.white
+                      : AppColors.black.dark,
+                }}
+              >
                 {props?.name}
               </Text>
               {props?.msg == "Audio" ? (

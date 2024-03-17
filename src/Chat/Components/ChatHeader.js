@@ -5,11 +5,17 @@ import {
   AppColors,
   AppHorizontalMargin,
   AppImages,
+  darkModeColors,
   hv,
+  lightModeColors,
   normalized,
 } from "../../util/AppConstant";
 import LoadingImage from "../../common/LoadingImage";
+import { useSelector } from "react-redux";
+import { Theme_Mode } from "../../util/Strings";
 const ChatHeader = (props) => {
+  const themeType = useSelector((AppState) => AppState.sliceReducer.themeType);
+
   const getOfflineTime = () => {
     let findedDate = moment(
       moment(
@@ -22,7 +28,18 @@ const ChatHeader = (props) => {
   };
   return (
     <>
-      <View style={[styles.maincontainer, props?.mainStyle]}>
+      <View
+        style={[
+          styles.maincontainer,
+          props?.mainStyle,
+          {
+            backgroundColor:
+              themeType == Theme_Mode.isDark
+                ? darkModeColors.background
+                : lightModeColors.background,
+          },
+        ]}
+      >
         <>
           <View
             style={{
@@ -43,7 +60,12 @@ const ChatHeader = (props) => {
             >
               <Image
                 source={AppImages.Auth.backIcon}
-                style={{ tintColor: AppColors.black.black }}
+                style={{
+                  tintColor:
+                    themeType == Theme_Mode.isDark
+                      ? AppColors.white.white
+                      : AppColors.black.black,
+                }}
               />
             </TouchableOpacity>
             {props?.profile?.length > 0 ? (
@@ -58,7 +80,17 @@ const ChatHeader = (props) => {
               />
             )}
             <View>
-              <Text style={styles.title}>{props?.title}</Text>
+              <Text
+                style={{
+                  ...styles.title,
+                  color:
+                    themeType == Theme_Mode.isDark
+                      ? AppColors.white.white
+                      : AppColors.black.black,
+                }}
+              >
+                {props?.title}
+              </Text>
               {props?.otherUserStatus?.value ? (
                 <Text style={styles.des}>
                   {props?.otherUserStatus?.value == "Online"

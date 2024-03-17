@@ -6,7 +6,9 @@ import {
   AppColors,
   AppHorizontalMargin,
   AppImages,
+  darkModeColors,
   hv,
+  lightModeColors,
   normalized,
 } from "../../util/AppConstant";
 import SingleChatComponent from "../Components/SingleChatComponent";
@@ -14,8 +16,10 @@ import { AppStyles } from "../../util/AppStyles";
 import { filterListAndSorted } from "../../util/helperFun";
 import CustomHeader from "../../common/CommonHeader";
 import { Routes } from "../../util/Route";
+import { Theme_Mode } from "../../util/Strings";
 
 const ChatListingScreen = ({ navigation, route }) => {
+  const themeType = useSelector((AppState) => AppState.sliceReducer.themeType);
   const threadList = useSelector(
     (AppState) => AppState.sliceReducer.threadList
   );
@@ -30,7 +34,15 @@ const ChatListingScreen = ({ navigation, route }) => {
     }
   }, [threadList]);
   return (
-    <View style={AppStyles.MainStyle}>
+    <View
+      style={{
+        ...AppStyles.MainStyle,
+        backgroundColor:
+          themeType == Theme_Mode.isDark
+            ? darkModeColors.background
+            : lightModeColors.background,
+      }}
+    >
       <CustomHeader
         atBackPress={() => {
           navigation.goBack();
@@ -43,7 +55,10 @@ const ChatListingScreen = ({ navigation, route }) => {
         style={{
           fontSize: normalized(24),
           fontWeight: "600",
-          color: AppColors.black.dark,
+          color:
+            themeType == Theme_Mode.isDark
+              ? AppColors.white.white
+              : AppColors.black.dark,
           margin: AppHorizontalMargin,
         }}
       >
@@ -96,7 +111,10 @@ const ChatListingScreen = ({ navigation, route }) => {
                 >
                   <Text
                     style={{
-                      color: AppColors.black.dark,
+                      color:
+                        themeType == Theme_Mode.isDark
+                          ? AppColors.white.white
+                          : AppColors.black.dark,
                       fontSize: normalized(16),
                     }}
                   >
@@ -120,7 +138,10 @@ const ChatListingScreen = ({ navigation, route }) => {
           <Text
             style={{
               textAlign: "center",
-              color: AppColors.black.dark,
+              color:
+                themeType == Theme_Mode.isDark
+                  ? AppColors.white.white
+                  : AppColors.black.dark,
               fontSize: normalized(16),
               fontWeight: "400",
               marginTop: hv(30),

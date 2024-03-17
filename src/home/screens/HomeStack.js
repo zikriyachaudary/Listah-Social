@@ -18,6 +18,7 @@ import UserRequestListScreen from "../../profile/screens/UserRequestList";
 import AppUserListScreen from "../../profile/screens/AppUsersListScreen";
 import RequestForVerifyAccountScreen from "../../profile/screens/RequestForVerifyAccountScreen";
 import SavePostsScreen from "../../profile/screens/SavePostsScreen";
+import ThemeChangingScreen from "../../profile/screens/ThemeChangingScreen";
 const Stack = createNativeStackNavigator();
 
 /* =============================================================================
@@ -60,6 +61,10 @@ const HomeStack = () => {
       <Stack.Screen
         name={Routes.Profile.userRequestList}
         component={UserRequestListScreen}
+      />
+      <Stack.Screen
+        name={Routes.Profile.themeChanging}
+        component={ThemeChangingScreen}
       />
       <Stack.Screen
         name={Routes.Profile.appUserList}

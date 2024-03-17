@@ -11,7 +11,7 @@ import {
   View,
   Text,
 } from "react-native";
-import { connect } from "react-redux";
+import { connect, useSelector } from "react-redux";
 import { Button } from "../../common";
 import { getLoading } from "../redux/selectors";
 import { login as loginAction } from "../redux/actions";
@@ -20,13 +20,15 @@ import {
   AppHorizontalMargin,
   AppImages,
   EmailValidator,
-  colorsList,
+  darkModeColors,
   hv,
+  lightModeColors,
   normalized,
 } from "../../util/AppConstant";
 import { AppStyles } from "../../util/AppStyles";
 import TextInputComponent from "../../common/TextInputComponent";
 import CustomSwitch from "../../common/CustomSwitch";
+import { Theme_Mode } from "../../util/Strings";
 
 /* =============================================================================
 <LoginScreen />
@@ -36,6 +38,8 @@ const regex =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/;
 
 const LoginScreen = ({ navigation, loading, login }) => {
+  const themeType = useSelector((AppState) => AppState.sliceReducer.themeType);
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isRemember, setIsRemember] = useState(false);
@@ -77,13 +81,19 @@ const LoginScreen = ({ navigation, loading, login }) => {
           "- One upper letter\n- One special character\n- One number"
         );
       }
-
-      //
     }
   };
 
   return (
-    <View style={AppStyles.MainStyle}>
+    <View
+      style={{
+        ...AppStyles.MainStyle,
+        backgroundColor:
+          themeType == Theme_Mode.isDark
+            ? darkModeColors.background
+            : lightModeColors.background,
+      }}
+    >
       <SafeAreaView />
       <KeyboardAvoidingView
         style={{ flex: 1 }}
@@ -97,7 +107,15 @@ const LoginScreen = ({ navigation, loading, login }) => {
           <View style={styles.childContainer}>
             <Image source={AppImages.Common.appLogo} style={styles.logoStyle} />
 
-            <Text style={styles.topDesTxt}>
+            <Text
+              style={{
+                ...styles.topDesTxt,
+                color:
+                  themeType == Theme_Mode.isDark
+                    ? darkModeColors.text
+                    : lightModeColors.text,
+              }}
+            >
               Log in to continue your journey.
             </Text>
             <TextInputComponent
@@ -132,7 +150,17 @@ const LoginScreen = ({ navigation, loading, login }) => {
                     setIsRemember(val);
                   }}
                 />
-                <Text style={styles.remembTxt}>Remember Me</Text>
+                <Text
+                  style={{
+                    ...styles.remembTxt,
+                    color:
+                      themeType == Theme_Mode.isDark
+                        ? darkModeColors.text
+                        : lightModeColors.text,
+                  }}
+                >
+                  Remember Me
+                </Text>
               </View>
               <TouchableOpacity
                 activeOpacity={1}
@@ -140,7 +168,17 @@ const LoginScreen = ({ navigation, loading, login }) => {
                   _handleForgotPasswordPress();
                 }}
               >
-                <Text style={styles.forgetPasTxt}>Forgot Password?</Text>
+                <Text
+                  style={{
+                    ...styles.forgetPasTxt,
+                    color:
+                      themeType == Theme_Mode.isDark
+                        ? darkModeColors.text
+                        : lightModeColors.text,
+                  }}
+                >
+                  Forgot Password?
+                </Text>
               </TouchableOpacity>
             </View>
             <Button
@@ -151,7 +189,15 @@ const LoginScreen = ({ navigation, loading, login }) => {
               }}
             />
 
-            <Text style={styles.bottomTxt}>
+            <Text
+              style={{
+                ...styles.bottomTxt,
+                color:
+                  themeType == Theme_Mode.isDark
+                    ? darkModeColors.text
+                    : lightModeColors.text,
+              }}
+            >
               Don’t have an account?{" "}
               <Text
                 onPress={() => {
@@ -250,7 +296,7 @@ const styles = StyleSheet.create({
     marginTop: normalized(80),
   },
   signUpBtn: {
-    fontSize: normalized(13),
+    fontSize: normalized(14),
     color: AppColors.blue.navy,
     alignSelf: "center",
     marginTop: normalized(90),

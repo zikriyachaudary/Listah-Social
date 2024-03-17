@@ -64,9 +64,7 @@ const useNotificationManger = (props) => {
         .collection(Collections.NOTIFICATION)
         .doc(data?.userId)
         .set(obj)
-        .then(() => {
-          console.log("set token -------->");
-        })
+        .then(() => {})
         .catch((err) => {
           console.log("update====>", err);
         });
@@ -349,7 +347,7 @@ const useNotificationManger = (props) => {
   };
   const sendPushNoti = async (obj, fcmToken) => {
     let title = selector?.Profile?.profile?.username;
-    console.log("fcmToken----->", fcmToken);
+
     if (fcmToken) {
       let notification = {
         title: title,
@@ -374,11 +372,9 @@ const useNotificationManger = (props) => {
   };
   const fetchNotificationList = async (onComplete) => {
     const userId = auth().currentUser.uid;
-    console.log("printUserId - > ", userId, selector?.Profile?.profile?.userId);
     await firestore()
       .collection(Collections.NOTIFICATION)
       .doc(userId)
-      // .doc(selector?.Profile?.profile?.userId)
       .get()
       .then((snapDoc) => {
         if (snapDoc?._data && snapDoc?._data?.notification_List?.length > 0) {

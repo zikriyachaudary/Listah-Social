@@ -4,15 +4,18 @@ import { ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import {
   AppColors,
   AppHorizontalMargin,
+  darkModeColors,
   hv,
+  lightModeColors,
   normalized,
 } from "../../util/AppConstant";
 import { useDispatch, useSelector } from "react-redux";
-import { RequestStatus } from "../../util/Strings";
+import { RequestStatus, Theme_Mode } from "../../util/Strings";
 import { updateUserReqStatus } from "../../network/Services/ProfileServices";
 import { setIsAlertShow } from "../../redux/action/AppLogics";
 
 const RequestForVerifyAccountScreen = (route) => {
+  const themeType = useSelector((AppState) => AppState.sliceReducer.themeType);
   const dispatch = useDispatch();
   const userData = useSelector((AppState) => AppState.Auth.user);
   const [isFocusedInput, setIsFocused] = useState(false);
@@ -43,7 +46,15 @@ const RequestForVerifyAccountScreen = (route) => {
   };
 
   return (
-    <Container style={styles.content}>
+    <Container
+      style={{
+        ...styles.content,
+        backgroundColor:
+          themeType == Theme_Mode.isDark
+            ? darkModeColors.background
+            : lightModeColors.background,
+      }}
+    >
       <StackHeader title={"Verify Request"} />
       <ScrollView
         style={{
@@ -56,6 +67,10 @@ const RequestForVerifyAccountScreen = (route) => {
           style={{
             ...styles.multiLineInput,
             borderColor: isFocusedInput ? "#6d14c4" : "darkgrey",
+            color:
+              themeType == Theme_Mode.isDark
+                ? darkModeColors.text
+                : lightModeColors.text,
           }}
           scrollEnabled={description?.length > 10 ? true : false}
           value={description}

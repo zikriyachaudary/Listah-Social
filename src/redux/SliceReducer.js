@@ -9,6 +9,7 @@ import {
   SET_THREAD_LIST,
   SET_HIDE_TAB,
   SET_SHOW_TOAST,
+  SET_THEME_TYPE,
 } from "./action/types";
 
 const initialState = {
@@ -22,6 +23,7 @@ const initialState = {
   isLoaderStart: false,
   isHideTabBar: false,
   showToast: "",
+  themeType: "",
 };
 const SliceReducer = (state = initialState, action) => {
   switch (action.type) {
@@ -75,6 +77,11 @@ const SliceReducer = (state = initialState, action) => {
       return {
         ...state,
         showToast: action.data,
+      };
+    case SET_THEME_TYPE:
+      return {
+        ...state,
+        themeType: action.data,
       };
     default:
       return state;
