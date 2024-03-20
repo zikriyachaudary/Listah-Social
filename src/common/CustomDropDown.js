@@ -119,7 +119,7 @@ const CustomDropDown = (props) => {
                       value == props?.selected
                         ? AppColors.blue.lightNavy
                         : themeType == Theme_Mode.isDark
-                        ? AppColors.black.black
+                        ? darkModeColors.background
                         : lightModeColors.background,
                   },
                 ]}
@@ -132,6 +132,8 @@ const CustomDropDown = (props) => {
                     ...styles.options,
                     color:
                       value == props?.selected
+                        ? AppColors.white.white
+                        : themeType == Theme_Mode.isDark
                         ? AppColors.white.white
                         : AppColors.grey.dark,
                   }}

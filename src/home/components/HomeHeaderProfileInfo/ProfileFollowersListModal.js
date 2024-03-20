@@ -6,12 +6,20 @@ import { Card, Text } from "../../../common";
 import ProfileFollowersListItem from "./ProfileFollowersListItem";
 import { ScrollView } from "react-native-gesture-handler";
 import { useNavigation } from "@react-navigation/native";
+import { useSelector } from "react-redux";
+import { Theme_Mode } from "../../../util/Strings";
+import {
+  AppColors,
+  darkModeColors,
+  lightModeColors,
+} from "../../../util/AppConstant";
 
 /* =============================================================================
  ProfileFollowersListModal />
 ============================================================================= */
 const ProfileFollowersListModal = ({ visible, followers, onClose }) => {
   const navigation = useNavigation();
+  const themeType = useSelector((AppState) => AppState.sliceReducer.themeType);
 
   const onItemPress = (user) => {
     onClose();
@@ -36,7 +44,10 @@ const ProfileFollowersListModal = ({ visible, followers, onClose }) => {
       <View
         style={{
           maxHeight: Dimensions.get("window").height - 350,
-          backgroundColor: "white",
+          backgroundColor:
+            themeType == Theme_Mode.isDark
+              ? darkModeColors.background
+              : AppColors.white.simpleLight,
           paddingVertical: 20,
           borderRadius: 20,
         }}
@@ -51,7 +62,16 @@ const ProfileFollowersListModal = ({ visible, followers, onClose }) => {
               />
             ))
           ) : (
-            <Text>You don't have any followers</Text>
+            <Text
+              style={{
+                color:
+                  themeType == Theme_Mode.isDark
+                    ? darkModeColors.text
+                    : lightModeColors.text,
+              }}
+            >
+              You don't have any followers
+            </Text>
           )}
         </ScrollView>
       </View>

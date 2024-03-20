@@ -42,14 +42,9 @@ import CustomHeader from "../../common/CommonHeader";
 import TopicsComp from "../components/TopicsComp";
 import HomeTopBar from "../components/HomeTopBar";
 import ProfileFollowersListModal from "../components/HomeHeaderProfileInfo/ProfileFollowersListModal";
-import {
-  filterPostReq,
-  updateCategiesList,
-} from "../../network/Services/ProfileServices";
+import { filterPostReq } from "../../network/Services/ProfileServices";
 import { setIsAppLoader } from "../../redux/action/AppLogics";
 import { Routes } from "../../util/Route";
-import moment from "moment";
-import ThreadManager from "../../ChatModule/ThreadManger";
 import VideoPlayerModal from "../../common/VideoPlayerModal";
 import { Theme_Mode } from "../../util/Strings";
 

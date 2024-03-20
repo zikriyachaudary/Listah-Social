@@ -9,7 +9,11 @@ import Touchable from "../Touchable";
 import GalleryIcon from "../../assets/icons/edit-gallery.svg";
 import CameraIcon from "../../assets/icons/edit-camera.svg";
 import { Theme_Mode } from "../../util/Strings";
-import { darkModeColors, lightModeColors } from "../../util/AppConstant";
+import {
+  AppColors,
+  darkModeColors,
+  lightModeColors,
+} from "../../util/AppConstant";
 import { useSelector } from "react-redux";
 
 /* =============================================================================

@@ -6,7 +6,11 @@ import { View, Touchable, Text } from "../../common";
 import * as Colors from "../../config/colors";
 import { useSelector } from "react-redux";
 import { Theme_Mode } from "../../util/Strings";
-import { darkModeColors, lightModeColors } from "../../util/AppConstant";
+import {
+  AppColors,
+  darkModeColors,
+  lightModeColors,
+} from "../../util/AppConstant";
 
 /* =============================================================================
 <FollowingTab />
@@ -38,7 +42,13 @@ const FollowingTab = ({ navigationState, jumpTo }) => {
           <View
             style={[
               styles.item,
-              index === navigationState.index && styles.itemActive,
+              index === navigationState.index && {
+                ...styles.itemActive,
+                borderBottomColor:
+                  themeType == Theme_Mode.isDark
+                    ? AppColors.white.white
+                    : Colors.primary,
+              },
             ]}
           >
             <Text
@@ -46,11 +56,13 @@ const FollowingTab = ({ navigationState, jumpTo }) => {
               defaultMessage={route.title}
               style={{
                 color:
-                  index === navigationState.index
+                  themeType == Theme_Mode.isDark
+                    ? index === navigationState.index
+                      ? AppColors.white.white
+                      : AppColors.grey.dark
+                    : index === navigationState.index
                     ? Colors.primary
-                    : themeType == Theme_Mode.isDark
-                    ? darkModeColors.text
-                    : lightModeColors.text,
+                    : AppColors.grey.dark,
               }}
             >
               {route.title}

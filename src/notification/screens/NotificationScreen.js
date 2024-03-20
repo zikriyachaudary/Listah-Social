@@ -35,7 +35,6 @@ const NotificationScreen = ({ notifications, getNotifications }) => {
   // GET_NOTIFICATIONS
   useEffect(() => {
     if (isFocused) {
-      // getNotifications(selector.Home.notificationUnread);
       setIsLoader(true);
       setMessageIsRead();
       fetchNotificationList((response) => {

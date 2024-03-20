@@ -1,14 +1,18 @@
-import React, { useEffect, useState } from 'react';
-import { connect } from 'react-redux';
-import { StyleSheet, TouchableWithoutFeedback } from 'react-native';
+import React, { useEffect, useState } from "react";
+import { connect, useSelector } from "react-redux";
+import { StyleSheet, TouchableWithoutFeedback } from "react-native";
 
-import { Avatar, Text, View } from '../../../common';
-import { getProfileById } from '../../../profile/redux/selectors';
+import { Avatar, Text, View } from "../../../common";
+import { getProfileById } from "../../../profile/redux/selectors";
+import { Theme_Mode } from "../../../util/Strings";
+import { darkModeColors, lightModeColors } from "../../../util/AppConstant";
 
 /* =============================================================================
  ProfileFollowersListItem />
 ============================================================================= */
 const ProfileFollowersListItem = ({ id, profile, onItemPress }) => {
+  const themeType = useSelector((AppState) => AppState.sliceReducer.themeType);
+
   const [user, setUser] = useState();
   const username = user?.username;
   const profileImage = user?.profileImage;
@@ -17,24 +21,33 @@ const ProfileFollowersListItem = ({ id, profile, onItemPress }) => {
     if (profile) {
       profile.then((res) => setUser(res));
     }
-  }, [])
+  }, []);
 
   if (!user) {
-    return null
+    return null;
   }
 
   return (
-
-    <TouchableWithoutFeedback onPress={()=>{
-      console.log("onPressCall", user)
-      onItemPress(user)
-    }}>
-
-  
-    <View horizontal style={styles.container}>
-      <Avatar url={{ uri: `${profileImage}` }} />
-      <Text style={styles.txt}>{username}</Text>
-    </View>
+    <TouchableWithoutFeedback
+      onPress={() => {
+        console.log("onPressCall", user);
+        onItemPress(user);
+      }}
+    >
+      <View horizontal style={styles.container}>
+        <Avatar url={{ uri: `${profileImage}` }} />
+        <Text
+          style={{
+            ...styles.txt,
+            color:
+              themeType == Theme_Mode.isDark
+                ? darkModeColors.text
+                : lightModeColors.text,
+          }}
+        >
+          {username}
+        </Text>
+      </View>
     </TouchableWithoutFeedback>
   );
 };
@@ -45,7 +58,7 @@ const styles = StyleSheet.create({
   },
   txt: {
     marginLeft: 10,
-  }
+  },
 });
 
 const mapStateToProps = (state, { id }) => ({
