@@ -9,11 +9,15 @@ import ChevronIcon from "../../assets/icons/edit-chevron-left-white.svg";
 import * as Colors from "../../config/colors";
 import LoadingImage from "../../common/LoadingImage";
 import { AppColors } from "../../util/AppConstant";
+import { Theme_Mode } from "../../util/Strings";
+import { useSelector } from "react-redux";
 
 /* =============================================================================
 <EditProfileHeader />
 ============================================================================= */
 const EditProfileHeader = ({ photoUrl, photoUrlLocalUrl }) => {
+  const themeType = useSelector((AppState) => AppState.sliceReducer.themeType);
+
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const styles = getStyles(insets);
@@ -32,7 +36,6 @@ const EditProfileHeader = ({ photoUrl, photoUrlLocalUrl }) => {
         </Touchable>
       </View>
       {photoUrlLocalUrl ? (
-        // <Avatar size={160} url={photoUrlLocalUrl} />
         <LoadingImage
           source={photoUrlLocalUrl}
           style={{
@@ -43,11 +46,13 @@ const EditProfileHeader = ({ photoUrl, photoUrlLocalUrl }) => {
             marginVertical: 10,
             borderRadius: 160 / 2,
             backgroundColor: Colors.outline,
-            borderColor: AppColors.blue.royalBlue,
+            borderColor:
+              themeType === Theme_Mode.isDark
+                ? AppColors.white.white
+                : AppColors.blue.royalBlue,
           }}
         />
       ) : (
-        // <Avatar size={160} url={{ uri: `${photoUrl}` }} />
         <LoadingImage
           source={{ uri: `${photoUrl}` }}
           style={{
@@ -58,7 +63,10 @@ const EditProfileHeader = ({ photoUrl, photoUrlLocalUrl }) => {
             marginVertical: 10,
             borderRadius: 160 / 2,
             backgroundColor: Colors.outline,
-            borderColor: AppColors.blue.royalBlue,
+            borderColor:
+              themeType === Theme_Mode.isDark
+                ? AppColors.white.white
+                : AppColors.blue.royalBlue,
           }}
         />
       )}

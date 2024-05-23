@@ -9,11 +9,15 @@ import EditIcon from "../../assets/icons/edit-icon.svg";
 import * as Colors from "../../config/colors";
 import LoadingImage from "../../common/LoadingImage";
 import { AppColors } from "../../util/AppConstant";
+import { Theme_Mode } from "../../util/Strings";
+import { useSelector } from "react-redux";
 
 /* =============================================================================
 <ProfileHeader />
 ============================================================================= */
 const ProfileHeader = ({ photoUrl }) => {
+  const themeType = useSelector((AppState) => AppState.sliceReducer.themeType);
+
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const styles = getStyles(insets);
@@ -32,7 +36,6 @@ const ProfileHeader = ({ photoUrl }) => {
           <EditIcon />
         </Touchable>
       </View>
-      {/* <Avatar size={160} url={{ uri: `${photoUrl}` }} /> */}
       <LoadingImage
         source={{ uri: `${photoUrl}` }}
         style={{
@@ -42,7 +45,10 @@ const ProfileHeader = ({ photoUrl }) => {
           borderWidth: 1.4,
           borderRadius: 160 / 2,
           backgroundColor: Colors.outline,
-          borderColor: AppColors.blue.royalBlue,
+          borderColor:
+            themeType === Theme_Mode.isDark
+              ? AppColors.white.white
+              : AppColors.blue.royalBlue,
         }}
       />
     </LinearGradient>

@@ -48,13 +48,8 @@ const NotificationListItem = ({ notification }) => {
         <TouchableOpacity
           onPress={() => {
             console.log("yes pres --- ", notification);
-            // navigation.navigate('MyPosts', { userId: post.author.userId, username: username, refreshCall: postRefresh });
           }}
         >
-          {/* <Avatar
-            style={styles.profileImg}
-            url={{ uri: `${senderProfilePic}` }}
-          /> */}
           <LoadingImage
             source={{ uri: `${notification?.sender?.image}` }}
             style={{
@@ -62,8 +57,10 @@ const NotificationListItem = ({ notification }) => {
               height: 50,
               borderWidth: 2,
               borderRadius: 50 / 2,
-              // backgroundColor: AppColors.blue.royalBlue,
-              borderColor: AppColors.blue.royalBlue,
+              borderColor:
+                themeType === Theme_Mode.isDark
+                  ? AppColors.white.white
+                  : AppColors.blue.royalBlue,
             }}
           />
         </TouchableOpacity>
@@ -120,7 +117,10 @@ const NotificationListItem = ({ notification }) => {
             height: 50,
             borderWidth: 2,
             borderRadius: 50 / 2,
-            borderColor: AppColors.blue.royalBlue,
+            borderColor:
+              themeType === Theme_Mode.isDark
+                ? AppColors.white.white
+                : AppColors.blue.royalBlue,
           }}
         />
         <View>

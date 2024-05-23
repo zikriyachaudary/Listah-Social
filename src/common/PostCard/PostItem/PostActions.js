@@ -24,6 +24,7 @@ import LikeInActiveIcon from "../../../assets/icons/edit-like-icon.svg";
 import LikeActiveIcon from "../../../assets/icons/edit-like-icon-active.svg";
 import CommentIcon from "../../../assets/icons/edit-comment-icon.svg";
 import SuggestionImg from "../../../assets/images/edit-suggestion-button.jpeg";
+import DarkSuggestionImg from "../../../assets/images/edit-suggestion-button_dark.png";
 import ShareIcon from "../../../assets/icons/edit-share-icon.svg";
 import * as Colors from "../../../config/colors";
 
@@ -35,10 +36,11 @@ import {
   likeUnlikeUserPosts,
 } from "../../../home/redux/actions";
 import { CHALLENGE_REQUEST } from "../../../suggestion/redux/constants";
-import { Notification_Types } from "../../../util/Strings";
+import { Notification_Types, Theme_Mode } from "../../../util/Strings";
 import useNotificationManger from "../../../hooks/useNotificationManger";
 import ThreadManager from "../../../ChatModule/ThreadManger";
 import moment from "moment";
+import { normalized } from "../../../util/AppConstant";
 
 /* =============================================================================
 <PostActions />
@@ -51,6 +53,7 @@ const PostActions = ({
   likeUserOpenClicked,
 }) => {
   const selector = useSelector((AppState) => AppState);
+  const themeType = useSelector((AppState) => AppState.sliceReducer.themeType);
   const toast = useToast();
   const { likeNUnLikePost } = useNotificationManger();
   const navigation = useNavigation();
@@ -191,7 +194,22 @@ const PostActions = ({
             style={{ ...styles.btn }}
             onPress={_handleSuggestionPress}
           >
-            <FastImage style={styles.suggestionBtnImg} source={SuggestionImg} />
+            <FastImage
+              style={{
+                ...styles.suggestionBtnImg,
+                height: 30,
+                width: 30,
+                borderRadius: normalized(
+                  themeType == Theme_Mode.isDark ? 40 / 2 : 0
+                ),
+              }}
+              resizeMode="cover"
+              source={
+                themeType == Theme_Mode.isDark
+                  ? DarkSuggestionImg
+                  : SuggestionImg
+              }
+            />
           </Touchable>
         )}
 

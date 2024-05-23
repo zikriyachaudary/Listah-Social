@@ -164,9 +164,11 @@ const PostItemHeader = ({
                 borderWidth: 1.4,
                 borderRadius: 68 / 2,
                 backgroundColor: Colors.outline,
-                borderColor: AppColors.blue.royalBlue,
+                borderColor:
+                  themeType == Theme_Mode.isDark
+                    ? AppColors.white.white
+                    : AppColors.blue.royalBlue,
               }}
-              // source={AppLogoImg}
               source={AppImages.Common.listahIcon}
             />
           ) : (
@@ -181,11 +183,14 @@ const PostItemHeader = ({
                   borderWidth: 1.4,
                   borderRadius: 68 / 2,
                   backgroundColor: Colors.outline,
-                  borderColor: AppColors.blue.royalBlue,
+                  borderColor:
+                    themeType == Theme_Mode.isDark
+                      ? AppColors.white.white
+                      : AppColors.blue.royalBlue,
                 }}
               />
 
-              {post.author?.verified ? (
+              {post.author?.verified && (
                 <FastImage
                   style={{
                     width: normalized(35),
@@ -197,7 +202,7 @@ const PostItemHeader = ({
                   }}
                   source={AppImages.Common.aPlusIcon}
                 />
-              ) : null}
+              )}
             </View>
           )}
 

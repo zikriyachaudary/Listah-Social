@@ -269,7 +269,10 @@ const MyPostsScreen = ({ profile, route, unFollowUser, followUser }) => {
                 borderWidth: 1.4,
                 borderRadius: 68 / 2,
                 backgroundColor: Colors.outline,
-                borderColor: AppColors.blue.royalBlue,
+                borderColor:
+                  themeType === Theme_Mode.isDark
+                    ? AppColors.white.white
+                    : AppColors.blue.royalBlue,
               }}
             />
             {userProfileInfo && userProfileInfo?.verified ? (

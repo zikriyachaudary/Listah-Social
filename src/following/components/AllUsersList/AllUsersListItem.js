@@ -107,7 +107,10 @@ const AllUsersListItem = ({
                   borderWidth: 1.4,
                   borderRadius: 68 / 2,
                   backgroundColor: Colors.outline,
-                  borderColor: AppColors.blue.royalBlue,
+                  borderColor:
+                    themeType === Theme_Mode.isDark
+                      ? AppColors.white.white
+                      : AppColors.blue.royalBlue,
                 }}
               />
               {user?.verified ? (

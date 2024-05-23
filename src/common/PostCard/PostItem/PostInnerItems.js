@@ -97,7 +97,10 @@ const PostInnerItems = ({ post, userPosts, profile, setOpenVideoModal }) => {
                       height: normalized(50),
                       borderRadius: 2,
                       borderWidth: 1.4,
-                      borderColor: AppColors.blue.royalBlue,
+                      borderColor:
+                        themeType === Theme_Mode.isDark
+                          ? AppColors.white.white
+                          : AppColors.blue.royalBlue,
                     }}
                   />
                 ) : item?.videoObj?.thumbnail || item?.video?.thumbnail ? (
@@ -116,7 +119,10 @@ const PostInnerItems = ({ post, userPosts, profile, setOpenVideoModal }) => {
                         height: normalized(50),
                         borderRadius: 2,
                         borderWidth: 1.4,
-                        borderColor: AppColors.blue.royalBlue,
+                        borderColor:
+                          themeType === Theme_Mode.isDark
+                            ? AppColors.white.white
+                            : AppColors.blue.royalBlue,
                       }}
                       source={{
                         uri:

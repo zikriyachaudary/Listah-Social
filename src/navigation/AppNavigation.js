@@ -69,17 +69,11 @@ const AppNavigation = ({ changeAuthState, getProfile, authenticated }) => {
     const loadTheme = async () => {
       let subscribeThemeListener;
       let themeType = await getThemeType();
-      if (!themeType) {
-        const isDark = Appearance.getColorScheme() === "dark";
-        saveThemeType(
-          isDark ? Theme_Types.deviceDarkMode : Theme_Types.deviceLightMode
-        );
-        dispatch(setThemeType(isDark ? Theme_Mode.isDark : Theme_Mode.isLight));
-      }
       if (
         themeType === Theme_Types.appDarkMode ||
         themeType === Theme_Types.appLightMode
       ) {
+        console.log("themeType00----->", themeType);
         saveThemeType(themeType);
         dispatch(
           setThemeType(
@@ -89,17 +83,24 @@ const AppNavigation = ({ changeAuthState, getProfile, authenticated }) => {
           )
         );
       } else {
-        subscribeThemeListener = Appearance.addChangeListener(
-          ({ colorScheme }) => {
-            if (colorScheme === "light") {
-              saveThemeType(Theme_Types.deviceLightMode);
-              dispatch(setThemeType(Theme_Mode.isLight));
-            } else {
-              saveThemeType(Theme_Types.deviceDarkMode);
-              dispatch(setThemeType(Theme_Mode.isDark));
-            }
-          }
+        const isDark = Appearance.getColorScheme() === "dark";
+        saveThemeType(
+          isDark ? Theme_Types.deviceDarkMode : Theme_Types.deviceLightMode
         );
+        dispatch(setThemeType(isDark ? Theme_Mode.isDark : Theme_Mode.isLight));
+
+        // subscribeThemeListener = Appearance.addChangeListener(
+        //   ({ colorScheme }) => {
+        //     console.log("colorScheme------->", colorScheme);
+        //     if (colorScheme === "light") {
+        //       saveThemeType(Theme_Types.deviceLightMode);
+        //       dispatch(setThemeType(Theme_Mode.isLight));
+        //     } else {
+        //       saveThemeType(Theme_Types.deviceDarkMode);
+        //       dispatch(setThemeType(Theme_Mode.isDark));
+        //     }
+        //   }
+        // );
       }
       return () => {
         subscribeThemeListener.remove()
