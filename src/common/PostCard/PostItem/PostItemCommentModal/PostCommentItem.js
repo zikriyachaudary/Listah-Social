@@ -25,7 +25,7 @@ import {
 import { updateHomeData } from "../../../../home/redux/appLogics";
 import SubCommentItem, { ShowMoreSubCommentView } from "./SubCommentItem";
 import { Theme_Mode } from "../../../../util/Strings";
-import { darkModeColors, lightModeColors } from "../../../../util/AppConstant";
+import { AppColors, darkModeColors, lightModeColors } from "../../../../util/AppConstant";
 
 /* =============================================================================
  PostCommentItem />
@@ -158,7 +158,12 @@ const PostCommentItem = ({
             >
               {username}
             </Text>
-            <Text medium>{text}</Text>
+            <Text medium style={{
+                color:
+                  themeType == Theme_Mode.isDark
+                      ? darkModeColors.textAccent
+                    : lightModeColors.textAccent,
+              }}>{text}</Text>
           </View>
 
           <Touchable

@@ -256,6 +256,7 @@ const MyPostsScreen = ({ profile, route, unFollowUser, followUser }) => {
           style={{
             flexDirection: "row",
             paddingHorizontal: 15,
+            marginVertical: 10,
           }}
         >
           <View style={{ width: userProfileInfo?.verified ? 76 : 70 }}>

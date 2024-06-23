@@ -67,7 +67,7 @@ const PostActions = ({
   useEffect(() => {
     setLoading(false);
     const isLiked =
-      post.likedUsers.filter((id) => id == profile.userId).length > 0
+      post?.likedUsers.filter((id) => id == profile?.userId).length > 0
         ? true
         : false;
     setLiked(isLiked);
