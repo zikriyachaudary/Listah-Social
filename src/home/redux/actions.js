@@ -573,7 +573,6 @@ export const createAnnouncementPost =
               };
             }
             if (item?.image && item?.image?.uri != "") {
-              console.log("image------>");
               const compressedImage = await ImageResizer.createResizedImage(
                 item?.image?.uri,
                 1000,
@@ -618,6 +617,12 @@ export const createAnnouncementPost =
                 id: index,
                 name: item?.name,
                 videoObj: { ...item?.videoObj, video: uploadMediaUrl },
+                description: item?.description,
+              };
+            } else {
+              return {
+                id: index,
+                name: item?.name,
                 description: item?.description,
               };
             }
@@ -712,7 +717,6 @@ export const createPost = (postContent) => async (dispatch) => {
       category,
       createdAt: FireStore.FieldValue.serverTimestamp(),
     };
-
     if (items) {
       post.items = await Promise.all(
         items.map(async (item, index) => {
@@ -722,14 +726,12 @@ export const createPost = (postContent) => async (dispatch) => {
             (typeof item?.videoObj?.video == "string" &&
               item?.videoObj?.video.includes("https"))
           ) {
-            console.log("return--->");
             return {
               ...item,
               id: index,
             };
           }
           if (item?.image && item?.image?.uri != "") {
-            console.log("image------>");
             const compressedImage = await ImageResizer.createResizedImage(
               item?.image?.uri,
               1000,
@@ -772,6 +774,12 @@ export const createPost = (postContent) => async (dispatch) => {
               id: index,
               name: item?.name,
               videoObj: { ...item?.videoObj, video: uploadMediaUrl },
+              description: item?.description,
+            };
+          } else {
+            return {
+              id: index,
+              name: item?.name,
               description: item?.description,
             };
           }
@@ -1029,6 +1037,12 @@ export const updatePost = (changes) => async (dispatch) => {
               id: index,
               name: item?.name,
               videoObj: { ...item?.videoObj, video: uploadMediaUrl },
+              description: item?.description,
+            };
+          } else {
+            return {
+              id: index,
+              name: item?.name,
               description: item?.description,
             };
           }

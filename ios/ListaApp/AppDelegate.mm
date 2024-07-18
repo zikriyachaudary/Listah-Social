@@ -4,7 +4,7 @@
 #import <React/RCTBundleURLProvider.h>
 #import <React/RCTRootView.h>
 #import "RNSplashScreen.h"
-#import <React/RCTAppSetupUtils.h>
+#import "RCTAppSetupUtils.h"
 
 
 //Push Notification
@@ -51,7 +51,7 @@ static NSString *const kRNConcurrentRoot = @"concurrentRoot";
 {
   [FIRApp configure];
   [FirebasePushNotifications configure];
-  RCTAppSetupPrepareApp(application);
+  RCTAppSetupPrepareApp(application, true);
   RCTBridge *bridge = [[RCTBridge alloc] initWithDelegate:self launchOptions:launchOptions];
 #if RCT_NEW_ARCH_ENABLED
   _contextContainer = std::make_shared<facebook::react::ContextContainer const>();
@@ -62,7 +62,7 @@ static NSString *const kRNConcurrentRoot = @"concurrentRoot";
 #endif
 
   NSDictionary *initProps = [self prepareInitialProps];
-  UIView *rootView = RCTAppSetupDefaultRootView(bridge, @"ListaApp", initProps);
+  UIView *rootView = RCTAppSetupDefaultRootView(bridge, @"ListaApp", initProps, true);
 
   if (@available(iOS 13.0, *)) {
     rootView.backgroundColor = [UIColor systemBackgroundColor];

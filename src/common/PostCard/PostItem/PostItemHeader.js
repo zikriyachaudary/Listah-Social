@@ -25,8 +25,6 @@ import {
   savePostInDb,
 } from "../../../home/redux/actions";
 import LoadingImage from "../../LoadingImage";
-
-import AppLogoImg from "../../../assets/images/edit-app-logo.jpeg";
 import FastImage from "react-native-fast-image";
 import {
   AppColors,
@@ -247,7 +245,13 @@ const PostItemHeader = ({
           onRequestClose={_toggleMenu}
           anchor={
             <Touchable style={styles.menuBtn} onPress={_toggleMenu}>
-              <MenuIcon style={{ tintColor: "#fff" }} />
+              <MenuIcon
+                stroke={
+                  themeType == Theme_Mode.isDark
+                    ? AppColors.white.white
+                    : AppColors.black.black
+                }
+              />
             </Touchable>
           }
         >

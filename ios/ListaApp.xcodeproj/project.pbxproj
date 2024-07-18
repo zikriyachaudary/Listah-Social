@@ -226,7 +226,6 @@
 				00E356EA1AD99517003FC87E /* Sources */,
 				00E356EB1AD99517003FC87E /* Frameworks */,
 				00E356EC1AD99517003FC87E /* Resources */,
-				0DB4B3BD73E5CE8CC93F5E3C /* [CP] Embed Pods Frameworks */,
 				30B839E3DEB4B2FA423680EA /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
@@ -249,7 +248,6 @@
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
-				19EB7D5D26F7EAA1C71F698F /* [CP] Embed Pods Frameworks */,
 				EBA208F020A2CB2C31CAC22B /* [CP-User] [RNFB] Core Configuration */,
 				093F6B1EFEBE2B6D76377D9E /* [CP] Copy Pods Resources */,
 			);
@@ -368,40 +366,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ListaApp/Pods-ListaApp-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		0DB4B3BD73E5CE8CC93F5E3C /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-ListaApp-ListaAppTests/Pods-ListaApp-ListaAppTests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-ListaApp-ListaAppTests/Pods-ListaApp-ListaAppTests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ListaApp-ListaAppTests/Pods-ListaApp-ListaAppTests-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		19EB7D5D26F7EAA1C71F698F /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-ListaApp/Pods-ListaApp-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-ListaApp/Pods-ListaApp-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ListaApp/Pods-ListaApp-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		30B839E3DEB4B2FA423680EA /* [CP] Copy Pods Resources */ = {

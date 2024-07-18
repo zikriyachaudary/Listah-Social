@@ -331,7 +331,6 @@ const PostCreateScreen = ({
     values["isNumberShowInItems"] = toggleCheckBox;
     values["category"] = selectedcategory;
     values["items"] = itemList?.length > 0 ? fetchItemList() : [];
-    // setIsLoading(true);
     dispatch(setIsAppLoader(true));
     if (route.params?.isEdit && route?.params?.data?.author?.userId) {
       values["author"] = route?.params?.data?.author;

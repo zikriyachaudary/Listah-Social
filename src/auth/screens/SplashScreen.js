@@ -54,6 +54,7 @@ export default function RNSplashScreen(props) {
   }, []);
 
   const AnimatedImage = Animated.createAnimatedComponent(Image);
+
   return (
     <ImageBackground
       style={styles.container}
