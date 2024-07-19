@@ -286,7 +286,11 @@ const MyPostsScreen = ({ profile, route, unFollowUser, followUser }) => {
                   marginStart: normalized(45),
                   borderRadius: normalized(35 / 2),
                 }}
-                source={AppImages.Common.aPlusIcon}
+                source={
+                  themeType === Theme_Mode.isDark
+                    ? AppImages.Common.aPlusIconDark
+                    : AppImages.Common.aPlusIcon
+                }
               />
             ) : null}
           </View>
