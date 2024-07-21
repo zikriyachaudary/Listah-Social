@@ -127,7 +127,7 @@ export const AppImages = {
   VideoError: require("../assets/images/VideoError.png"),
 
   Common: {
-    appLogo: require("../assets/images/appIcon.png"),
+    appLogo: require("../assets/images/Common/logo.png"),
     PlusBtn: require("../assets/images/Common/PlusBtn.png"),
     SplashBg: require("../assets/images/Common/SplashBg.png"),
     versus_icon: require("../assets/images/Common/versus-icon.png"),
