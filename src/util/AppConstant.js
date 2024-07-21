@@ -127,7 +127,7 @@ export const AppImages = {
   VideoError: require("../assets/images/VideoError.png"),
 
   Common: {
-    appLogo: require("../assets/images/Common/logo.png"),
+    appLogo: require("../assets/images/appIcon.png"),
     PlusBtn: require("../assets/images/Common/PlusBtn.png"),
     SplashBg: require("../assets/images/Common/SplashBg.png"),
     versus_icon: require("../assets/images/Common/versus-icon.png"),
@@ -163,7 +163,7 @@ export const AppImages = {
     Camera: require("../assets/images/Auth/Camera.png"),
     closeEye: require("../assets/images/Auth/closeEye.png"),
     eye: require("../assets/images/Auth/eye.png"),
-    logo: require("../assets/images/Auth/logo.png"),
+    logo: require("../assets/images/appIcon.png"),
   },
   Chat: {
     SendIcon: require("../assets/images/Chat/SendIcon.png"),
