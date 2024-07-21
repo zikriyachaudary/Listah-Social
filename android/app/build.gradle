@@ -4,6 +4,9 @@ apply plugin: 'com.google.gms.google-services'
 
 react {
 }
+project.ext.react = [
+  enableHermes: true  // clean and rebuild if changing
+]
 
 def enableProguardInReleaseBuilds = false
 def jscFlavor = 'org.webkit:android-jsc:+'
@@ -42,18 +45,15 @@ android {
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
     }
-    configurations {
-    all {
-        exclude group: 'com.google.firebase', module: 'firebase-common'
-    }
-}
+//     configurations {
+//     all {
+//         exclude group: 'com.google.firebase', module: 'firebase-common'
+//     }
+// }
 }
 
 dependencies {
-     implementation platform('com.google.firebase:firebase-bom:31.2.0') // Use the latest BOM version
-    implementation 'com.google.firebase:firebase-analytics'
-    implementation 'com.google.firebase:firebase-firestore'
-    implementation 'com.google.firebase:firebase-auth'
+    implementation platform('com.google.firebase:firebase-bom:31.2.3')
     implementation("com.facebook.react:react-android")
     implementation 'com.google.android.gms:play-services-auth:21.2.0'
     implementation 'com.google.android.gms:play-services-base:18.5.0'
