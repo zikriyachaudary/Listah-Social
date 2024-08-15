@@ -2,12 +2,13 @@ buildscript {
     ext {
         buildToolsVersion = "33.0.0"
         minSdkVersion = 21
-        compileSdkVersion = 33
+        compileSdkVersion = 34
         targetSdkVersion = 33
-        ndkVersion = "21.4.7075529"
+        ndkVersion = "23.1.7779620"
         androidXAnnotation = "1.2.0"
         androidXBrowser = "1.3.0"
         googlePlayServicesAuthVersion = "19.2.0" // <--- use this version or newer
+        kotlinVersion = "1.8.22"
     }
     repositories {
         google()
