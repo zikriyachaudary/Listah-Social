@@ -100,6 +100,8 @@ const PostActions = ({
   };
 
   const _toggleCommentModal = (count = 0) => {
+    console.log("comments counter ---- " , count);
+    
     setCommentsCount(count);
     setCommentModal((prevState) => !prevState);
   };
@@ -234,8 +236,10 @@ const PostActions = ({
           id={id}
           post={post}
           visible={commentModal}
-          onClose={_toggleCommentModal}
+          onClose={()=>{_toggleCommentModal(commentsCount)}}
           postRefresh={postRefresh}
+          commentsCount = {commentsCount}
+          setCommentsCounter = {setCommentsCount}
         />
       )}
     </View>

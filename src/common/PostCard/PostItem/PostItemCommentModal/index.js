@@ -41,6 +41,8 @@ const PostItemCommentModal = ({
   onClose,
   postComment,
   postRefresh,
+  commentsCount,
+  setCommentsCounter
 }) => {
   const themeType = useSelector((AppState) => AppState.sliceReducer.themeType);
   const { commentPostNoti } = useNotificationManger();
@@ -53,6 +55,7 @@ const PostItemCommentModal = ({
   const selector = useSelector((AppState) => AppState);
   const [shouldDismissKeyboard, setShouldDismissKeyboard] = useState(true);
   const flatListRef = useRef(null);
+  const [count, setCount] = useState(commentsCount)
 
   useEffect(() => {
     return () => {
@@ -109,11 +112,14 @@ const PostItemCommentModal = ({
               response?.status &&
               post?.author?.userId != selector?.Auth?.user?.uid
             ) {
+              
               await commentPostNoti({
                 actionType: Notification_Types.comment,
                 reciverId: post?.author?.userId,
                 extraData: { postId: post?.id },
               });
+              setCommentsCounter(count + 1)
+              setCount(count+1)
             }
           });
 
@@ -234,11 +240,12 @@ const PostItemCommentModal = ({
         onBackdropPress={() => {
           onClose(comments.length);
         }}
+        avoidKeyboard = {false}
       >
-        <KeyboardAvoidingView
+        {/* <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : "height"}
-          keyboardVerticalOffset={60}
-        >
+          keyboardVerticalOffset={20}
+        > */}
           <View style={styles.card}>
             <SafeAreaView />
             <View style={styles.header}>
@@ -385,10 +392,11 @@ const PostItemCommentModal = ({
               onFocus={() => setShouldDismissKeyboard(false)}
               onBlur={() => setShouldDismissKeyboard(true)}
               onSubmitEditing={_handleComment}
+              shouldDismissKeyboard = {false}
             />
             <SafeAreaView />
           </View>
-        </KeyboardAvoidingView>
+        {/* </KeyboardAvoidingView> */}
       </Modal>
     </SafeAreaView>
   );
