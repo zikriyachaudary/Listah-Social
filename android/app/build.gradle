@@ -4,6 +4,9 @@ apply plugin: 'com.google.gms.google-services'
 
 react {
 }
+project.ext.react = [
+  enableHermes: true  // clean and rebuild if changing
+]
 
 def enableProguardInReleaseBuilds = false
 def jscFlavor = 'org.webkit:android-jsc:+'
@@ -24,12 +27,19 @@ android {
     javaMaxHeapSize "4g"
     }
 
+    ndkVersion rootProject.ext.ndkVersion
+
+    compileSdkVersion rootProject.ext.compileSdkVersion
+
+    namespace "com.listaapp"
+
+    
     defaultConfig {
         applicationId "com.listaapp"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 28
-        versionName "1.2.7"
+        versionCode 29
+        versionName "1.2.9"
         missingDimensionStrategy 'react-native-camera', 'general' 
         missingDimensionStrategy "store", "play"
         vectorDrawables.useSupportLibrary = true
@@ -56,6 +66,7 @@ android {
 }
 
 dependencies {
+    implementation platform('com.google.firebase:firebase-bom:31.2.3')
     implementation("com.facebook.react:react-android")
     implementation 'com.google.firebase:firebase-analytics:17.2.2'
     implementation fileTree(dir: "libs", include: ["*.jar"])

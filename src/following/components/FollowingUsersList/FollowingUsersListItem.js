@@ -88,7 +88,11 @@ const FollowingUsersListItem = ({ user, unFollowUser }) => {
                     right: normalized(-8),
                     alignSelf: "flex-end",
                   }}
-                  source={AppImages.Common.aPlusIcon}
+                  source={
+                    themeType === Theme_Mode.isDark
+                      ? AppImages.Common.aPlusIconDark
+                      : AppImages.Common.aPlusIcon
+                  }
                 />
               ) : null}
             </View>

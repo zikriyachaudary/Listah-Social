@@ -139,6 +139,7 @@ export const AppImages = {
     announcement: require("../assets/images/announcement-ic.png"),
     profile: require("../assets/images/Common/profile.png"),
     aPlusIcon: require("../assets/images/Common/aPlusIcon.jpeg"),
+    aPlusIconDark: require("../assets/images/Common/aPlusIconDark.jpeg"),
     sports: require("../assets/images/Common/sports.jpeg"),
     food: require("../assets/images/Common/food.jpeg"),
     beauty: require("../assets/images/Common/beauty.jpeg"),
@@ -162,7 +163,7 @@ export const AppImages = {
     Camera: require("../assets/images/Auth/Camera.png"),
     closeEye: require("../assets/images/Auth/closeEye.png"),
     eye: require("../assets/images/Auth/eye.png"),
-    logo: require("../assets/images/Auth/logo.png"),
+    logo: require("../assets/images/appIcon.png"),
   },
   Chat: {
     SendIcon: require("../assets/images/Chat/SendIcon.png"),

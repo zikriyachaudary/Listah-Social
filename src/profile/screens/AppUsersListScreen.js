@@ -128,7 +128,11 @@ const AppUserListScreen = (route) => {
                                     end: 0,
                                     borderRadius: normalized(35 / 2),
                                   }}
-                                  source={AppImages.Common.aPlusIcon}
+                                  source={
+                                    themeType === Theme_Mode.isDark
+                                      ? AppImages.Common.aPlusIconDark
+                                      : AppImages.Common.aPlusIcon
+                                  }
                                 />
                               )}
                             </View>
@@ -202,7 +206,11 @@ const AppUserListScreen = (route) => {
                                     end: 0,
                                     borderRadius: normalized(35 / 2),
                                   }}
-                                  source={AppImages.Common.aPlusIcon}
+                                  source={
+                                    themeType === Theme_Mode.isDark
+                                      ? AppImages.Common.aPlusIconDark
+                                      : AppImages.Common.aPlusIcon
+                                  }
                                 />
                               )}
                             </View>

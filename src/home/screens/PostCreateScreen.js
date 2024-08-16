@@ -263,7 +263,7 @@ const PostCreateScreen = ({
   };
   const _handleAdd = () => {
     let newArr = [...itemList];
-    if (newArr?.length >= 7) {
+    if (newArr?.length >= 10) {
       setShowAddBtn(false);
     } else {
       newArr.push({
@@ -299,14 +299,14 @@ const PostCreateScreen = ({
       isBtnActive.current = false;
       setTitleError("!Empty Field");
     }
-    if (des == "") {
-      isBtnActive.current = false;
-      setDesError("!Empty Field");
-    }
+    // if (des == "") {
+    //   isBtnActive.current = false;
+    //   setDesError("!Empty Field");
+    // }
 
     if (
       title?.length == 0 ||
-      des?.length == 0 ||
+      // des?.length == 0 ||
       selectedcategory?.length == 0
     ) {
       isBtnActive.current = false;
@@ -326,7 +326,7 @@ const PostCreateScreen = ({
     }
     let values = {};
     values["title"] = title;
-    values["description"] = des;
+    values["description"] = des || "";
     values["order"] = radioButtons.find((item) => item.selected).id;
     values["isNumberShowInItems"] = toggleCheckBox;
     values["category"] = selectedcategory;
