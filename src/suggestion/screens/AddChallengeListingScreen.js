@@ -82,16 +82,19 @@ const AddChallengeListingScreen = ({ challengePost, navigation, route }) => {
 
   const _handleAdd = () => {
     let newArr = [...itemList];
-    if (newArr?.length >= 7) {
+    if (newArr?.length >= 10) {
       setShowAddBtn(false);
     } else {
       newArr.push({
         name: "",
         image: "",
         description: "",
-      });
+      });      
       setShowAddBtn(true);
       setItemList(newArr);
+      if(newArr?.length == 10){
+        setShowAddBtn(false)
+      }      
     }
   };
   const _handleRemove = (index) => {

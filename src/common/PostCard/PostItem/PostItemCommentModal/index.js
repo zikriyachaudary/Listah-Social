@@ -120,6 +120,8 @@ const PostItemCommentModal = ({
               });
               setCommentsCounter(count + 1)
               setCount(count+1)
+              console.log("Modal counter ---  ", count, " ----  ", commentsCounter);
+              
             }
           });
 

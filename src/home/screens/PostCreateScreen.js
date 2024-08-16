@@ -263,6 +263,7 @@ const PostCreateScreen = ({
   };
   const _handleAdd = () => {
     let newArr = [...itemList];
+    console.log("new Arr -----  ", newArr);
     if (newArr?.length >= 10) {
       setShowAddBtn(false);
     } else {
@@ -272,7 +273,10 @@ const PostCreateScreen = ({
         description: "",
       });
       setShowAddBtn(true);
-      setItemList(newArr);
+      setItemList(newArr);      
+      if(newArr?.length == 10){
+        setShowAddBtn(false)
+      } 
     }
   };
   const _handleRemove = (index) => {
