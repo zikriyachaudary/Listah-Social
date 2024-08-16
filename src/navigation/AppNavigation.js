@@ -127,7 +127,6 @@ const AppNavigation = ({ changeAuthState, getProfile, authenticated }) => {
         removeOnNotificationOpened = notifications.onNotificationOpened(
           (notification) => {
             if (notification?._data) {
-              // dispatch(setPushNotifi(notification));
               setTimeout(() => {
                 openDetail(notification);
               }, 2000);
