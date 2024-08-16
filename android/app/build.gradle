@@ -20,6 +20,9 @@ android {
     aaptOptions {  
         cruncherEnabled = false  
     }
+    dexOptions {
+    javaMaxHeapSize "4g"
+    }
 
     defaultConfig {
         applicationId "com.listaapp"
@@ -27,10 +30,10 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 28
         versionName "1.2.7"
-        missingDimensionStrategy 'react-native-camera', 'general' // <-- insert this line
+        missingDimensionStrategy 'react-native-camera', 'general' 
         missingDimensionStrategy "store", "play"
         vectorDrawables.useSupportLibrary = true
-
+        multiDexEnabled = true
     }
     signingConfigs {
         debug {
@@ -65,6 +68,7 @@ dependencies {
     implementation 'androidx.work:work-runtime:2.7.1'
     implementation 'com.google.android.gms:play-services-auth:19.0.0'
     implementation 'com.google.android.gms:play-services-base:17.6.0'
+    implementation 'com.android.support:multidex:1.0.3'
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}")
     debugImplementation("com.facebook.flipper:flipper-network-plugin:${FLIPPER_VERSION}") {
         exclude group:'com.squareup.okhttp3', module:'okhttp'
